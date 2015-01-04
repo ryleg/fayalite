@@ -19,7 +19,9 @@ import scala.reflect.ClassTag
 import org.apache.spark.rdd.RDD
 
 
-val SPARK_HOME = "/Users/ryle/Documents/repo/spark-dynamic/dist/"
+val home = System.getProperty("user.home")
+
+val SPARK_HOME = s"$home/repo/spark-dynamic/dist/"
 
 val FAYALITE_JAR = "/home/ubuntu/repo/fayalite/target/scala-2.10/fayalite.jar"
 
@@ -167,9 +169,40 @@ class TestActorResponse extends Actor {
   }
 }
 
+class TestREPLManager extends Actor {
+  def receive = {
+    case codeMsg : String => {
+      val (result, stdOutString) = dr.run(codeMsg)
+      val interp = dr.iloop.intp
+      val request = interp.prevRequestList.last
+/*      val lastHandler: interp.memberHandlers.MemberHandler = request.handlers.last.asInstanceOf[interp.memberHandlers.MemberHandler]
+      val line = request.lineRep
+      val lhdt = lastHandler.definesTerm.get*/
+      sender ! (request, result, stdOutString)
+    }
+  }
+
+}
 
 val actorSystem = createActorSystem(serverActorSystemName, defaultHost, defaultPort)
+
+def serverInitialize(host: String = defaultHost, port: Int = defaultPort) = {
+  actorSystem.actorOf(Props(new TestREPLManager()), name=serverActorName)
+}
+
+val server = serverInitialize()
+
+import scala.concurrent.duration._
+import scala.concurrent._
+
+implicit val timeout = Timeout(10.seconds)
+
+Await.result(server ? "$sc", 1.seconds)
+
 val tar = actorSystem.actorOf(Props(new TestActorResponse()), name=serverActorName)
+
+
+
 
 dr.run("1")
 
