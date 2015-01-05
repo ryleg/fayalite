@@ -13,7 +13,7 @@ import REPL._
 class REPLHandler extends Actor {
 
   def receive = {
-
+    case _ =>
 
   }
 

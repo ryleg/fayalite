@@ -11,7 +11,7 @@ import REPL._
 
 class TestREPLServerClient extends FunSuite {
 
-  implicit val actorSystem = ActorSystem("TestREPLServerClient")
+/*  implicit val actorSystem = ActorSystem("TestREPLServerClient")
 
   val server = Server.start()
   val (listener, client) = Client.start()
@@ -27,5 +27,5 @@ class TestREPLServerClient extends FunSuite {
     client.read()
    // println(response)
 
-  }
+  }*/
 }

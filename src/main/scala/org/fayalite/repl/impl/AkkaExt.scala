@@ -24,11 +24,11 @@ trait AkkaExt {
      * Listener actor receives actual data.
      */
       def read() : Unit = {
-        actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "read")))
+      //  actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "read")))
       }
 
       def write(text: String) = {
-        actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "write", text = text)))
+       // actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "write", text = text)))
       }
 
   }

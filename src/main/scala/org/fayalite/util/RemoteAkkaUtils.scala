@@ -2,10 +2,8 @@ package org.fayalite.util
 
 import akka.actor.{Props, Actor, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import org.fayalite.repl.{REPLHandler, HackREPLManager}
 import org.fayalite.repl.REPL._
 import akka.pattern.ask
-import org.fayalite.repl.HackREPLManager._
 import scala.tools.nsc.interpreter
 
 object RemoteAkkaUtils {
@@ -32,7 +30,7 @@ object RemoteAkkaUtils {
 
   def serverInitialize(host: String = defaultHost, port: Int = defaultPort) = {
     val actorSystem = createActorSystem(serverActorSystemName, defaultHost, defaultPort)
-    actorSystem.actorOf(Props(new REPLHandler(), name=serverActorName)
+    //actorSystem.actorOf(Props(new REPLHandler(), name=serverActorName)
   }
 
   def createActorSystem(name: String = serverActorSystemName,

@@ -7,6 +7,8 @@ import org.json4s.{Extraction, JsonAST, DefaultFormats}
 import org.json4s.JsonDSL._
 import org.json4s._
 
+import scala.reflect.ClassTag
+
 
 object JSON {
 
@@ -20,6 +22,6 @@ object JSON {
 
   def parse4s(msg: String) = parse(msg)
 
-  def parseAs[T](msg: String) = parse(msg).extract[T]
+//  def parseAs[T](msg: String)(implicit ev: ClassTag[T]) = parse(msg).extract[T]
 
 }
