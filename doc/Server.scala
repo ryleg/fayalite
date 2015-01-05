@@ -12,7 +12,7 @@ import org.json4s._
 import REPL._
 import akka.actor._
 import scala.concurrent.duration._
-import org.fayalite.util.SparkAkkaUtilsExample
+import org.fayalite.util.RemoteAkkaUtils
 
 
 object Server{
@@ -20,7 +20,7 @@ object Server{
   val portOffset = 16180
 
   def main(args: Array[String]) {
-    implicit val as =  SparkAkkaUtilsExample.createActorSystem()
+    implicit val as =  RemoteAkkaUtils.createActorSystem()
     start()
   }
 

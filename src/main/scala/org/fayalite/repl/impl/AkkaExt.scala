@@ -15,6 +15,7 @@ import JSON._
 
 
 trait AkkaExt {
+
   implicit val timeout = Timeout(5 seconds)
 
   implicit class ActorExt(actor: ActorRef) {

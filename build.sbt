@@ -43,6 +43,5 @@ libraryDependencies ++= Seq(
   "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8" % "provided" withSources(),
   "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8" % "provided" withSources(),
   "com.github.fge" % "jackson-coreutils" % "1.8" withSources(),
-  "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources(),
-  "org.reflections" % "reflections" % "0.9" withSources() withJavadoc()
+  "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
 )

@@ -1,15 +1,12 @@
 package org.apache.spark.repl
 
-import org.apache.spark.SparkContext
-
 import scala.reflect._
 import scala.reflect.api.{Mirror, TypeCreator, Universe => ApiUniverse}
-import scala.tools.nsc.interpreter._
+import scala.tools.nsc.interpreter.{JPrintWriter, _}
 import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.nsc.{Settings, io}
-import scala.tools.nsc.interpreter.{JPrintWriter}
 
-class HackSparkILoop(out:JPrintWriter) extends SparkILoop(None, out, None) { 
+class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) extends SparkILoop(None, out, None) {
   private def getMaster(): String = {
     val master = this.master match {
       case Some(m) => m
@@ -30,13 +27,6 @@ class HackSparkILoop(out:JPrintWriter) extends SparkILoop(None, out, None) {
       })
 
   override def initializeSpark() {
-    /*intp.beQuietDuring {
-      command("""
-         @transient val sc = org.apache.spark.repl.Main.interp.createSparkContext();
-              """)
-      command("import org.apache.spark.SparkContext._")
-    }
-    echo("Spark context available as sc.")*/
   }
   
   override def process(settings: Settings): Boolean = savingContextLoader {

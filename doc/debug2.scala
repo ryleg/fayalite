@@ -155,7 +155,7 @@ import org.fayalite.repl.JSON._
 import org.fayalite.repl.REPL._
 import scala.concurrent.Future
 import _root_.scala.concurrent.Future
-import org.fayalite.util.SparkAkkaUtilsExample._
+import org.fayalite.util.RemoteAkkaUtils._
 import org.fayalite.util.SparkReference
 
 

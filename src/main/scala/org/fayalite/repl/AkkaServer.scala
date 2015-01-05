@@ -5,15 +5,13 @@ package org.fayalite.repl
  */
 
 import akka.actor.Props
-import org.fayalite.util.SparkAkkaUtilsExample
+import org.fayalite.util.RemoteAkkaUtils
 
 object AkkaServer {
 
   def main(args: Array[String]) {
 
-      implicit val actorSystem = SparkAkkaUtilsExample.serverInitialize()
-
-
+      implicit val actorSystem = RemoteAkkaUtils.serverInitialize()
 
   }
 

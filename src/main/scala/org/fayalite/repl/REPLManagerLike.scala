@@ -1,63 +1,22 @@
 package org.fayalite.repl
 
-import java.io._
 
-import akka.actor.Actor
-import org.fayalite.repl.JSON.{REPLHistory, REPLRead, REPLWrite, REPLWriteHistory}
-import org.fayalite.repl.REPL._
+import java.io.{InputStreamReader, BufferedReader, PipedOutputStream, PipedInputStream}
 
-import scala.concurrent.Future
+import scala.tools.nsc.interpreter.JPrintWriter
 
 
-/*
-
-trait REPLManagerLike extends Actor{
+class REPLManagerLike(userId: Int) extends java.io.Serializable {
 
   val replInputSource = new PipedInputStream()
   val replInputSink = new PipedOutputStream(replInputSource)
   val br = new BufferedReader(new InputStreamReader(replInputSource, "UTF-8"))
-
   val replOutputSink = new PipedOutputStream()
   val replOutputSource = new PipedInputStream(replOutputSink)
-
-  val pw = new PrintWriter(replOutputSink)
-
-//  val plex : PlexLike = ???
-
- // val plexRun = Future { plex.run() }
-
-
-
-  def receive = {
-
-    case x : REPLRead => println("attempting read"); sender ! read()
-    case REPLWrite(text) => println("attempting write of " + text); write(text)
-    case REPLHistory(depth) => println("attempting get repl history")
-      sender ! allHistory.takeRight(depth)
-    case REPLWriteHistory(depth) => println("attempting get repl write history")
-      sender ! allWriteHistory.takeRight(depth).mkString("\n")
-
-  }
-
-  val allWriteHistory = scala.collection.mutable.MutableList[String]()
-
-
-  def write(stringData : String) : Unit = {
-
-    allWriteHistory += stringData
-    val byteData = stringData.map {
-      _.toChar
-    }.toCharArray.map {
-      _.toByte
-    }
-    replInputSink.write(byteData)
-    replInputSink.flush()
-  }
+  val pw = new JPrintWriter(replOutputSink)
 
   var allHistory : String = ""
-
   def read() : String = {
-
     var output = ""
     var bytesRead = 0
     do {
@@ -68,11 +27,7 @@ trait REPLManagerLike extends Actor{
         _.toChar
       }.mkString("")
     } while (bytesRead > 0)
-
     allHistory += output
     output
-
   }
-
 }
-*/

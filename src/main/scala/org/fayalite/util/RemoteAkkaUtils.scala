@@ -2,13 +2,13 @@ package org.fayalite.util
 
 import akka.actor.{Props, Actor, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import org.fayalite.repl.HackREPLManager
+import org.fayalite.repl.{REPLHandler, HackREPLManager}
 import org.fayalite.repl.REPL._
 import akka.pattern.ask
 import org.fayalite.repl.HackREPLManager._
 import scala.tools.nsc.interpreter
 
-object SparkAkkaUtilsExample {
+object RemoteAkkaUtils {
 
   val serverActorSystemName = "FayaliteServer"
   val clientActorSystemName = "FayaliteClient"
@@ -27,24 +27,12 @@ object SparkAkkaUtilsExample {
     implicit val actorSystem = createActorSystem(clientActorSystemName, host, port)
     implicit val rap = RemoteActorPath()
     val server = getActor()
-
-    def request(msg: HackREPLMessage) : interpreter.IR.Result = {
-      val reply = server ? msg
-      val response = reply.getAs[interpreter.IR.Result]
-      response
-    }
-
-    val req : HackREPLMessage => interpreter.IR.Result =
-      (m: HackREPLMessage) => request(m)
-
-    (actorSystem, server, req)
-
-
+    server
   }
 
   def serverInitialize(host: String = defaultHost, port: Int = defaultPort) = {
     val actorSystem = createActorSystem(serverActorSystemName, defaultHost, defaultPort)
-    actorSystem.actorOf(Props(new HackREPLManager()), name=serverActorName)
+    actorSystem.actorOf(Props(new REPLHandler(), name=serverActorName)
   }
 
   def createActorSystem(name: String = serverActorSystemName,

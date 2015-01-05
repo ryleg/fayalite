@@ -1,7 +1,7 @@
 package org.fayalite.repl
 
 import akka.actor.{Props, Actor, ActorRef}
-import org.fayalite.util.SparkAkkaUtilsExample._
+import org.fayalite.util.RemoteAkkaUtils._
 
 /**
  * Created by ryle on 12/12/2014.

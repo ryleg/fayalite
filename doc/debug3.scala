@@ -101,7 +101,6 @@ dr.run("$sc")
 import akka.util.Timeout
 import akka.actor.{ActorRef, Actor}
 import akka.pattern.ask
-implicit val timeout = Timeout(10)
 
 import akka.actor.{ActorSystem, Props}
 import com.typesafe.config.ConfigFactory
@@ -163,14 +162,30 @@ def createActorSystem(name: String = serverActorSystemName,
   actorSystem
 }
 
+import scala.util.Try
+
 class TestActorResponse extends Actor {
   def receive = {
     case x => println(x)
   }
 }
 
+case class Register(clientActorPath: String)
+
+def getAct(ass: actorSystem, pth: String) = {
+  Await.result( ass.actorSelection(pth).resolveOne(), 5.seconds)
+}
+
 class TestREPLManager extends Actor {
+
+  var subscribedClients : List[ActorRef] = List()
+
   def receive = {
+    case Register(cap) => {
+      subscribedClients = subscribedClients ++ List(
+      getAct(actorSystem)
+      )
+    }
     case codeMsg : String => {
       val (result, stdOutString) = dr.run(codeMsg)
       val interp = dr.iloop.intp
@@ -178,7 +193,8 @@ class TestREPLManager extends Actor {
 /*      val lastHandler: interp.memberHandlers.MemberHandler = request.handlers.last.asInstanceOf[interp.memberHandlers.MemberHandler]
       val line = request.lineRep
       val lhdt = lastHandler.definesTerm.get*/
-      sender ! (request, result, stdOutString)
+      println(s"TestReplMAnager:  ${sender.path} $codeMsg $request  $result $stdOutString")
+      Try{sender ! (request, result, stdOutString)}
     }
   }
 
@@ -194,10 +210,190 @@ val server = serverInitialize()
 
 import scala.concurrent.duration._
 import scala.concurrent._
-
 implicit val timeout = Timeout(10.seconds)
 
+
 Await.result(server ? "$sc", 1.seconds)
+
+
+
+
+implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
+
+import akka.util.Timeout
+import akka.actor.{ActorRef, Actor}
+import akka.pattern.ask
+
+import scala.concurrent.duration._
+
+import akka.util.Timeout
+import akka.actor.{ActorRef, Actor}
+import akka.pattern.ask
+
+import akka.actor.{ActorSystem, Props}
+import com.typesafe.config.ConfigFactory
+
+
+import akka.util.Timeout
+import akka.actor.{ActorRef, Actor}
+import akka.pattern.ask
+import akka.pattern._
+
+
+import akka.actor.{ActorSystem, Props}
+import com.typesafe.config.ConfigFactory
+
+val serverActorSystemName = "FayaliteServer"
+val clientActorSystemName = "FayaliteClient"
+
+val serverActorName = "FayaliteMultiplex"
+val clientActor = "FayaliteREPLClient"
+
+val defaultHost = "127.0.0.1"
+val defaultPort = 16180
+implicit val timeout = Timeout(10.seconds)
+
+def createActorSystem(name: String = serverActorSystemName,
+                      host: String = defaultHost,
+                      port: Int = defaultPort
+                       ) = {
+  val akkaThreads = 4
+  val akkaBatchSize = 15
+  val akkaTimeout = 100
+  val akkaFrameSize = 10 * 1024 * 1024
+  val akkaLogLifecycleEvents = false
+  val lifecycleEvents = "on"
+  val logAkkaConfig = "on"
+  val akkaHeartBeatPauses = 600
+  val akkaFailureDetector = 300.0
+  val akkaHeartBeatInterval = 1000
+  val requireCookie = false
+  val secureCookie = ""
+  val akkaConf =
+    ConfigFactory.parseString(
+      s"""
+      |akka.daemonic = on
+      |akka.loggers = [""akka.event.slf4j.Slf4jLogger""]
+      |akka.stdout-loglevel = "ERROR"
+      |akka.jvm-exit-on-fatal-error = off
+      |akka.remote.require-cookie = "$requireCookie"
+      |akka.remote.secure-cookie = "$secureCookie"
+      |akka.remote.transport-failure-detector.heartbeat-interval = $akkaHeartBeatInterval s
+      |akka.remote.transport-failure-detector.acceptable-heartbeat-pause = $akkaHeartBeatPauses s
+      |akka.remote.transport-failure-detector.threshold = $akkaFailureDetector
+      |akka.actor.provider = "akka.remote.RemoteActorRefProvider"
+      |akka.remote.netty.tcp.transport-class = "akka.remote.transport.netty.NettyTransport"
+      |akka.remote.netty.tcp.hostname = "$host"
+      |akka.remote.netty.tcp.port = $port
+      |akka.remote.netty.tcp.tcp-nodelay = on
+      |akka.remote.netty.tcp.connection-timeout = $akkaTimeout s
+      |akka.remote.netty.tcp.maximum-frame-size = ${akkaFrameSize}B
+      |akka.remote.netty.tcp.execution-pool-size = $akkaThreads
+      |akka.actor.default-dispatcher.throughput = $akkaBatchSize
+      |akka.log-config-on-start = $logAkkaConfig
+      |akka.remote.log-remote-lifecycle-events = $lifecycleEvents
+      |akka.log-dead-letters = $lifecycleEvents
+      |akka.log-dead-letters-during-shutdown = $lifecycleEvents
+      """.stripMargin)
+
+  val actorSystem = ActorSystem(name, akkaConf)
+
+  actorSystem
+}
+
+
+
+case class RemoteActorPath(
+                            host: String = defaultHost,
+                            port: Int = defaultPort,
+                            remoteActorSystemName: String = serverActorSystemName,
+                            remoteActorName: String = serverActorName
+                            )
+
+implicit val cactorSystem = createActorSystem(clientActorSystemName, defaultHost, defaultPort+1)
+implicit val rap = RemoteActorPath()
+
+def getRAP = {
+  val remoteActorPath = rap
+  s"akka.tcp://${
+    remoteActorPath.remoteActorSystemName}" +
+    s"@${remoteActorPath.host}:${remoteActorPath.port}/user/" +
+    s"${remoteActorPath.remoteActorName}"
+}
+
+def getActor()(
+  implicit localActorSystem: ActorSystem,
+  remoteActorPath: RemoteActorPath
+  ) = {
+  val actorPath = s"akka.tcp://${
+    remoteActorPath.remoteActorSystemName}" +
+    s"@${remoteActorPath.host}:${remoteActorPath.port}/user/" +
+    s"${remoteActorPath.remoteActorName}"
+
+  val actor = localActorSystem.actorSelection(actorPath).resolveOne()
+  val actorRef = Await.result(actor, 5.seconds)
+
+  actorRef
+}
+/*
+val clpe = "akka.tcp://FayaliteClient@127.0.0.1:16181/user/FayaliteREPLClient"
+val cl = actorSystem.actorSelection(clpe).resolveOne()
+
+
+*/
+
+val ase = cactorSystem.actorSelection(getRAP)
+
+val actor = cactorSystem.actorSelection(getRAP).resolveOne()
+val actorRef = Await.result(actor, 5.seconds)
+val delay = 5.seconds
+
+def axe(axtor: ActorRef, msg: String) =  scala.concurrent.Await.result(axtor ? msg, delay)
+
+class TestClientManager extends Actor {
+  def receive = {
+    case codeMsg : String => {
+      val response = axe(actorRef, codeMsg)
+      println(s"TestClientManager response and rq: ${sender.path} $codeMsg $response")
+      sender ! response
+    }
+  }
+}
+
+val clnt = cactorSystem.actorOf(Props(new TestClientManager()), name=clientActor)
+
+
+
+
+Await.result(clnt ? "$sc", 5.seconds)
+
+Await.result(server ? "$sc", 1.seconds)
+
+val sparkREPLServer = getActor()
+
+def makeRequest(code: String) = {
+  (sparkREPLServer ? code).get.asInstanceOf[(SparkIMain#Request, interpreter.IR.Result, String)]
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 val tar = actorSystem.actorOf(Props(new TestActorResponse()), name=serverActorName)
 
@@ -282,7 +478,7 @@ scc.setLocalProperty("spark.dynamic.jarPath", s"file:/$FAYALITE_JAR")
 scc.setLocalProperty("spark.dynamic.userReplPath", $intp.classServer.uri)
 scc.makeRDD(1 to 10).map{_ => Try{Test.test}}.first*/
 
-org.fayalite.util.SparkAkkaUtilsExample.defaultHost
+org.fayalite.util.RemoteAkkaUtils.defaultHost
 //file:///home/ubuntu/
 def getTLC(userId: Int) : String ={
   ( """
