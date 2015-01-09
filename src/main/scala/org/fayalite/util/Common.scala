@@ -6,5 +6,4 @@ package org.fayalite.util
 object Common {
   val home = System.getProperty("user.home")
   val SPARK_HOME = s"$home/repo/spark-dynamic/dist/"
-
 }

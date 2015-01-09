@@ -10,10 +10,10 @@ import scala.util.{Failure, Success, Try}
 import REPL._
 
 
-class REPLHandler extends Actor {
+class REPLHandler(serverPort: Int) extends Actor {
 
   def receive = {
-    case _ =>
+    case x => println(s"replHandler received $x on serverPort: $serverPort")
 
   }
 
