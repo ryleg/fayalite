@@ -9,7 +9,6 @@ class HackAkkaDuplex(
                         val port: Int = defaultPort
                         )  {
 
-
     val serverActorSystem = createActorSystem(serverActorSystemName, host, port)
 
     val replHandler = serverActorSystem.actorOf(Props(new REPLHandler(port)), name=serverActorName)
@@ -22,6 +21,20 @@ class HackAkkaDuplex(
       remoteServer = getActor()
     }
 
+}
 
+abstract class DuplexPipe {
+  val duplex : HackAkkaDuplex
+}
+
+class HackAkkaServer extends DuplexPipe {
+
+  val duplex = new HackAkkaDuplex()
+
+}
+
+class HackAkkaClient extends DuplexPipe {
+
+  val duplex = new HackAkkaDuplex(port = defaultPort + 10)
 
 }
