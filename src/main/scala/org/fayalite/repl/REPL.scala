@@ -13,8 +13,6 @@ object REPL extends AkkaExt with FutureExt {
 
   case class Write(code: String) extends Instruction
 
-  case class Output(
-
-                     )
+  case class Output(evaluationResult: String ) extends Instruction
 
 }

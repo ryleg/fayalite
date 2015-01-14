@@ -11,8 +11,6 @@ object AkkaServer {
 
   def main(args: Array[String]) {
 
-      implicit val actorSystem = RemoteAkkaUtils.serverInitialize()
-
   }
 
 }
