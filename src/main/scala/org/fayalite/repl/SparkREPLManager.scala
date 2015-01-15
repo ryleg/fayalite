@@ -2,7 +2,7 @@ package org.fayalite.repl
 
 
 import org.fayalite.repl.REPL._
-import org.fayalite.util.Common
+import org.fayalite.util.{SparkReference, Common}
 
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.repl.{HackSparkILoop, SparkCommandLine, SparkILoop}
@@ -21,6 +21,8 @@ class SparkREPLManager(userId: Int) extends REPLManagerLike(userId) {
   val command = new SparkCommandLine(args.toList, msg => println(msg))
   val settings = command.settings
   val maybeFailed = iloop.process(settings)
+
+  rebindSC(SparkReference.sc)
 
   def run(code: String, doRead: Boolean = true) = {
     val res = iloop.intp.interpret(code)

@@ -20,6 +20,8 @@ trait AkkaExt {
 
   implicit class ActorExt(actor: ActorRef) {
 
+    def ??[T](msg: Any) = (actor ? msg).getAs[T]
+
     /**
      * Listener actor receives actual data.
      */

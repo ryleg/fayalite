@@ -9,9 +9,9 @@ object REPL extends AkkaExt with FutureExt {
 
   trait Instruction
 
-  case class Initialize(userId: Int, remoteActorPath: RemoteActorPath) extends Instruction
+  case class Start(clientPort: Int, replId: Int)
 
-  case class Write(code: String) extends Instruction
+  case class Evaluate(code: String, replId: Int, clientResponsePort: Int) extends Instruction
 
   case class Output(evaluationResult: String ) extends Instruction
 
