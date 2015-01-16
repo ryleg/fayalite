@@ -4,6 +4,7 @@ import java.util.Calendar
 
 import RemoteAkkaUtils._
 import akka.actor.{Actor, Props, ActorRef}
+import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import org.fayalite.repl.Supervisor
 
@@ -36,9 +37,18 @@ abstract class DuplexPipe {
   val duplex : HackAkkaDuplex
 }
 
-class HackAkkaServer extends DuplexPipe {
+object HackAkkaServer {
 
-  val port = defaultPort
+  def main(args: Array[String]) {
+
+    new HackAkkaServer ()
+
+    Thread.sleep(Long.MaxValue)
+
+  }
+}
+
+class HackAkkaServer(val port: Int = defaultPort) extends DuplexPipe {
 
   //Initialize static reference.
   SparkReference.getSC
@@ -51,7 +61,6 @@ class HackAkkaServer extends DuplexPipe {
 
 class NotebookClient extends Actor {
 
-  case class CheckResult()
   //God no
   var lastMessage : (String, java.util.Date) = ("init",  Calendar.getInstance().getTime)
 
@@ -65,19 +74,36 @@ class NotebookClient extends Actor {
   }
 }
 import akka.pattern.ask
-class HackAkkaClient extends DuplexPipe {
 
-  val port = defaultPort + 10
+class HackAkkaClient(
+                      val port: Int = defaultPort + 10,
+                     val masterServerPort: Int = defaultPort) extends DuplexPipe
+with Logging {
+
 
   val duplex = new HackAkkaDuplex(port=port)
 
   val client = duplex.serverActorSystem.actorOf(Props(new NotebookClient()), name=serverActorName)
 
+  val remoteServer = duplex.startClient(port + 2000, masterServerPort)
+
+  def start(replId: Int) : Unit = {
+    remoteServer ! Start(port, replId)
+  }
+
   def evaluate(evaluationParams: Evaluate) : String = {
-    val (lastMessage, prevTime) = client ?? _
+    val (lastMessage, prevTime) = client.??[(String, java.util.Date)]("")
     duplex.remoteServer ! evaluationParams
-
-
+    var sleeps = 0
+    while (true) {
+      Thread.sleep(200)
+      sleeps = sleeps + 1
+      if (sleeps % 50 == 0) logInfo("client awaiting response") // 10 seconds
+      if (sleeps > 100) return "failed"
+      val (checkMessage, checkTime) = client.??[(String, java.util.Date)]("")
+      if (checkTime.after(prevTime)) return checkMessage
+    }
+    "failure?"
   }
 
 }

@@ -11,7 +11,7 @@ object REPL extends AkkaExt with FutureExt {
 
   case class Start(clientPort: Int, replId: Int)
 
-  case class Evaluate(code: String, replId: Int, clientResponsePort: Int) extends Instruction
+  case class Evaluate(code: String, replId: Int) extends Instruction
 
   case class Output(evaluationResult: String ) extends Instruction
 

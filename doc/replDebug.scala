@@ -13,7 +13,7 @@ scala -classpath
 import java.io.{PipedOutputStream, PipedInputStream, BufferedReader, InputStreamReader}
 import scala.tools.nsc.interpreter.{JPrintWriter, AbstractFileClassLoader}
 import org.apache.spark.repl.{SparkILoop, SparkIMain}
-import org.apache.spark.repl.HackSparkILoop
+import org.apache.spark.repl.MagicSparkILoop
 
 
 

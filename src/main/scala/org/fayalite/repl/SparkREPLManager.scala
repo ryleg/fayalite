@@ -4,14 +4,26 @@ package org.fayalite.repl
 import org.fayalite.repl.REPL._
 import org.fayalite.util.{SparkReference, Common}
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.repl.{HackSparkILoop, SparkCommandLine, SparkILoop}
+import org.apache.spark.{Logging, SparkConf, SparkContext}
+import org.apache.spark.repl.{MagicSparkILoop, SparkCommandLine, SparkILoop}
 import scala.reflect._
 
+object SparkREPLManager {
 
-class SparkREPLManager(userId: Int) extends REPLManagerLike(userId) {
+   def main (args: Array[String]) {
+    testEvaluation()
+  }
 
-  val iloop = new HackSparkILoop(Some(br), pw)
+  def testEvaluation() : Unit = {
+    SparkReference.getSC
+    val srm = new SparkREPLManager(0)
+    println(srm.run("val x = 1"))
+  }
+}
+
+class SparkREPLManager(userId: Int) extends REPLManagerLike with Logging {
+
+  val iloop = new MagicSparkILoop(Some(br), pw)
 
   var cp = s"::${Common.SPARK_HOME}conf:" +
     s"${Common.SPARK_HOME}lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar:"
@@ -20,31 +32,24 @@ class SparkREPLManager(userId: Int) extends REPLManagerLike(userId) {
 
   val command = new SparkCommandLine(args.toList, msg => println(msg))
   val settings = command.settings
+
+  logInfo("Manager starting REPL loop")
   val maybeFailed = iloop.process(settings)
+  logInfo("Manager finished attempting start REPL loop Success? " + maybeFailed)
 
   rebindSC(SparkReference.sc)
 
   def run(code: String, doRead: Boolean = true) = {
+    logInfo("Manager code to run " + code)
     val res = iloop.intp.interpret(code)
-    if (doRead) (res, read())
-    else (res, "")
+    val response = (res, read()) //else (res, "")
+    logInfo("Manager response " + response)
+    response
   }
-
-  import scala.reflect.api.{Mirror, TypeCreator, Universe => ApiUniverse}
-  val u: scala.reflect.runtime.universe.type = scala.reflect.runtime.universe
-  val m = u.runtimeMirror(Thread.currentThread().getContextClassLoader)
-
-  private def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
-    u.TypeTag[T](
-      m,
-      new TypeCreator {
-        def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U # Type =
-          m.staticClass(classTag[T].runtimeClass.getName).toTypeConstructor.asInstanceOf[U # Type]
-      })
 
   def bind[T](name: String, reference: T)(implicit evidence: ClassTag[T]) = {
     import _root_.scala.tools.nsc.Settings
-    lazy val tagOfReference = tagOfStaticClass[T]
+    lazy val tagOfReference = iloop.tagOfStaticClass[T]
     import _root_.scala.reflect._
     import scala.tools.nsc.interpreter.NamedParam
     iloop.intp.quietBind(scala.tools.nsc.interpreter.NamedParam[T](name,

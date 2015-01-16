@@ -5,9 +5,12 @@ import scala.reflect.api.{Mirror, TypeCreator, Universe => ApiUniverse}
 import scala.tools.nsc.interpreter.{JPrintWriter, _}
 import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.nsc.{Settings, io}
+import scala.reflect.{ClassTag, classTag}
+import org.apache.spark.repl.SparkJLineReader
+import org.apache.spark.repl.SparkIMain
 
-class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) extends SparkILoop(None, out, None) {
-  private def getMaster(): String = {
+class MagicSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) extends SparkILoop(None, out, None) {
+  override def getMaster(): String = {
     val master = this.master match {
       case Some(m) => m
       case None =>
@@ -18,7 +21,7 @@ class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) ext
     master
   }
 
-  private def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
+  override def tagOfStaticClass[T: ClassTag]: u.TypeTag[T] =
     u.TypeTag[T](
       m,
       new TypeCreator {
@@ -28,14 +31,13 @@ class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) ext
 
   override def initializeSpark() {
   }
-  
+
   override def process(settings: Settings): Boolean = savingContextLoader {
 
     if (getMaster() == "yarn-client") System.setProperty("SPARK_YARN_MODE", "true")
 
     this.settings = settings
     createInterpreter()
-
     // sets in to some kind of reader depending on environmental cues
     in ={
         // some post-initialization
@@ -44,7 +46,6 @@ class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) ext
           case x                   => x
         }
     }
-
     lazy val tagOfSparkIMain = tagOfStaticClass[org.apache.spark.repl.SparkIMain]
     // Bind intp somewhere out of the regular namespace where
     // we can get at it in generated code.
@@ -53,14 +54,11 @@ class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) ext
       val autorun = replProps.replAutorunCode.option flatMap (f => io.File(f).safeSlurp())
       if (autorun.isDefined) intp.quietRun(autorun.get)
     })
-
     addThunk(printWelcome())
     addThunk(initializeSpark())
-
     // it is broken on startup; go ahead and exit
     if (intp.reporter.hasErrors)
       return false
-
     // This is about the illusion of snappiness.  We call initialize()
     // which spins off a separate thread, then print the prompt and try
     // our best to look ready.  The interlocking lazy vals tend to
@@ -75,16 +73,10 @@ class HackSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) ext
       postInitialization()
     }
     // printWelcome()
-
     loadFiles(settings)
-
     //try loop()
     //catch AbstractOrMissingHandler()
     //finally closeInterpreter()
-
     true
   }
-
-
-
 }

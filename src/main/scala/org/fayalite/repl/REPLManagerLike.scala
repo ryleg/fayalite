@@ -6,7 +6,7 @@ import java.io.{InputStreamReader, BufferedReader, PipedOutputStream, PipedInput
 import scala.tools.nsc.interpreter.JPrintWriter
 
 
-class REPLManagerLike(userId: Int) extends java.io.Serializable {
+class REPLManagerLike extends java.io.Serializable {
 
   val replInputSource = new PipedInputStream()
   val replInputSink = new PipedOutputStream(replInputSource)

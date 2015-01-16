@@ -3,6 +3,7 @@ package org.fayalite.repl
 import akka.actor.{Actor, ActorRef}
 import akka.io.Tcp.{Write, Received}
 import akka.util.{ByteString, Timeout}
+import org.apache.spark.Logging
 import org.apache.spark.repl.SparkIMain
 import org.fayalite.util.HackAkkaDuplex
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
@@ -15,10 +16,13 @@ import REPL._
 
 /**
  * Main bottleneck for communicating with notebook jvm processes
- * and handling traffic to REPL objects. Yes it's wrong but it's quick.
- * @param duplex : Connector to client
+ * and handling traffic to REPL objects. Yes it's wrong but it's quick
+ * and it works with case classes
+ * @param duplex : Connector helper method for creating connection
+ *               to client and host of main server actor system
  */
-class Supervisor(duplex: HackAkkaDuplex)(implicit masterIntp: SparkIMain = _) extends Actor {
+class Supervisor(duplex: HackAkkaDuplex)
+                (implicit masterIntp: SparkIMain = null) extends Actor with Logging {
 
 
   var repls : Map[Int, SparkREPLManager] = Map()
@@ -33,7 +37,9 @@ class Supervisor(duplex: HackAkkaDuplex)(implicit masterIntp: SparkIMain = _) ex
 
   def receive = {
     case Start(clientPort, replId) =>
-      val client = duplex.startClient(clientPort)
+      logInfo(s"Start received: $clientPort replId: $replId")
+      val tempASClientPort = clientPort + 100*scala.util.Random.nextInt(10) + 42
+      val client = duplex.startClient(tempASClientPort, clientPort)
       repls.get(replId) match {
         case Some(repl) =>
         // send ack todo
@@ -43,12 +49,13 @@ class Supervisor(duplex: HackAkkaDuplex)(implicit masterIntp: SparkIMain = _) ex
       }
       subscribe(client, replId)
     case Evaluate(code, replId) =>
-        val stdOut = if (replId == 0 && masterIntp != null) {
+      logInfo(s"Evaluate received: $code replId: $replId")
+      val stdOut = if (replId == 0 && masterIntp != null) {
           masterIntp.interpret(code).toString //god no
         } else {
           val repl = repls.get(replId).get //no
           val (res, stdOut) = repl.run(code)
-          stdOut
+          res + " " + stdOut
         }
         replSubscribers.get(replId).get.foreach{
           subscriber => subscriber ! Output(stdOut)

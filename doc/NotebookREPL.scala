@@ -8,7 +8,7 @@ package org.fayalite.repl
  */
 
 import java.io.{PipedOutputStream, StringWriter, PrintWriter, ByteArrayOutputStream}
-import org.apache.spark.repl.{SparkJLineCompletion, HackSparkILoop, SparkILoop}
+import org.apache.spark.repl.{SparkJLineCompletion, MagicSparkILoop, SparkILoop}
 import scala.tools
 import tools.nsc.Settings
 import _root_.scala.tools.nsc.interpreter._
@@ -42,7 +42,7 @@ class NotebookREPL(stdout: JPrintWriter, stdoutBytes: PipedOutputStream, compile
     settings.usejavacp.value = true
     // println(System.getProperty("java.class.path"))
     //val i = new HackIMain(settings, stdout)
-    loop = new HackSparkILoop(stdout)
+    loop = new MagicSparkILoop(stdout)
     jars.foreach { jar =>
       import scala.tools.nsc.util.ClassPath
       val f = scala.tools.nsc.io.File(jar).normalize

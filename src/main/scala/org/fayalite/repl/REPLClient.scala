@@ -12,6 +12,7 @@ import akka.pattern.ask
 
 import scala.util.{Failure, Success, Try}
 import REPL._
+/*
 
 class REPLClient extends Actor {
 
@@ -21,3 +22,4 @@ class REPLClient extends Actor {
   }
 
 }
+*/
