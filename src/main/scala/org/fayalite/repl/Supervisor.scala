@@ -1,17 +1,19 @@
 package org.fayalite.repl
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{ActorSystem, Actor, ActorRef}
 import akka.io.Tcp.{Write, Received}
 import akka.util.{ByteString, Timeout}
 import org.apache.spark.Logging
 import org.apache.spark.repl.SparkIMain
-import org.fayalite.util.HackAkkaDuplex
+import org.fayalite.util.{SparkReference, HackAkkaDuplex}
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
+import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.pattern._
+import scala.collection.mutable.{Map => MMap}
 
 import scala.util.{Failure, Success, Try}
-import REPL._
+import org.fayalite.repl.REPL._
 
 
 /**
@@ -24,41 +26,101 @@ import REPL._
 class Supervisor(duplex: HackAkkaDuplex)
                 (implicit masterIntp: SparkIMain = null) extends Actor with Logging {
 
+  SparkReference.getSC
 
   var repls : Map[Int, SparkREPLManager] = Map()
 
-  var replSubscribers : Map[Int, List[ActorRef]] = Map()
+  var replSubscribers : MMap[Int, ActorRef] = MMap()
+  var clientAS : MMap[Int, ActorSystem] = MMap()
 
-  def subscribe(client: ActorRef, replId: Int) = {
-    val subscribers = client :: replSubscribers.getOrElse(replId, List())
-    replSubscribers = replSubscribers ++
-      Map(replId -> subscribers)
+  def subscribe(client: ActorRef, clientPort: Int) = {
+    replSubscribers(clientPort) = client
   }
+
+
+  def keepAlive() = Future{
+    while (true) {
+      replSubscribers.foreach {
+        case (port, r) => r ! Heartbeat(port)
+      }
+
+      val beatTime = System.currentTimeMillis()
+      Thread.sleep(10000)
+
+      val portDelta = replSubscribers.toList.map {
+        case (port, r) => heartbeats.get(port) match {
+          case Some(prevTime) =>
+            val delta = beatTime - prevTime
+            (port, delta)
+          case None => (port, Long.MaxValue)
+        }
+      }
+
+      portDelta.filter{_._2 > 35000L}.foreach{
+        case (port, delta) =>
+          logInfo("Heartbeat not received from port " + port + " in 10s --- Removing subscriber")
+          replSubscribers.remove(port)
+      }
+
+    }
+  }
+
+ // val keptAlive = keepAlive()
+
+  var heartbeats : scala.collection.mutable.Map[Int, Long] = scala.collection.mutable.Map()
+
 
   def receive = {
-    case Start(clientPort, replId) =>
-      logInfo(s"Start received: $clientPort replId: $replId")
-      val tempASClientPort = clientPort + 100*scala.util.Random.nextInt(10) + 42
-      val client = duplex.startClient(tempASClientPort, clientPort)
-      repls.get(replId) match {
+    case Heartbeat(port) => {
+      logInfo("Received heartbeat on port " + port)
+      heartbeats(port) = System.currentTimeMillis()
+    }
+    case si @ SuperInstruction(code, replId, userId, notebookId, clientPort: Int) =>
+      logInfo(s"Evaluate received: $si")
+      replSubscribers.get(clientPort) match {
+        case Some(client) =>
+        case None =>
+          val tempASClientPort = 15000 + 100 * scala.util.Random.nextInt(15) + 42
+          val client = duplex.startClient(tempASClientPort, clientPort)
+          subscribe(client, clientPort)
+          logInfo("Subscribing " + client + " clientPort: " + clientPort)
+          Supervisor.replSubscribers = replSubscribers
+      }
+
+      val repl = repls.get(replId) match {
         case Some(repl) =>
         // send ack todo
+          logInfo("Found existing repl under id " + replId)
+          repl
         case None =>
+          logInfo("Starting replId " + replId)
           val sparkManager = new SparkREPLManager(replId)
           repls = repls ++ Map(replId -> sparkManager)
+          Supervisor.repls = repls
+          sparkManager
       }
-      subscribe(client, replId)
-    case Evaluate(code, replId) =>
-      logInfo(s"Evaluate received: $code replId: $replId")
-      val stdOut = if (replId == 0 && masterIntp != null) {
+
+      /* if (replId == -1 && masterIntp != null) {
           masterIntp.interpret(code).toString //god no
-        } else {
-          val repl = repls.get(replId).get //no
-          val (res, stdOut) = repl.run(code)
-          res + " " + stdOut
+        } else {*/
+//          val res = repl.run(code)
+//          res
+//        }
+      val stdOut = repl.run(code)
+      logInfo("Supervisor output of code run "  +stdOut)
+        replSubscribers.foreach{
+          case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
         }
-        replSubscribers.get(replId).get.foreach{
-          subscriber => subscriber ! Output(stdOut)
-        }
+
   }
+}
+
+object Supervisor{
+
+  //Debug
+  var repls : Map[Int, SparkREPLManager] = _
+  var replSubscribers : MMap[Int, ActorRef] = MMap()
+
+
+
 }

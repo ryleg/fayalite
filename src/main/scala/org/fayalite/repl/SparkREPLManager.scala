@@ -16,8 +16,11 @@ object SparkREPLManager {
 
   def testEvaluation() : Unit = {
     SparkReference.getSC
-    val srm = new SparkREPLManager(0)
+    val srm = new SparkREPLManager(1)
     println(srm.run("val x = 1"))
+    println(srm.run("val x = 2"))
+
+
   }
 }
 

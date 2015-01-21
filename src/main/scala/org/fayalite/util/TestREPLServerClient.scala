@@ -1,6 +1,8 @@
 package org.fayalite.util
 
-import org.fayalite.repl.REPL.Evaluate
+import org.fayalite.repl.REPL.{SuperInstruction, Evaluate}
+
+import scala.concurrent.Future
 
 
 /**
@@ -9,19 +11,55 @@ import org.fayalite.repl.REPL.Evaluate
 
 object TestREPLRemote{
   def main(args: Array[String]) {
+
     val clientPort = 1400 + scala.util.Random.nextInt(5000)
 
-    val client = new HackAkkaClient(port=clientPort)
-    val replId = 1
 
-    client.start(replId)
+    val client = new HackAkkaClient(1, port=clientPort) //, masterServerPort = 15029)
 
-  //  Thread.sleep(10000) // Of course there's no ack
+    val result = client.evaluate(s"val x = 5", 0, 1)
 
-    val result = client.evaluate(Evaluate("val x = 1", replId))
 
-    println(result)
+
+    import org.fayalite.repl.REPL._
+
+    client.pollTestLog()
+
+    var x = 0
+    while (true) {
+      Thread.sleep(3000)
+      client.evaluate(s"val x = $x", 0, 1)
+
+    }
+
+    Thread.sleep(Long.MaxValue)
+    /*
+        1 to 10 foreach { i =>
+          val result = client.evaluate(s"val x = $i", 1, 1)
+          Thread.sleep(1000)
+          1 to 5 foreach { j =>
+            Thread.sleep(1000)
+            val resp = client.poll()
+            println(j + "  " + resp.slice(0, 1))
+          }
+        }*/
+
   }
+}
+
+object TestREPLServer {
+
+  def main (args: Array[String]) {
+
+
+    val serverPort = 15029//1400 + scala.util.Random.nextInt(5000)
+    val server = new HackAkkaServer(serverPort)
+
+    Thread.sleep(Long.MaxValue)
+
+    }
+
+
 }
 
 object TestREPLServerClient {
@@ -34,20 +72,14 @@ object TestREPLServerClient {
 
   val server = new HackAkkaServer(serverPort)
 
-  val client = new HackAkkaClient(port=clientPort, masterServerPort = serverPort)
+  val client = new HackAkkaClient(1, port=clientPort, masterServerPort = serverPort)
 
-  Thread.sleep(3000)
+    1 to 10 foreach { i =>
+      val result = client.evaluate(s"val x = $i", 1, 1)
 
-    val replId = 1
+      println(result)
 
-    client.start(replId)
-
-    Thread.sleep(10000) // Of course there's no ack
-
-    val result = client.evaluate(Evaluate("val x = 1", replId))
-
-    println(result)
-
+    }
   }
 
 

@@ -16,6 +16,7 @@ class REPLManagerLike extends java.io.Serializable {
   val pw = new JPrintWriter(replOutputSink)
 
   var allHistory : String = ""
+
   def read() : String = {
     var output = ""
     var bytesRead = 0

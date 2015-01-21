@@ -2,11 +2,12 @@ package org.fayalite.util
 
 import akka.actor.{Props, Actor, ActorSystem}
 import com.typesafe.config.ConfigFactory
+import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import akka.pattern.ask
 import scala.tools.nsc.interpreter
 
-object RemoteAkkaUtils {
+object RemoteAkkaUtils extends Logging {
 
   val serverActorSystemName = "FayaliteServer"
   val clientActorSystemName = "FayaliteClient"
@@ -79,6 +80,7 @@ object RemoteAkkaUtils {
       |akka.log-dead-letters-during-shutdown = $lifecycleEvents
       """.stripMargin)
 
+    logInfo(s"Create actor system on port $port")
     val actorSystem = ActorSystem(name, akkaConf)
 
     actorSystem

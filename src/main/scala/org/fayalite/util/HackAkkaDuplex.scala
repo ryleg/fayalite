@@ -8,6 +8,8 @@ import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import org.fayalite.repl.Supervisor
 
+import scala.concurrent.Future
+
 
 class HackAkkaDuplex(
                         val host: String = defaultHost,
@@ -32,7 +34,7 @@ class HackAkkaDuplex(
 
 }
 
-abstract class DuplexPipe {
+abstract class DuplexPipe extends Logging {
   val port: Int
   val duplex : HackAkkaDuplex
 }
@@ -49,41 +51,42 @@ object HackAkkaServer {
 }
 
 class HackAkkaServer(val port: Int = defaultPort) extends DuplexPipe {
-
   //Initialize static reference.
   SparkReference.getSC
-
   val duplex = new HackAkkaDuplex(port=port)
-
   duplex.serverActorSystem.actorOf(Props(new Supervisor(duplex)), name=serverActorName)
+  logInfo("Started server on port " + port)
 
 }
 
-class NotebookClient extends Actor {
+class NotebookClient(duplex: HackAkkaDuplex) extends Actor {
 
   //God no
-  var lastMessage : (String, java.util.Date) = ("init",  Calendar.getInstance().getTime)
+
+  var messages : List[(Output, java.util.Date)] = List()
 
   def receive = {
-    case Output(evaluationResult) =>
+    case output : Output =>
       val now = Calendar.getInstance().getTime
-      lastMessage = (evaluationResult, now)
-    case _ => {
-      sender ! lastMessage
-    }
+      messages = (output, now) :: messages
+    case h: Heartbeat =>
+      duplex.remoteServer ! h
+    case _ => sender ! messages
   }
 }
 import akka.pattern.ask
 
 class HackAkkaClient(
+                      val notebookId : Int,
                       val port: Int = defaultPort + 10,
                      val masterServerPort: Int = defaultPort) extends DuplexPipe
 with Logging {
 
+  type Messages = List[(Output, java.util.Date)]
 
   val duplex = new HackAkkaDuplex(port=port)
 
-  val client = duplex.serverActorSystem.actorOf(Props(new NotebookClient()), name=serverActorName)
+  val client = duplex.serverActorSystem.actorOf(Props(new NotebookClient(duplex)), name=serverActorName)
 
   val remoteServer = duplex.startClient(port + 2000, masterServerPort)
 
@@ -91,19 +94,27 @@ with Logging {
     remoteServer ! Start(port, replId)
   }
 
-  def evaluate(evaluationParams: Evaluate) : String = {
-    val (lastMessage, prevTime) = client.??[(String, java.util.Date)]("")
-    duplex.remoteServer ! evaluationParams
-    var sleeps = 0
+  def poll() = client.??[List[(Output, java.util.Date)]]("")
+
+  def pollTestLog() = Future {
     while (true) {
-      Thread.sleep(200)
-      sleeps = sleeps + 1
-      if (sleeps % 50 == 0) logInfo("client awaiting response") // 10 seconds
-      if (sleeps > 100) return "failed"
-      val (checkMessage, checkTime) = client.??[(String, java.util.Date)]("")
-      if (checkTime.after(prevTime)) return checkMessage
+      Thread.sleep(5000)
+      logInfo("Polling: " + poll())
     }
-    "failure?"
   }
 
+  def evaluate(code: String, userId: Int, replId: Int) = {
+    val evaluationParams = SuperInstruction(code, replId, userId, notebookId, port)
+  /*  val prevHistory = poll()
+    var checkHistory  = poll()*/
+    duplex.remoteServer ! evaluationParams
+/*    val check = Future {
+      do {
+        Thread.sleep(200)
+        checkHistory  = poll()
+      } while(checkHistory == prevHistory)
+      checkHistory
+    }
+    check.getAs[Messages]*/
+  }
 }

@@ -1,7 +1,7 @@
 package org.fayalite.repl
 
 
-
+import org.fayalite.repl.REPL.SuperInstruction
 import org.json4s.jackson.JsonMethods._
 import org.json4s.{Extraction, JsonAST, DefaultFormats}
 import org.json4s.JsonDSL._
@@ -21,6 +21,8 @@ object JSON {
   }
 
   def parse4s(msg: String) = parse(msg)
+
+  def parseSuperInstruction(msg: String) = parse(msg).extract[SuperInstruction]
 
 //  def parseAs[T](msg: String)(implicit ev: ClassTag[T]) = parse(msg).extract[T]
 
