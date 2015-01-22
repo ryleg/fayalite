@@ -38,34 +38,38 @@ class Supervisor(duplex: HackAkkaDuplex)
   }
 
 
-  def keepAlive() = Future{
-    while (true) {
-      replSubscribers.foreach {
-        case (port, r) => r ! Heartbeat(port)
-      }
-
-      val beatTime = System.currentTimeMillis()
-      Thread.sleep(10000)
-
-      val portDelta = replSubscribers.toList.map {
-        case (port, r) => heartbeats.get(port) match {
-          case Some(prevTime) =>
-            val delta = beatTime - prevTime
-            (port, delta)
-          case None => (port, Long.MaxValue)
+  def keepAlive() = Try {
+    Future {
+      while (true) {
+        replSubscribers.foreach {
+          case (port, r) => r ! Heartbeat(port)
         }
-      }
 
-      portDelta.filter{_._2 > 35000L}.foreach{
-        case (port, delta) =>
-          logInfo("Heartbeat not received from port " + port + " in 10s --- Removing subscriber")
-          replSubscribers.remove(port)
-      }
+        val beatTime = System.currentTimeMillis()
+        Thread.sleep(10000)
 
+        val portDelta = replSubscribers.toList.map {
+          case (port, r) => heartbeats.get(port) match {
+            case Some(prevTime) =>
+              val delta = beatTime - prevTime
+              (port, delta)
+            case None => (port, Long.MaxValue)
+          }
+        }
+
+        portDelta.filter {
+          _._2 > 35000L
+        }.foreach {
+          case (port, delta) =>
+            logInfo("Heartbeat not received from port " + port + " in 10s --- FakeRemoving subscriber")
+          //  replSubscribers.remove(port)
+        }
+
+      }
     }
   }
 
- // val keptAlive = keepAlive()
+  val keptAlive = keepAlive()
 
   var heartbeats : scala.collection.mutable.Map[Int, Long] = scala.collection.mutable.Map()
 

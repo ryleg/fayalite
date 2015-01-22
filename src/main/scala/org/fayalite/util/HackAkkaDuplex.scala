@@ -8,7 +8,8 @@ import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import org.fayalite.repl.Supervisor
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.util.Try
 
 
 class HackAkkaDuplex(
@@ -101,6 +102,24 @@ with Logging {
       Thread.sleep(5000)
       logInfo("Polling: " + poll())
     }
+  }
+
+  import scala.concurrent.duration._
+  def pollWait(fEval : => String, timeout : Duration = 10.seconds) = {
+    val prevResult = poll()
+    var currentResult = poll()
+
+    fEval
+    // scala.rx is way better pattern than this.
+    val attempt = Future {
+      do {
+        Thread.sleep(1000)
+        currentResult = poll()
+      } while (prevResult == currentResult)
+    }
+
+    val res = Await.result(attempt, timeout).toString
+    res
   }
 
   def evaluate(code: String, userId: Int, replId: Int) = {

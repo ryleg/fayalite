@@ -19,12 +19,21 @@ object SparkREPLManager {
     val srm = new SparkREPLManager(1)
     println(srm.run("val x = 1"))
     println(srm.run("val x = 2"))
+    println(srm.run("$sc"))
 
+    val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
+      '"' + s"$property" + "\"," + s"$value)"
+
+    val prop = setLocal("userId")("1")
+
+    val p = (code: String) => println(srm.run(p))
+
+    p(prop)
 
   }
 }
 
-class SparkREPLManager(userId: Int) extends REPLManagerLike with Logging {
+class SparkREPLManager(replId: Int) extends REPLManagerLike with Logging {
 
   val iloop = new MagicSparkILoop(Some(br), pw)
 
