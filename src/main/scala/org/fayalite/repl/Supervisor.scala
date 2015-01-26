@@ -10,7 +10,7 @@ import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.pattern._
-import scala.collection.mutable.{Map => MMap}
+import scala.collection.mutable.{Map => MMap, Map}
 
 import scala.util.{Failure, Success, Try}
 import org.fayalite.repl.REPL._
@@ -28,7 +28,7 @@ class Supervisor(duplex: HackAkkaDuplex)
 
   SparkReference.getSC
 
-  var repls : Map[Int, SparkREPLManager] = Map()
+  var repls : MMap[Int, SparkREPLManager] = MMap()
 
   var replSubscribers : MMap[Int, ActorRef] = MMap()
   var clientAS : MMap[Int, ActorSystem] = MMap()
@@ -91,40 +91,54 @@ class Supervisor(duplex: HackAkkaDuplex)
           Supervisor.replSubscribers = replSubscribers
       }
 
-      val repl = repls.get(replId) match {
-        case Some(repl) =>
-        // send ack todo
-          logInfo("Found existing repl under id " + replId)
-          repl
+      // todo: not this
+      val repl = repls.get(replId)
+      repl match {
+        case Some(r) =>
+          // send ack todo
+          code match {
+            case c if c.startsWith(":startcp=") =>
+              r.iloop.intp.close()
+              logInfo("Found existing repl under id " + replId + " and destroyed it for a new cp")
+              val sparkManager = new SparkREPLManager(replId, c.replaceAll(":startcp=", ""))
+              repls(replId) = sparkManager
+              Supervisor.repls = repls
+            case _ =>
+              val stdOut = r.run(code)
+              logInfo("Supervisor output of code run "  +stdOut)
+              replSubscribers.foreach{
+                case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
+              }
+          }
         case None =>
-          logInfo("Starting replId " + replId)
+          logInfo("New repl under id " + replId)
           val sparkManager = new SparkREPLManager(replId)
-          repls = repls ++ Map(replId -> sparkManager)
+          repls(replId) = sparkManager
           Supervisor.repls = repls
-          sparkManager
+          val stdOut = sparkManager.run(code)
+          logInfo("Supervisor output of code run "  +stdOut)
+          replSubscribers.foreach{
+            case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
+          }
       }
-
-      /* if (replId == -1 && masterIntp != null) {
-          masterIntp.interpret(code).toString //god no
-        } else {*/
+    }
+}
+/* if (replId == -1 && masterIntp != null) {
+    masterIntp.interpret(code).toString //god no
+  } else {*/
 //          val res = repl.run(code)
 //          res
 //        }
-      val stdOut = repl.run(code)
-      logInfo("Supervisor output of code run "  +stdOut)
-        replSubscribers.foreach{
-          case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
-        }
-
-  }
-}
-
 object Supervisor{
 
   //Debug
   var repls : Map[Int, SparkREPLManager] = _
   var replSubscribers : MMap[Int, ActorRef] = MMap()
 
+  def superInstruct(si: SuperInstruction) = {
+
+
+  }
 
 
 }
