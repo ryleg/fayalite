@@ -10,7 +10,7 @@ import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import akka.pattern._
-import scala.collection.mutable.{Map => MMap, Map}
+import scala.collection.mutable.{Map => MMap}
 
 import scala.util.{Failure, Success, Try}
 import org.fayalite.repl.REPL._
@@ -102,7 +102,7 @@ class Supervisor(duplex: HackAkkaDuplex)
               logInfo("Found existing repl under id " + replId + " and destroyed it for a new cp")
               val sparkManager = new SparkREPLManager(replId, c.replaceAll(":startcp=", ""))
               repls(replId) = sparkManager
-              Supervisor.repls = repls
+      //        Supervisor.repls = repls
             case _ =>
               val stdOut = r.run(code)
               logInfo("Supervisor output of code run "  +stdOut)
@@ -114,7 +114,7 @@ class Supervisor(duplex: HackAkkaDuplex)
           logInfo("New repl under id " + replId)
           val sparkManager = new SparkREPLManager(replId)
           repls(replId) = sparkManager
-          Supervisor.repls = repls
+       //   Supervisor.repls = repls
           val stdOut = sparkManager.run(code)
           logInfo("Supervisor output of code run "  +stdOut)
           replSubscribers.foreach{

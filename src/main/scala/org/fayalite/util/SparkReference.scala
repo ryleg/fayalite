@@ -18,7 +18,7 @@ object SparkReference {
       sparkConf.set("spark.speculation", "true")
       sparkConf.setMaster(master)
       sparkConf.setAppName("SuperMaster")
-      sparkConf.set("spark.executor.memory", "5G")
+      sparkConf.set("spark.executor.memory", "512M")
       sparkConf.set("spark.driver.memory", "1G")
       sc = new SparkContext(sparkConf)
     }

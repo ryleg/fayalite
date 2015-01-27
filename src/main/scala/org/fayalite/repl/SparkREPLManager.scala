@@ -85,7 +85,7 @@ object SparkREPLManager {
 
       p("org.fayalite.arcturus.Test.x")
 
-      p("$sc.makeRDD(1 to 10).map{_ => org.fayalite.arcturus.Test.x}.collect().toList")
+      p("$sc.parallelize(1 to 10, 3).map{_ => org.fayalite.arcturus.Test.x}.collect().toList")
 
     }
 
@@ -95,6 +95,7 @@ object SparkREPLManager {
     new TestM(1)
     new TestM(2)
 
+    Thread.sleep(Long.MaxValue)
   }
 }
 
