@@ -20,7 +20,9 @@ object SparkRuntimeManager {
   // ./spark-class org.apache.spark.deploy.worker.Worker spark://ubuntu:7077 -m 512M -c 1
   def main(args: Array[String]) {
 
-    //startMaster()
+    println(startMaster())
+
+    Thread.sleep(10000)
 
     (1 to 3).par.foreach { _ => startSlave()}
 

@@ -6,6 +6,7 @@ import org.fayalite.util.{SparkReference, Common}
 
 import org.apache.spark.{Logging, SparkConf, SparkContext}
 import org.apache.spark.repl.{MagicSparkILoop, SparkCommandLine, SparkILoop}
+import scala.concurrent.Future
 import scala.reflect._
 import java.io.File
 import java.net.URL
@@ -46,7 +47,7 @@ object SparkREPLManager {
 
     class TestM(uid: Int) {
 
-      val tcp =    s"/home/ryle/vx$uid.jar"
+      val tcp = s"/home/ryle/vx$uid.jar"
       val tcpu = "file://" + tcp
 
       val currentLoader = Thread.currentThread().getContextClassLoader
@@ -82,17 +83,21 @@ object SparkREPLManager {
 
       p(jarprop)
       p(uprop)
+  //    p(setLocal("spark.scheduler.pool")(s"$uid"))
 
       p("org.fayalite.arcturus.Test.x")
+    //  while (true) {
+        p("$sc.parallelize(1 to 10, 3).map{_ => org.fayalite.arcturus.Test.x}.collect().toList")
 
-      p("$sc.parallelize(1 to 10, 3).map{_ => org.fayalite.arcturus.Test.x}.collect().toList")
+   //     Thread.sleep(15000)
 
+    //  }
     }
 
  //   "/home/ryle/repo/arcturus/target/scala-2.10/arcturus.jar"
     val x2 = "/home/ryle/vx2.jar"
-
     new TestM(1)
+    //Future { }
     new TestM(2)
 
     Thread.sleep(Long.MaxValue)
