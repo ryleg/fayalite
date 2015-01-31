@@ -24,6 +24,8 @@ resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/
 
 resolvers += "Spray" at "http://repo.spray.io"
 
+mainClass in (Compile, run) := Some("org.fayalite.ui.SimpleServer")
+
 libraryDependencies ++= Seq(
     "com.scalarx" %% "scalarx" % "0.2.6" withSources() withJavadoc(),
   "org.scalatest" %% "scalatest" % "2.2.1" % "test" withSources() withJavadoc(),

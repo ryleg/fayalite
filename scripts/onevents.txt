@@ -1,0 +1,43 @@
+  var ondragend : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var onkeydown : scala.scalajs.js.Function1[org.scalajs.dom.KeyboardEvent, _] = { /* compiled code */ }
+  var ondragover : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var onkeyup : scala.scalajs.js.Function1[org.scalajs.dom.KeyboardEvent, _] = { /* compiled code */ }
+  var onmouseup : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var ondragstart : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var ondrag : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var onmouseover : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var ondragleave : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var onmousedown : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var onclick : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var onmousemove : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var ondragenter : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var ondblclick : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var onkeypress : scala.scalajs.js.Function1[org.scalajs.dom.KeyboardEvent, _] = { /* compiled code */ }
+  var onresize : scala.scalajs.js.Function1[org.scalajs.dom.UIEvent, _] = { /* compiled code */ }
+  var ondrop : scala.scalajs.js.Function1[org.scalajs.dom.DragEvent, _] = { /* compiled code */ }
+  var onmouseout : scala.scalajs.js.Function1[org.scalajs.dom.MouseEvent, _] = { /* compiled code */ }
+  var onscroll : scala.scalajs.js.Function1[org.scalajs.dom.UIEvent, _] = { /* compiled code */ }
+
+  var onmousewheel : scala.scalajs.js.Function1[org.scalajs.dom.WheelEvent, _] = { /* compiled code */ }
+
+
+  var onload : scala.scalajs.js.Function1[org.scalajs.dom.Event, _] = { /* compiled code */ }
+
+  var onvolumechange : scala.scalajs.js.Function1[org.scalajs.dom.Event, _] = { /* compiled code */ }
+
+
+
+    /*
+    onwheel
+    ontouch / cancel, end, move, start
+    mouseecvent: altKey, buttons
+    onclick
+    ondblclick
+    onmousedown
+    onmousemove
+    onmouseup
+    onkeydown
+    onkeypress
+    onkeyup
+     */
+   // document.onmousemove = pxy

@@ -34,26 +34,54 @@ object SimpleServer extends App with MySslConfiguration {
 
     def businessLogic: Receive = {
       // just bounce frames back for Autobahn testsuite
-      case x @ (_: BinaryFrame | _: TextFrame) =>
-        sender() ! x
+   //   println("buslogic websoket.");
+  //    {
+        case x@(_: BinaryFrame | _: TextFrame) =>
+          sender() ! x
+          println("businessLogic run echoing: " + x)
+          println("message: " + x.toString)
+          x match {
+            case TextFrame(msg) =>
+              println("utf msg " + msg.utf8String)
+              org.fayalite.ui.LoopRxWS.onMessage(msg.utf8String, sender())
+            case _ =>
+                println("cant recognize frame as textframe.")
+          }
 
-      case Push(msg) => send(TextFrame(msg))
 
-      case x: FrameCommandFailed =>
-        log.error("frame command failed", x)
+        case Push(msg) => {
+          println("Pushmsg: " + msg + " " + TextFrame(msg))
+          send(TextFrame(msg))
+        }
 
-      case x: HttpRequest => // do something
+        case x: FrameCommandFailed =>
+          println("frame failed " + x)
+          //log.error("frame command failed", x)
+
+        case x: HttpRequest =>
+        println("httprequest " + x)
+        // do something
+     // }
     }
 
     def businessLogicNoUpgrade: Receive = {
       implicit val refFactory: ActorRefFactory = context
       runRoute {
       //  path("hello") {
-        getFromResource("websocket.html") ~
+        pathPrefix("css") { get { getFromResourceDirectory("css") } } ~
+          pathPrefix("js") { get { getFromResourceDirectory("js") } } ~
+    //      getFromResource("websocket.html") ~
           get {
             complete {
+              <body>
               <h1>Say hello to spray</h1>
-            }
+                <script type="text/javascript" src="http://cdn.jsdelivr.net/jquery/2.1.1/jquery.js"></script>
+                <script type="text/javascript" src="js/fayalite-fastopt.js"></script>
+                <script type="text/javascript">
+                  tutorial.webapp.TutorialApp().main();
+                </script>
+              </body>
+                }
           }
      //   }
         //getFromResourceDirectory("webapp")
