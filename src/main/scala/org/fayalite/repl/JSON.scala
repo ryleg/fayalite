@@ -16,7 +16,6 @@ object JSON {
 
   def caseClassToJson(message: Any) = {
     implicit val formats = DefaultFormats
-
     compact(render(Extraction.decompose(message)))
   }
 
