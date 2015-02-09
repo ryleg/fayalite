@@ -1,13 +1,10 @@
 package org.apache.spark.repl
 
-import scala.reflect._
 import scala.reflect.api.{Mirror, TypeCreator, Universe => ApiUniverse}
+import scala.reflect.{ClassTag, classTag}
 import scala.tools.nsc.interpreter.{JPrintWriter, _}
 import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.nsc.{Settings, io}
-import scala.reflect.{ClassTag, classTag}
-import org.apache.spark.repl.SparkJLineReader
-import org.apache.spark.repl.SparkIMain
 
 class MagicSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) extends SparkILoop(None, out, None) {
   override def getMaster(): String = {

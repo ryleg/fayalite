@@ -13,6 +13,8 @@ import org.fayalite.repl.REPL._
 
 import JSON._
 
+import scala.reflect.ClassTag
+
 
 trait AkkaExt {
 

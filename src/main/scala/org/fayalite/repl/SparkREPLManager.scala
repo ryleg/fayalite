@@ -1,6 +1,7 @@
 package org.fayalite.repl
 
 
+import org.apache.spark.rdd.RDD
 import org.fayalite.repl.REPL._
 import org.fayalite.util.{SparkReference, Common}
 
@@ -17,9 +18,50 @@ import org.apache.spark.util.Utils
 
 object SparkREPLManager {
 
-   def main (args: Array[String]) {
-    testEvaluation()
+
+  def main(args: Array[String]) {
+    testEvaluation2()
   }
+  def testEvaluation2() : Unit = {
+    val sc = new SparkContext("spark://Ryles-MacBook-Pro.local:7077", "dogs")
+    SparkReference.sc = sc
+    class TestTyler(uid: Int) {
+      val tcpu =   "file:///Users/ryle/Documents/repo/fayalite/target/scala-2.10/fayalite.jar:" +
+        "file:///Users/ryle/Documents/repo/fayalite/lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar"
+      val currentLoader = Thread.currentThread().getContextClassLoader
+      val urls = Array(new java.net.URL("file://" + tcpu))
+      val parent: MutableURLClassLoader = new ExecutorURLClassLoader(urls, currentLoader)
+      val conf = new SparkConf(true)
+      val userCP: java.lang.Boolean = false
+      val klass = Class.forName("org.apache.spark.repl.ExecutorClassLoader").asInstanceOf[Class[_ <: ClassLoader]]
+      val constructor = klass.getConstructor(classOf[SparkConf], classOf[String],
+        classOf[ClassLoader], classOf[Boolean])
+      val srm = new SparkREPLManager(uid, classPath = tcpu)
+      val cl = constructor.newInstance(conf, srm.iloop.classServer.uri, parent, userCP)
+      SparkContext.classLoaders(uid) = cl
+      println(srm.run("val x = 1"))
+      println(srm.run("val x = 2"))
+      println(srm.run("$sc"))
+      val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
+        "\"" + property + "\",\"" + value + "\")"
+      val curi = srm.iloop.classServer.uri
+      val prop = setLocal("userId")("1")
+      val jarprop = setLocal("spark.dynamic.jarPath")(tcpu)
+      val uprop = setLocal("spark.dynamic.userReplPath")(curi)
+      val p = (code: String) => println(srm.run(code))
+      println(prop)
+      p(jarprop)
+      p(uprop)
+      p("""
+val places = $sc.parallelize(1 to 100, 3)
+val ids = places.map { x => "dog" + org.fayalite.util.Common.SPARK_HOME}.count()
+println(ids)
+""")
+    }
+    new TestTyler(1)
+    Thread.sleep(Long.MaxValue)
+  }
+
 
   val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
     "\"" + property + "\",\"" + value + "\")"

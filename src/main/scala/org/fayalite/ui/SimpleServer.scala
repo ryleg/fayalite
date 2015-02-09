@@ -1,13 +1,21 @@
 package org.fayalite.ui
 
+import java.awt.image.RenderedImage
+import javax.imageio.ImageIO
+
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.io.IO
+import org.scalajs.dom.{ArrayBuffer, Uint8Array}
 import spray.can.server.UHttp
 import spray.can.{Http, websocket}
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{BinaryFrame, TextFrame}
 import spray.http.HttpRequest
 import spray.routing.HttpServiceActor
+
+import scala.collection.mutable
+import java.awt._
+import java.io._
 
 object SimpleServer extends App with MySslConfiguration {
 
@@ -32,19 +40,41 @@ object SimpleServer extends App with MySslConfiguration {
   class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor with websocket.WebSocketServerWorker {
     override def receive = handshaking orElse businessLogicNoUpgrade orElse closeLogic
 
+    import org.fayalite.repl.REPL._
+
     def businessLogic: Receive = {
       // just bounce frames back for Autobahn testsuite
    //   println("buslogic websoket.");
   //    {
         case x@(_: BinaryFrame | _: TextFrame) =>
-          sender() ! x
-          println("businessLogic run echoing: " + x)
-          println("message: " + x.toString)
+       //   println("businessLogic run " + sender.path)
           x match {
             case TextFrame(msg) =>
-              println("utf msg " + msg.utf8String)
-              org.fayalite.ui.LoopRxWS.onMessage(msg.utf8String, sender())
-            case _ =>
+        //      println("utf msg " + msg.utf8String)
+            //  sender() ! TextFrame("msg reciv")
+              sender() ! TextFrame(parser.??[String](msg.utf8String))
+            case BinaryFrame(dat) =>
+             /*   val ab = dat.toArray.map{
+                b => b & 0xFF;}
+              import java.awt.image.BufferedImage
+              val image = new BufferedImage(460, 495, BufferedImage.TYPE_INT_ARGB);
+              val g = image.createGraphics()
+              g.setBackground(Color.red)
+              //g.drawImage(image, null, 0, 0);
+              g.setColor(Color.white)
+              g.drawString("yo", 50, 50) // (x/300, y/300)
+            val w = image.getWidth
+              val h = image.getHeight
+              val rgba =     image.getRGB(0, 0, w, h, null, 0, w);
+                image.setRGB(0, 0, w, h, ab, 0, w)
+              //   val d3 = bi2db(image)
+              //  d3
+              val ri = image.asInstanceOf[RenderedImage]
+              val fi = new java.io.File("/Users/ryle/adfsf.jpg")
+              ImageIO.write(ri, "JPEG", fi)
+
+                println(rgba.length)
+                println(ab.length)*/
                 println("cant recognize frame as textframe.")
           }
 
@@ -71,8 +101,14 @@ object SimpleServer extends App with MySslConfiguration {
         pathPrefix("css") { get { getFromResourceDirectory("css") } } ~
           pathPrefix("js") { get { getFromResourceDirectory("js") } } ~
     //      getFromResource("websocket.html") ~
-          get {
-            complete {
+/*
+          pathPrefix("fayalite") { get { getFromFile("/Users/ryle/Documents/repo/fayalite/target/" +
+            "scala-2.10/fayalite-fastopt.js") } } ~
+        get {
+          getFromFile("/Users/ryle/Documents/repo/fayalite/target/scala-2.10" +
+            "index-fastopt.html")
+} ~  */
+             get{complete {
               <body>
               <h1>Say hello to spray</h1>
                 <script type="text/javascript" src="http://cdn.jsdelivr.net/jquery/2.1.1/jquery.js"></script>
@@ -82,8 +118,7 @@ object SimpleServer extends App with MySslConfiguration {
                 </script>
               </body>
                 }
-          }
-     //   }
+        }
         //getFromResourceDirectory("webapp")
     //
       }
@@ -101,6 +136,8 @@ object SimpleServer extends App with MySslConfiguration {
     system.shutdown()
     system.awaitTermination()
   }
+
+  val parser = org.fayalite.util.Tutils.parseClient()
 
   // because otherwise we get an ambiguous implicit if doMain is inlined
   doMain()
