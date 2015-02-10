@@ -93,30 +93,27 @@ object TutorialApp extends JSApp {
     }
     ws.onopen = (e: Event) => {
       open = true
-  /*    //val nimd = sm.tail.map{_.toInt}
-      println(nimd.length + " nimd")
-      var imgData=sid
-      // invert colors
-      for (i4 <- 0 until imgData.data.length) yield
-      {
-        val i = i4*4
-        val rgba =
-          imgData.data(i) = 255-nimd(i);
-        imgData.data(i+1)=255-nimd(i+1);
-        imgData.data(i+2)=255-nimd(i+2);
-        imgData.data(i+3)=255;
-      }*/
-      ws.send(bytearray.buffer)
-    }
+      var imgData=sid.data
+      var bytearray = new Uint8Array(imgData.length);
+
+      imgData.zipWithIndex.foreach{
+        case (dat, idx) => bytearray(idx) = dat
+      }
+
+      ws.send(bytearray.buffer);
+   //   ws.send(imgData.data.mkString(","))
+      }
+
     ws.onclose = (e: Event) => open = false
     ws.onerror = (e: Event) => open = false
 
-    window.onmousemove = i m "move"
-    window.onmousedown = i m "down"
-    window.onmouseup = i m "up"
-    window.onkeydown = i k "down"
-    window.onkeyup = i k "up"
-
+    def regML {
+      window.onmousemove = i m "move"
+      window.onmousedown = i m "down"
+      window.onmouseup = i m "up"
+      window.onkeydown = i k "down"
+      window.onkeyup = i k "up"
+    }
 /*   */
 
   }

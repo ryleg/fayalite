@@ -5,6 +5,7 @@ import javax.imageio.ImageIO
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.io.IO
+import org.fayalite.util.SparkReference
 import org.scalajs.dom.{ArrayBuffer, Uint8Array}
 import spray.can.server.UHttp
 import spray.can.{Http, websocket}
@@ -50,10 +51,14 @@ object SimpleServer extends App with MySslConfiguration {
        //   println("businessLogic run " + sender.path)
           x match {
             case TextFrame(msg) =>
+              val umsg = msg.utf8String
         //      println("utf msg " + msg.utf8String)
             //  sender() ! TextFrame("msg reciv")
-              sender() ! TextFrame(parser.??[String](msg.utf8String))
+          //    sender() ! TextFrame(parser.??[String](msg.utf8String))
+              scala.tools.nsc.io.File("msgio.txt").writeAll(umsg.split(",").mkString("\n"))
+
             case BinaryFrame(dat) =>
+              SparkReference.getSC.makeRDD(Seq(dat)).saveAsObjectFile("dat")
              /*   val ab = dat.toArray.map{
                 b => b & 0xFF;}
               import java.awt.image.BufferedImage
@@ -75,7 +80,7 @@ object SimpleServer extends App with MySslConfiguration {
 
                 println(rgba.length)
                 println(ab.length)*/
-                println("cant recognize frame as textframe.")
+                println("binaryframe.")
           }
 
 
@@ -137,7 +142,7 @@ object SimpleServer extends App with MySslConfiguration {
     system.awaitTermination()
   }
 
-  val parser = org.fayalite.util.Tutils.parseClient()
+//  val parser = org.fayalite.util.Tutils.parseClient()
 
   // because otherwise we get an ambiguous implicit if doMain is inlined
   doMain()

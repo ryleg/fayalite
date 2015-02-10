@@ -1,10 +1,14 @@
 package org.fayalite.ui
 
-import java.awt.image.RenderedImage
+import java.awt.image.{DataBufferByte, DataBufferInt, RenderedImage}
 import javax.imageio.ImageIO;
 
+import akka.util.ByteString
+import org.fayalite.util.SparkReference
 import rx._
 
+import scala.collection.Iterable
+import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 object ClientMessageToResponse {
@@ -28,6 +32,91 @@ object ClientMessageToResponse {
   import java.awt.Color
 //  val rgbArray = Array.fill(300*300)(0)
 
+  def byteStringToUInt8(bs : ByteString) = {
+    val uint = bs.toIterable.map {
+      b => b & 0xFF
+    }.grouped(4).map {
+      _.toList
+    }.map {
+      case List(r, g, b, a) => new Color(r, g, b, a).getRGB
+    }
+  }
+
+  def bufferedImageToByteString(bi: BufferedImage) = {
+
+    image.setRGB(0, 0, w, h, rgbs.toArray, 0, w)
+
+    val rgba = argb.flatMap{ b =>
+      val c = new Color(b, true);
+      Seq(    c.getRGB,
+        c.getRed(),
+        c.getGreen(),
+        c.getBlue(),
+        c.getAlpha())
+    }
+  }
+
+def main(args: Array[String]) {
+  val dat = SparkReference.getSC.objectFile[ByteString]("dat").first
+  dat.toIterable.map {
+    b => (b, b & 0xFF)
+  }.toList.slice(0, 10).foreach{println}
+//  val uint8 = byteStringToUInt8(dat)
+
+}
+/*
+
+  println(dat.length)
+
+
+  println(uint.slice(0, 15))
+
+  import java.awt.image.BufferedImage
+  val image = new BufferedImage(460, 495, BufferedImage.TYPE_4BYTE_ABGR);
+  val g = image.createGraphics()
+  val w = image.getWidth
+  val h = image.getHeight
+  g.setBackground(Color.BLUE)
+  g.setPaint ( Color.BLUE);
+  g.fillRect ( 0, 0, w,h);
+//  g.drawImage(image, null, 0, 0);
+  g.setColor(Color.YELLOW)
+  g.drawString("asdfzsd", 55, 55) // (x/300, y/300)
+
+ // val argb =     image.getRGB(0, 0, w, h, null, 0, w);
+//  val dbb = image.getRaster.getDataBuffer.asInstanceOf[DataBufferByte]
+//   val db = dbb.getData.toList
+ // val len = db.getSize
+
+ // val of = (0 until len).toList.map{idx => db.getDataType}
+    val argb = image.getRGB(0, 0, w, h, null, 0, w).toList
+  println(argb.slice(0, 10))
+
+  image.setRGB(0, 0, w, h, rgbs.toArray, 0, w)
+
+  val rgba = argb.flatMap{ b =>
+    val c = new Color(b, true);
+    Seq(    c.getRGB,
+      c.getRed(),
+      c.getGreen(),
+      c.getBlue(),
+      c.getAlpha())
+  }
+  println(rgba.slice(0, 10))
+
+  //   imag
+ // e.setRGB(0, 0, w, h, msg, 0, w)
+/*
+
+
+    println("rgba " + rgba.slice(0, 10).toList)
+    println("msg " + msg.slice(0, 10).toList)*/
+
+    val ri = image.asInstanceOf[RenderedImage]
+    val fi = new java.io.File("adfsf.png")
+    ImageIO.write(ri, "PNG", fi)
+
+}*/
   def moveToResponse(x: Int, y: Int) = {
 /*
     var imgData=ctx.getImageData(0,0,c.width,c.height);
@@ -64,10 +153,6 @@ object ClientMessageToResponse {
     ImageIO.write(ri, "JPEG", fi)
 
     rgba
-  }
-
-  def main(args: Array[String]) {
-    println(moveToResponse(10, 10).toList.length)
   }
 
   def parse(msg: String) : String = {

@@ -100,7 +100,8 @@ object RemoteAkkaUtils extends Logging {
     val akkaThreads = 4
     val akkaBatchSize = 15
     val akkaTimeout = 100
-    val akkaFrameSize = 10 * 1024 * 1024
+    val xKB = 500
+    val akkaFrameSize = xKB * 1024 * 1024
     val akkaLogLifecycleEvents = false
     val lifecycleEvents = "on"
     val logAkkaConfig = "on"

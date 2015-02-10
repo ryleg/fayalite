@@ -9,7 +9,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object SparkReference {
 
   var sc: SparkContext = _
-  implicit var master = "spark://ubuntu:7077" // "local[*]"
+  implicit var master = "local[*]" //"spark://ubuntu:7077" //
 
   def getSC = {
     if (sc == null) {
