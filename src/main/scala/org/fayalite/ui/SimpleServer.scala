@@ -58,28 +58,6 @@ object SimpleServer extends App with MySslConfiguration {
               scala.tools.nsc.io.File("msgio.txt").writeAll(umsg.split(",").mkString("\n"))
 
             case BinaryFrame(dat) =>
-              SparkReference.getSC.makeRDD(Seq(dat)).saveAsObjectFile("dat")
-             /*   val ab = dat.toArray.map{
-                b => b & 0xFF;}
-              import java.awt.image.BufferedImage
-              val image = new BufferedImage(460, 495, BufferedImage.TYPE_INT_ARGB);
-              val g = image.createGraphics()
-              g.setBackground(Color.red)
-              //g.drawImage(image, null, 0, 0);
-              g.setColor(Color.white)
-              g.drawString("yo", 50, 50) // (x/300, y/300)
-            val w = image.getWidth
-              val h = image.getHeight
-              val rgba =     image.getRGB(0, 0, w, h, null, 0, w);
-                image.setRGB(0, 0, w, h, ab, 0, w)
-              //   val d3 = bi2db(image)
-              //  d3
-              val ri = image.asInstanceOf[RenderedImage]
-              val fi = new java.io.File("/Users/ryle/adfsf.jpg")
-              ImageIO.write(ri, "JPEG", fi)
-
-                println(rgba.length)
-                println(ab.length)*/
                 println("binaryframe.")
           }
 

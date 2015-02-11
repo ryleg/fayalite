@@ -9,8 +9,12 @@ import scala.scalajs.js.JSApp
 
 
 object Canvas {
+
+  var canvas : dom.HTMLCanvasElement = _
+  var ctx : dom.CanvasRenderingContext2D = _
+
   def initCanvas() = {
-    val canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
+    canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     document.body.appendChild(canvas)
     val ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
     canvas.width = window.innerWidth
@@ -23,4 +27,18 @@ object Canvas {
     ctx.fillStyle = "#9ea7b8"
     ctx.fillRect(0, 0, w, h)
   }
+
+  def getCanvasData = {
+    val sid = ctx.getImageData(0, 0, canvas.width, canvas.height)
+    val canvaspixelarray = sid.data
+    val canvaspixellen = canvaspixelarray.length
+    val bytearray = new Uint8Array(canvaspixellen)
+    for (i <- 0 until canvaspixellen) {
+      bytearray(i) = canvaspixelarray(i)
+    }
+    bytearray
+  }
+
+  def setCanvasData()
+
 }

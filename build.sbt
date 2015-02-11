@@ -42,8 +42,9 @@ libraryDependencies ++= Seq(
   "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8" % "provided" withSources(),
   "com.github.fge" % "jackson-coreutils" % "1.8" withSources(),
   "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources(),
-  "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4",
-  "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
-  "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6",
-  "org.scalajs" %%% "scalajs-pickling" % "0.3"
+  "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
+  "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6" withSources() withJavadoc(),
+  "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6" withSources() withJavadoc(),
+  "org.scalajs" %%% "scalajs-pickling" % "0.3" withSources() withJavadoc(),
+  "com.lihaoyi" %%% "scalarx" % "0.2.7" withSources() withJavadoc()
 )
