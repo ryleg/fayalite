@@ -24,6 +24,10 @@ resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/
 
 resolvers += "Spray" at "http://repo.spray.io"
 
+resolvers += Resolver.url("scala-js-releases",
+  url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
+    Resolver.ivyStylePatterns)
+
 mainClass in (Compile, run) := Some("org.fayalite.ui.SimpleServer")
 
 libraryDependencies ++= Seq(
@@ -40,5 +44,6 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources(),
   "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4",
   "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6",
-  "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6"
+  "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6",
+  "org.scalajs" %%% "scalajs-pickling" % "0.3"
 )

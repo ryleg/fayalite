@@ -32,7 +32,7 @@ object ClientMessageToResponse {
   import java.awt.Color
 //  val rgbArray = Array.fill(300*300)(0)
 
-  def byteStringToUInt8(bs : ByteString) = {
+  def byteStringToUInt8ToRGBInt(bs : ByteString) = {
     val uint = bs.toIterable.map {
       b => b & 0xFF
     }.grouped(4).map {
@@ -40,29 +40,89 @@ object ClientMessageToResponse {
     }.map {
       case List(r, g, b, a) => new Color(r, g, b, a).getRGB
     }
+    uint.toArray
+  }
+
+  case class UIParams(width: Int, height: Int)
+
+  object RGBI {
+    def apply(bs: ByteString)(implicit uip: UIParams) = {
+      new RGBI(byteStringToUInt8ToRGBInt(bs), uip.width, uip.height)
+    }
+  }
+  class RGBI(rgba: Array[Int], width: Int, height: Int) {
+
+
+    import java.awt.image.BufferedImage
+    val image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+    val g = image.createGraphics()
+    image.setRGB(0, 0, width, height, rgba, 0, width)
+    def save(path: String) = {
+      val ri = image.asInstanceOf[RenderedImage]
+      val fi = new java.io.File("adfsf.png")
+      ImageIO.write(ri, "PNG", fi)
+    }
+
+    def byteString = bufferedImageToByteString(image)
+
   }
 
   def bufferedImageToByteString(bi: BufferedImage) = {
-
-    image.setRGB(0, 0, w, h, rgbs.toArray, 0, w)
-
-    val rgba = argb.flatMap{ b =>
-      val c = new Color(b, true);
-      Seq(    c.getRGB,
+    val w = bi.getWidth
+    val h = bi.getHeight
+    val rgbaInt = bi.getRGB(0, 0, w, h, null, 0, w)
+    val rgba = rgbaInt.flatMap{ b =>
+      val c = new Color(b, true)
+      Seq(
         c.getRed(),
         c.getGreen(),
         c.getBlue(),
-        c.getAlpha())
+        c.getAlpha()
+      ).map{_.toByte}
+    }
+    ByteString(rgba)
+  }
+
+
+  implicit def byteStringToUInt8(bs : ByteString): IndexedSeq[Int] = {
+    bs.map {
+      b => b & 0xFF
     }
   }
 
+
+  implicit def uInt8ToByteString(uint8: IndexedSeq[Int]) : ByteString = {
+    ByteString(uint8.map{_.toByte}.toArray)
+  }
+
 def main(args: Array[String]) {
+
+
+/*
+
   val dat = SparkReference.getSC.objectFile[ByteString]("dat").first
+
+  val s : IndexedSeq[Int] = dat
+  val ss : ByteString = s
+
+  dat.slice(0, 10).foreach{println}
+  println("dat")
+  s.slice(0, 10).foreach{println}
+  println(s.zip(ss).filter{case (x,y) => x != y}.length)
+  println(s.length + " " + ss.length)
+  ss.slice(0, 10).foreach{println}
+*/
+
+  /*
+    val rgba = byteStringToUInt8ToRGBInt(dat)
+    val rg = new RGBI(rgba, 460, 495)
+    println(rg.byteString == dat)*/
+  /*
   dat.toIterable.map {
     b => (b, b & 0xFF)
   }.toList.slice(0, 10).foreach{println}
 //  val uint8 = byteStringToUInt8(dat)
-
+*/
 }
 /*
 
