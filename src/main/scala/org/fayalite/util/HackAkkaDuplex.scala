@@ -55,7 +55,7 @@ class HackAkkaServer(val port: Int = defaultPort) extends DuplexPipe {
   //Initialize static reference.
   SparkReference.getSC
   val duplex = new HackAkkaDuplex(port=port)
-  duplex.serverActorSystem.actorOf(Props(new SparkSupervisor(duplex)), name=serverActorName)
+ // duplex.serverActorSystem.actorOf(Props(new SparkSupervisor(duplex)), name=serverActorName)
   logInfo("Started server on port " + port)
 
 }

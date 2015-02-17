@@ -27,7 +27,7 @@ class SparkSupervisor()(implicit masterIntp: SparkIMain = null) extends Actor wi
   def receive = {
     case si @ SuperInstruction(code, replId, userId, notebookId, clientPort: Int) =>
       logInfo(s"Evaluate received: $si")
-
+/*
       // todo: not this
       val repl = repls.get(replId)
       repl match {
@@ -57,7 +57,7 @@ class SparkSupervisor()(implicit masterIntp: SparkIMain = null) extends Actor wi
           replSubscribers.foreach{
             case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
           }
-      }
+      }*/
     }
 }
 /* if (replId == -1 && masterIntp != null) {

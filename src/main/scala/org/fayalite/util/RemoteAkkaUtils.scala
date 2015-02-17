@@ -5,7 +5,6 @@ import com.typesafe.config.ConfigFactory
 import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import akka.pattern.ask
-import org.fayalite.ui.ClientMessageToResponse
 import scala.tools.nsc.interpreter
 import scala.util.{Failure, Success, Try}
 

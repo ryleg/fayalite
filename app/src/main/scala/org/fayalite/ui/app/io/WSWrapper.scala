@@ -17,12 +17,6 @@ class WSWrapper(wsUri: String) {
 
   def defaultParseMessageEvent = Unit
 
-  var onMessage =  (me: MessageEvent) => {
-  //    me.data.
-    //  defaultParseMessageEvent
-    println(me.data)
-  }
-
   var reconnectionAttempts = 0
 
   def attemptReconnect() = {
@@ -40,10 +34,15 @@ class WSWrapper(wsUri: String) {
     }
     ws.onclose = (e: Event) => {
       open = false
-      attemptReconnect()
+  //    attemptReconnect()
     }
-    ws.onerror = (e: Event) => open = false; attemptReconnect()
-    ws.onmessage = onMessage
+    ws.onerror = (e: Event) => open = false; //attemptReconnect()
+    ws.onmessage = (me: MessageEvent) => {
+      //    me.data.
+      //  defaultParseMessageEvent
+      println("onmsg")
+      println("me.data " + me.data.toString)
+    }
   }
 
 

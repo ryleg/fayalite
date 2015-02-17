@@ -5,7 +5,8 @@ import javax.imageio.ImageIO
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.io.IO
-import org.fayalite.util.SparkReference
+import org.fayalite.util.RemoteAkkaUtils._
+import org.fayalite.util.{SimpleRemoteServer, SparkReference}
 import org.scalajs.dom.{ArrayBuffer, Uint8Array}
 import spray.can.server.UHttp
 import spray.can.{Http, websocket}
@@ -40,21 +41,68 @@ object SimpleServer extends App with MySslConfiguration {
   object WebSocketWorker {
     def props(serverConnection: ActorRef) = Props(classOf[WebSocketWorker], serverConnection)
   }
+
+  import scala.collection.mutable.{Map => MMap}
+  
+
+  type SenderMap = MMap[String, ActorRef]
+  val allSenders = MMap[String, ActorRef]()
+
+ // val parser = org.fayalite.ui.ParseClient.parseClient()
+  
+  //var parseServer = parser.getServerRef
+  type SprayFrame = spray.can.websocket.frame.Frame
+  
+  case class WebsocketPipeMessage(senderPath: String, message: SprayFrame)
+  
+  case class RequestClients()
+  
+  class WebsocketPipe() extends Actor {
+    def receive = {
+      case WebsocketPipeMessage(senderPath, message) =>
+        println("attempting to send client msg " + senderPath + " msg: " + message)
+      allSenders.get(senderPath).foreach{
+          s =>
+            println("found sender")
+            s ! message //.asInstanceOf[spray.can.websocket.frame.Frame]
+        }
+      case RequestClients() =>
+        println("requestClients")
+        sender ! allSenders.keys.toSet
+      case _ =>
+        println("websocketpipe")
+    }
+  }
+  
+  val pipePort = defaultPort + 168
+  val pipeServer = new SimpleRemoteServer({new WebsocketPipe()}, pipePort)
+
+
   class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor with websocket.WebSocketServerWorker {
     override def receive = handshaking orElse businessLogicNoUpgrade orElse closeLogic
-
     import org.fayalite.repl.REPL._
     import akka.pattern.ask
-
-    val parser = org.fayalite.ui.ParseClient.parseClient()
-
-    var parseServer = parser.getServerRef
-
-
-
     def businessLogic: Receive = {
         case x@(_: BinaryFrame | _: TextFrame) =>
-          sender ! x
+
+         //case TextFrame(msg)
+          x match {
+            case TextFrame(msg) =>
+              println("echoing " + msg.utf8String)
+              println(sender().path)
+              println(serverConnection.path)
+              println(serverConnection.path.toSerializationFormat)
+/*              send(TextFrame(msg.utf8String))
+              sender() ! TextFrame(msg.utf8String + "sender() ! x")*/
+              allSenders(sender().path.toString) = sender()
+        /*      allSenders.foreach{
+                case (sp, sndr) =>
+                  println("attempting to send to " + sp)
+                  sndr ! TextFrame(msg.utf8String + sp)
+              }*/
+          }
+
+
 
 /*
           parseServer match {

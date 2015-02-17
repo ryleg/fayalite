@@ -39,9 +39,9 @@ class UIPipeClient(duplex: HackAkkaDuplex) extends Actor {
       val attempt = Try {
         println("pipeparser " + x)
         //a() = x.toString
-        val response = ClientMessageToResponse.parse(x.toString)
+        /*val response = ClientMessageToResponse.parse(x.toString)
         println("response " + response)
-        duplex.remoteServer ! response
+        duplex.remoteServer ! response*/
       }
       attempt match {
         case Success(x) => println("succesfful parse")
@@ -86,7 +86,7 @@ class UIPipe(duplex: HackAkkaDuplex) extends Actor {
             })}))*/
         case parsedResponse: String =>
           println("ui pipe server got parsed response " + parsedResponse)
-          ClientMessageToResponse.parsedMessage() = parsedResponse
+          //ClientMessageToResponse.parsedMessage() = parsedResponse
           LoopRxWS.clients().foreach{
             c =>
               println(" SEDNING  to j s cleintparesdresponse")

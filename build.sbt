@@ -48,5 +48,3 @@ libraryDependencies ++= Seq(
   "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6" withSources() withJavadoc(),
   "com.lihaoyi" %% "scalarx" % "0.2.7"
 )
-
-lazy val core = (project in file("."))
