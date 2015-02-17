@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui.io
 
 import org.scalajs.dom._
@@ -12,3 +13,4 @@ object InputCapture {
     window.onkeyup = i k "up"
   }
 }
+*/

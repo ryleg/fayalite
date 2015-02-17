@@ -9,6 +9,8 @@ trait FutureExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
+  def getFuture[T](fut: Future[T], timeout: Int = 10) = Await.result(fut, timeout.seconds)
+
   implicit class getAsFuture(some: Future[Any]) {
     def getAs[T] = Await.result(some, 15.seconds).asInstanceOf[T]
   }

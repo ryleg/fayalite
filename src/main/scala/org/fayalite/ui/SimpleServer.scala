@@ -18,6 +18,8 @@ import scala.collection.mutable
 import java.awt._
 import java.io._
 
+import scala.util.Try
+
 object SimpleServer extends App with MySslConfiguration {
 
   final case class Push(msg: String)
@@ -42,25 +44,28 @@ object SimpleServer extends App with MySslConfiguration {
     override def receive = handshaking orElse businessLogicNoUpgrade orElse closeLogic
 
     import org.fayalite.repl.REPL._
+    import akka.pattern.ask
+
+    val parser = org.fayalite.ui.ParseClient.parseClient()
+
+    var parseServer = parser.getServerRef
 
     def businessLogic: Receive = {
-      // just bounce frames back for Autobahn testsuite
-   //   println("buslogic websoket.");
-  //    {
         case x@(_: BinaryFrame | _: TextFrame) =>
-       //   println("businessLogic run " + sender.path)
-          x match {
-            case TextFrame(msg) =>
-              val umsg = msg.utf8String
-        //      println("utf msg " + msg.utf8String)
-            //  sender() ! TextFrame("msg reciv")
-          //    sender() ! TextFrame(parser.??[String](msg.utf8String))
-              scala.tools.nsc.io.File("msgio.txt").writeAll(umsg.split(",").mkString("\n"))
 
-            case BinaryFrame(dat) =>
-                println("binaryframe.")
+          parseServer match {
+            case Some(parseServerActorRef) =>
+              val response = Try{
+                parseServerActorRef.??[spray.can.websocket.frame.Frame](x)
+              }.toOption
+              response.foreach{
+                r => send(r)
+              }
+            case None =>
+              println("parse server not found on request, re-attempting connection")
+              //TODO: Make this so much less dangerous
+              parseServer = parser.getServerRef
           }
-
 
         case Push(msg) => {
           println("Pushmsg: " + msg + " " + TextFrame(msg))
@@ -119,8 +124,6 @@ object SimpleServer extends App with MySslConfiguration {
     system.shutdown()
     system.awaitTermination()
   }
-
-//  val parser = org.fayalite.util.Tutils.parseClient()
 
   // because otherwise we get an ambiguous implicit if doMain is inlined
   doMain()

@@ -6,8 +6,16 @@ package org.fayalite.util
 
 import scala.sys.process._
 
+/**
+ * In order to avoid patching spark, we must hijack the bootstrap launcher
+ * for driver/master/executor and deploy instead our overriden versions
+ * of these respective classes with patches inside. The only alternative
+ * is a live patch of executor using scalive but that's pretty hard.
+ * NOTE ** Currently using patched version of spark until replacement complete.
+ */
 object SparkRuntimeManager {
 
+  // TODO: Pickup from configs.
   val shome = Common.SPARK_HOME
   val SPARK_PRINT_LAUNCH_COMMAND = "SPARK_PRINT_LAUNCH_COMMAND"
   val sbin = Common.SPARK_HOME + "sbin/"

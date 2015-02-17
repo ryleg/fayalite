@@ -6,7 +6,7 @@ import RemoteAkkaUtils._
 import akka.actor.{Actor, Props, ActorRef}
 import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
-import org.fayalite.repl.Supervisor
+import org.fayalite.repl.SparkSupervisor
 
 import scala.concurrent.{Await, Future}
 import scala.util.Try
@@ -55,7 +55,7 @@ class HackAkkaServer(val port: Int = defaultPort) extends DuplexPipe {
   //Initialize static reference.
   SparkReference.getSC
   val duplex = new HackAkkaDuplex(port=port)
-  duplex.serverActorSystem.actorOf(Props(new Supervisor(duplex)), name=serverActorName)
+  duplex.serverActorSystem.actorOf(Props(new SparkSupervisor(duplex)), name=serverActorName)
   logInfo("Started server on port " + port)
 
 }

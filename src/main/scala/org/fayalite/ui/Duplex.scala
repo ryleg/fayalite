@@ -1,7 +1,7 @@
 package org.fayalite.ui
 
 import akka.actor.{ActorRef, Actor, Props}
-import org.fayalite.repl.Supervisor
+import org.fayalite.repl.SparkSupervisor
 import org.fayalite.util.RemoteAkkaUtils._
 import org.fayalite.util.{HackAkkaClient, HackAkkaDuplex, DuplexPipe, SparkReference}
 import rx.core.Obs

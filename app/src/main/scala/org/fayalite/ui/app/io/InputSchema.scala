@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui.io
 import org.scalajs.spickling._
 
@@ -11,3 +12,4 @@ object InputSchema {
   PicklerRegistry.register[Person]
   PicklerRegistry.register(TrivialCaseObject)
 }
+*/

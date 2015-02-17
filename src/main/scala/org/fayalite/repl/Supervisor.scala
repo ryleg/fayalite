@@ -88,7 +88,7 @@ class Supervisor(duplex: HackAkkaDuplex)
           val client = duplex.startClient(tempASClientPort, clientPort)
           subscribe(client, clientPort)
           logInfo("Subscribing " + client + " clientPort: " + clientPort)
-          Supervisor.replSubscribers = replSubscribers
+          SparkSupervisor.replSubscribers = replSubscribers
       }
 
       // todo: not this
@@ -102,10 +102,10 @@ class Supervisor(duplex: HackAkkaDuplex)
               logInfo("Found existing repl under id " + replId + " and destroyed it for a new cp")
               val sparkManager = new SparkREPLManager(replId, c.replaceAll(":startcp=", ""))
               repls(replId) = sparkManager
-      //        Supervisor.repls = repls
+      //        SparkSupervisor.repls = repls
             case _ =>
               val stdOut = r.run(code)
-              logInfo("Supervisor output of code run "  +stdOut)
+              logInfo("SparkSupervisor output of code run "  +stdOut)
               replSubscribers.foreach{
                 case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
               }
@@ -114,9 +114,9 @@ class Supervisor(duplex: HackAkkaDuplex)
           logInfo("New repl under id " + replId)
           val sparkManager = new SparkREPLManager(replId)
           repls(replId) = sparkManager
-       //   Supervisor.repls = repls
+       //   SparkSupervisor.repls = repls
           val stdOut = sparkManager.run(code)
-          logInfo("Supervisor output of code run "  +stdOut)
+          logInfo("SparkSupervisor output of code run "  +stdOut)
           replSubscribers.foreach{
             case (id, subscriber) => subscriber ! Output(stdOut.toString, si)
           }

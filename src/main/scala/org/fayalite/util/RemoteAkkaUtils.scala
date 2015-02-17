@@ -9,61 +9,14 @@ import org.fayalite.ui.ClientMessageToResponse
 import scala.tools.nsc.interpreter
 import scala.util.{Failure, Success, Try}
 
-object Tutils {
-  import RemoteAkkaUtils._
 
-    def main(args: Array[String]) {
-
-      val c = parseClient()
-      println(c.??[String]("move,5,5"))
-
-    }
-
-    def parseClient() ={
-
-      val actorSystem = createActorSystem(clientActorSystemName, defaultHost, defaultPort+51)
-
-      val actorPath = s"akka.tcp://$serverActorSystemName" +
-        s"@$defaultHost:$defaultPort/user/" +
-        s"$serverActorName"
-
-      val actor = actorSystem.actorSelection(actorPath).resolveOne()
-      val actorRef = actor.get
-      actorRef
-
-    }
-}
 
 object RemoteAkkaUtils extends Logging {
 
   def main(args: Array[String]) {
 
-    parseServer()
     Thread.sleep(Long.MaxValue)
   }
-
-  def parseServer() = {
-
-    class TServ extends Actor{
-      def receive = {
-        case x =>
-          val attempt = Try {
-            println("pipeparser " + x)
-            val response = ClientMessageToResponse.parse(x.toString)
-            println("response " + response)
-            response
-          }
-          sender ! (attempt match {
-            case Success(xs) => xs
-            case Failure(e) => e.printStackTrace()
-          })
-      }
-    }
-    val actorSystem = createActorSystem(serverActorSystemName, defaultHost, defaultPort)
-    val sch = actorSystem.actorOf(Props(new TServ()), name=serverActorName)
-
-  }
-
 
   val serverActorSystemName = "FayaliteServer"
   val clientActorSystemName = "FayaliteClient"
