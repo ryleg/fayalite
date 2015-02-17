@@ -50,9 +50,13 @@ object SimpleServer extends App with MySslConfiguration {
 
     var parseServer = parser.getServerRef
 
+
+
     def businessLogic: Receive = {
         case x@(_: BinaryFrame | _: TextFrame) =>
+          sender ! x
 
+/*
           parseServer match {
             case Some(parseServerActorRef) =>
               val response = Try{
@@ -66,6 +70,7 @@ object SimpleServer extends App with MySslConfiguration {
               //TODO: Make this so much less dangerous
               parseServer = parser.getServerRef
           }
+*/
 
         case Push(msg) => {
           println("Pushmsg: " + msg + " " + TextFrame(msg))
@@ -87,7 +92,8 @@ object SimpleServer extends App with MySslConfiguration {
       runRoute {
       //  path("hello") {
         pathPrefix("css") { get { getFromResourceDirectory("css") } } ~
-          pathPrefix("js") { get { getFromResourceDirectory("js") } } ~
+          pathPrefix("js") { get { getFromResourceDirectory("js") } } //~
+        //TODO: Fix serving of pages -- testing websocket directly for now on static html.
     //      getFromResource("websocket.html") ~
 /*
           pathPrefix("fayalite") { get { getFromFile("/Users/ryle/Documents/repo/fayalite/target/" +
@@ -96,7 +102,7 @@ object SimpleServer extends App with MySslConfiguration {
           getFromFile("/Users/ryle/Documents/repo/fayalite/target/scala-2.10" +
             "index-fastopt.html")
 } ~  */
-             get{complete {
+/*             get{complete {
               <body>
               <h1>Say hello to spray</h1>
                 <script type="text/javascript" src="http://cdn.jsdelivr.net/jquery/2.1.1/jquery.js"></script>
@@ -105,8 +111,8 @@ object SimpleServer extends App with MySslConfiguration {
                   tutorial.webapp.TutorialApp().main();
                 </script>
               </body>
-                }
-        }
+                }*/
+       // }
         //getFromResourceDirectory("webapp")
     //
       }

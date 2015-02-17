@@ -19,7 +19,8 @@ class WSWrapper(wsUri: String) {
 
   var onMessage =  (me: MessageEvent) => {
   //    me.data.
-      defaultParseMessageEvent
+    //  defaultParseMessageEvent
+    println(me.data)
   }
 
   var reconnectionAttempts = 0
@@ -33,7 +34,10 @@ class WSWrapper(wsUri: String) {
   }
 
   def initWS(): Unit = {
-    ws.onopen = (e: Event) => { open = true; reconnectionAttempts = 0 }
+    ws.onopen = (e: Event) => {
+      open = true; reconnectionAttempts = 0
+      ws.send("init")
+    }
     ws.onclose = (e: Event) => {
       open = false
       attemptReconnect()

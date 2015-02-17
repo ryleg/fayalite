@@ -12,19 +12,8 @@ class ParseServer extends Actor{
     case TextFrame(msg) =>
       val umsg = msg.utf8String
     case BinaryFrame(dat) =>
+      //TODO : Check how to binary serialize dom event input classes here.
       println("binaryframe.")
-
-
-      val attempt = Try {
-        println("pipeparser " + x)
-        val response = ClientMessageToResponse.parse(x.toString)
-        println("response " + response)
-        response
-      }
-      sender ! (attempt match {
-        case Success(xs) => xs
-        case Failure(e) => e.printStackTrace()
-      })
   }
 }
 
@@ -34,13 +23,9 @@ object ParseServer {
   import RemoteAkkaUtils._
 
   def parseServer() = {
-
-
     val actorSystem = createActorSystem(serverActorSystemName, defaultHost, defaultPort)
-    val sch = actorSystem.actorOf(Props(new TServ()), name=serverActorName)
-
+    val sch = actorSystem.actorOf(Props(new ParseServer()), name=serverActorName)
+    sch
   }
-
-
 
 }

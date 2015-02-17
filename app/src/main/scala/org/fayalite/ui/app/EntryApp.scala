@@ -15,19 +15,13 @@ import org.fayalite.ui.app.Canvas
 
 object EntryApp extends JSApp {
 
+  // TODO : parse from somewhere
   val WS_URI = "ws://localhost:8080/"
 
   def main(): Unit = {
 
     implicit val wsw = new WSWrapper(WS_URI)
-
     Canvas.initCanvas()
-    /*
-    object i {
-      def m (k: String) = (me: MouseEvent) => s s s"$k,${me.clientX},${me.clientY}"
-      def k(kt: String) = (ke: KeyboardEvent) => s s s"$kt,${ke.key}"
-    }
-    */
 
   }
 }

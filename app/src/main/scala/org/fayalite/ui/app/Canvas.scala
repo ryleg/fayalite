@@ -12,6 +12,8 @@ object Canvas {
 
   var canvas : dom.HTMLCanvasElement = _
   var ctx : dom.CanvasRenderingContext2D = _
+  var defaultImageData : ImageData = _ // ctx.getImageData(0,0,width,height)
+  var defaultImageDataLength : Int = _
 
   var width = 0
   var height = 0
@@ -31,11 +33,9 @@ object Canvas {
     // Fill the path
     ctx.fillStyle = "#9ea7b8"
     ctx.fillRect(0, 0, w, h)
+    defaultImageData = ctx.getImageData(0,0,width,height)
+    defaultImageDataLength = defaultImageData.data.length
   }
-
-  var defaultImageData = ctx.getImageData(0,0,width,height)
-
-  var defaultImageDataLength = defaultImageData.data.length
 
   def getCanvasData = {
     val sid = ctx.getImageData(0, 0, canvas.width, canvas.height)
