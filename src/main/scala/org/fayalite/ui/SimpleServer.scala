@@ -88,10 +88,10 @@ object SimpleServer extends App with MySslConfiguration {
          //case TextFrame(msg)
           x match {
             case TextFrame(msg) =>
-              println("echoing " + msg.utf8String)
-              println(sender().path)
+         //     println("echoing " + msg.utf8String)
+       /*       println(sender().path)
               println(serverConnection.path)
-              println(serverConnection.path.toSerializationFormat)
+              println(serverConnection.path.toSerializationFormat)*/
 /*              send(TextFrame(msg.utf8String))
               sender() ! TextFrame(msg.utf8String + "sender() ! x")*/
               allSenders(sender().path.toString) = sender()

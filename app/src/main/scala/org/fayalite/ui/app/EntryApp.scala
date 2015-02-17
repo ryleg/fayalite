@@ -20,8 +20,8 @@ object EntryApp extends JSApp {
 
   def main(): Unit = {
 
+    Canvas.initCanvas()
     implicit val wsw = new WSWrapper(WS_URI)
- //   Canvas.initCanvas()
 
   }
 }

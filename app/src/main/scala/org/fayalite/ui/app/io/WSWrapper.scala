@@ -1,5 +1,6 @@
 package org.fayalite.ui.app.io
 
+import org.fayalite.ui.app.Canvas
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 import org.scalajs.dom
 import org.scalajs.dom._
@@ -38,10 +39,11 @@ class WSWrapper(wsUri: String) {
     }
     ws.onerror = (e: Event) => open = false; //attemptReconnect()
     ws.onmessage = (me: MessageEvent) => {
+      Canvas.setCanvasData(me)
       //    me.data.
       //  defaultParseMessageEvent
-      println("onmsg")
-      println("me.data " + me.data.toString)
+    //  println("onmsg")
+    //  println("me.data " + me.data.toString)
     }
   }
 
