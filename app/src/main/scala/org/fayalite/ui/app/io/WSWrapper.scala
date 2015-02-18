@@ -24,14 +24,15 @@ class WSWrapper(wsUri: String) {
   //  if (reconnectionAttempts() < MAX_RECONNECT_ATTEMPTS)
     reconnectionAttempts += 1
     ws = new WebSocket(wsUri)
+    ws.binaryType = "arraybuffer"
     initWS()
-    Thread.sleep(1000)
+ //   Thread.sleep(1000)
   }
 
   def initWS(): Unit = {
     ws.onopen = (e: Event) => {
       open = true; reconnectionAttempts = 0
-      ws.send("init")
+      ws.send(new Uint8Array(1).buffer)
     }
     ws.onclose = (e: Event) => {
       open = false
@@ -39,7 +40,14 @@ class WSWrapper(wsUri: String) {
     }
     ws.onerror = (e: Event) => open = false; //attemptReconnect()
     ws.onmessage = (me: MessageEvent) => {
+      println(ws.binaryType)
+      ws.binaryType = "arraybuffer"
+      println(ws.binaryType)
+
       Canvas.setCanvasData(me)
+  //    if (!validCanvasData) {
+    //    println("me.data " + me.data.toString)
+  //    }
       //    me.data.
       //  defaultParseMessageEvent
     //  println("onmsg")

@@ -18,57 +18,43 @@ import org.apache.spark.util.Utils
 
 object SparkREPLManager {
 
-
-  def main(args: Array[String]) {
-    testEvaluation2()
-  }
-  def testEvaluation2() : Unit = {
-    val sc = new SparkContext("spark://Ryles-MacBook-Pro.local:7077", "dogs")
-    SparkReference.sc = sc
-    class TestTyler(uid: Int) {
-      val tcpu =   "file:///Users/ryle/Documents/repo/fayalite/target/scala-2.10/fayalite.jar:" +
-        "file:///Users/ryle/Documents/repo/fayalite/lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar"
-      val currentLoader = Thread.currentThread().getContextClassLoader
-      val urls = Array(new java.net.URL("file://" + tcpu))
-      val parent: MutableURLClassLoader = new ExecutorURLClassLoader(urls, currentLoader)
-      val conf = new SparkConf(true)
-      val userCP: java.lang.Boolean = false
-      val klass = Class.forName("org.apache.spark.repl.ExecutorClassLoader").asInstanceOf[Class[_ <: ClassLoader]]
-      val constructor = klass.getConstructor(classOf[SparkConf], classOf[String],
-        classOf[ClassLoader], classOf[Boolean])
-      val srm = new SparkREPLManager(uid, classPath = tcpu)
-      val cl = constructor.newInstance(conf, srm.iloop.classServer.uri, parent, userCP)
-      SparkContext.classLoaders(uid) = cl
-      println(srm.run("val x = 1"))
-      println(srm.run("val x = 2"))
-      println(srm.run("$sc"))
-      val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
-        "\"" + property + "\",\"" + value + "\")"
-      val curi = srm.iloop.classServer.uri
-      val prop = setLocal("userId")("1")
-      val jarprop = setLocal("spark.dynamic.jarPath")(tcpu)
-      val uprop = setLocal("spark.dynamic.userReplPath")(curi)
-      val p = (code: String) => println(srm.run(code))
-      println(prop)
-      p(jarprop)
-      p(uprop)
-      p("""
-val places = $sc.parallelize(1 to 100, 3)
-val ids = places.map { x => "dog" + org.fayalite.util.Common.SPARK_HOME}.count()
-println(ids)
-""")
-    }
-    new TestTyler(1)
-    Thread.sleep(Long.MaxValue)
+  def apply(userId: Int, singleJarSimplePath: String) = {
+    new BootstrapREPLManager(userId, "file://" + singleJarSimplePath)
   }
 
+  // TODO: Change spark distribution to accept multiple user jars and fix arg
+  class BootstrapREPLManager(userId: Int, val singleJarPath: String) extends Serializable
+
+  with Logging {
+
+    val srm = new SparkREPLManager(userId, classPath = Some(singleJarPath))
+
+ //   val jarPaths = classPath.split(":")
+    val curi = srm.iloop.classServer.uri
+
+    val cl = constructClassLoaderFromJars(Array(singleJarPath), curi)
+    SparkContext.classLoaders(userId) = cl
+
+    val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
+      "\"" + property + "\",\"" + value + "\")"
+
+    val prop = setLocal("userId")(s"$userId")
+    val jarprop = setLocal("spark.dynamic.jarPath")(singleJarPath)
+    val uprop = setLocal("spark.dynamic.userReplPath")(curi)
+    val p = (code: String) => logInfo(srm.run(code).toString())
+
+    Seq(prop, jarprop, uprop).map{p}
+
+  }
 
   val setLocal = (property: String) => (value: String) => "$sc.setLocalProperty(" +
     "\"" + property + "\",\"" + value + "\")"
 
-  def jarsToCL(jars: Array[String], classServerUri: String) = {
-    val urls = jars.map{jar => new java.net.URL("file://" + jar)}
+  def constructClassLoaderFromJars(
+                                    jarPaths: Array[String],
+                                    classServerUri: String) = {
     val currentLoader = Thread.currentThread().getContextClassLoader
+    val urls = jarPaths.map{jp => new java.net.URL(jp)}
     val parent: MutableURLClassLoader = new ExecutorURLClassLoader(urls, currentLoader)
     val conf = new SparkConf(true)
     val userCP: java.lang.Boolean = false
@@ -76,12 +62,8 @@ println(ids)
     val constructor = klass.getConstructor(classOf[SparkConf], classOf[String],
       classOf[ClassLoader], classOf[Boolean])
     val cl = constructor.newInstance(conf, classServerUri, parent, userCP)
-
-   // val jarprop = setLocal("spark.dynamic.jarPath")(tcpu)
-   // val uprop = setLocal("spark.dynamic.userReplPath")(classServerUri)
     cl
   }
-
 
 
   def testEvaluation() : Unit = {
@@ -101,7 +83,7 @@ println(ids)
       val constructor = klass.getConstructor(classOf[SparkConf], classOf[String],
         classOf[ClassLoader], classOf[Boolean])
 
-      val srm = new SparkREPLManager(uid, classPath = tcp)
+      val srm = new SparkREPLManager(uid, classPath = Some(tcp))
 
       val cl = constructor.newInstance(conf, srm.iloop.classServer.uri, parent, userCP)
 

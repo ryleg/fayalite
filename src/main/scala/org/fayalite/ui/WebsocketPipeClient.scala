@@ -5,18 +5,38 @@ import org.fayalite.util.RemoteClient
 import org.fayalite.repl.REPL._
 import spray.can.websocket.frame.TextFrame
 
+class WebsocketPipeClient {
+
+  val rc = new RemoteClient(15909)
+  val sr = rc.getServerRef(16348)
+
+  def sendFrame(sprayFrame: SprayFrame) = {
+    sr.map{
+      s =>
+        val sm = s.??[Set[String]](RequestClients())
+        sm.toList.map{
+          sp =>
+            s ! WebsocketPipeMessage(sp, sprayFrame)
+        }
+    }
+
+  }
+}
+
 object WebsocketPipeClient {
 
   import SimpleServer.pipePort
+
+  def sendBinary(binary: Int) = {}
 
   def sendFrame(sprayFrame: SprayFrame) = {
 
     val rc = new RemoteClient(15909)
     val sr = rc.getServerRef(16348)
-    sr.foreach{
+    sr.map{
       s =>
         val sm = s.??[Set[String]](RequestClients())
-        sm.toList.foreach{
+        sm.toList.map{
             sp =>
             s ! WebsocketPipeMessage(sp, sprayFrame)
         }

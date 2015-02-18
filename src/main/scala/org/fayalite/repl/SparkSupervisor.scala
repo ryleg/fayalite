@@ -5,7 +5,7 @@ import akka.io.Tcp.{Write, Received}
 import akka.util.{ByteString, Timeout}
 import org.apache.spark.Logging
 import org.apache.spark.repl.SparkIMain
-import org.fayalite.util.{SparkReference, HackAkkaDuplex}
+import org.fayalite.util.{SimpleRemoteServer, SparkReference}
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -26,12 +26,15 @@ object SparkSupervisor{
   case class Completion(code: String, id: Int)
   case class Kill(id: Int)
   case class RunMaster(code: String, async: Boolean = true)
+
+  def apply(port: Int = supervisorPort) = {
+    new SimpleRemoteServer({new SparkSupervisor()}, port)
+  }
 }
 
 
 /*
         case x@(_: BinaryFrame | _: TextFrame) =>
-
  */
 /**
  * Main bottleneck for communicating with driver

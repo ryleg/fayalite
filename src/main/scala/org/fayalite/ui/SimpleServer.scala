@@ -94,31 +94,37 @@ object SimpleServer extends App with MySslConfiguration {
               println(serverConnection.path.toSerializationFormat)*/
 /*              send(TextFrame(msg.utf8String))
               sender() ! TextFrame(msg.utf8String + "sender() ! x")*/
-              allSenders(sender().path.toString) = sender()
+           //   allSenders(sender().path.toString) = sender()
         /*      allSenders.foreach{
                 case (sp, sndr) =>
                   println("attempting to send to " + sp)
                   sndr ! TextFrame(msg.utf8String + sp)
               }*/
+            case _ =>
+              println("binary frame")
+        //      allSenders(sender().path.toString) = sender()
+
           }
+          allSenders(sender().path.toString) = sender()
 
 
 
-/*
-          parseServer match {
-            case Some(parseServerActorRef) =>
-              val response = Try{
-                parseServerActorRef.??[spray.can.websocket.frame.Frame](x)
-              }.toOption
-              response.foreach{
-                r => send(r)
-              }
-            case None =>
-              println("parse server not found on request, re-attempting connection")
-              //TODO: Make this so much less dangerous
-              parseServer = parser.getServerRef
-          }
-*/
+
+        /*
+                  parseServer match {
+                    case Some(parseServerActorRef) =>
+                      val response = Try{
+                        parseServerActorRef.??[spray.can.websocket.frame.Frame](x)
+                      }.toOption
+                      response.foreach{
+                        r => send(r)
+                      }
+                    case None =>
+                      println("parse server not found on request, re-attempting connection")
+                      //TODO: Make this so much less dangerous
+                      parseServer = parser.getServerRef
+                  }
+        */
 
         case Push(msg) => {
           println("Pushmsg: " + msg + " " + TextFrame(msg))

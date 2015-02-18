@@ -4,6 +4,7 @@ import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.extensions._
 
+import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSApp
 
@@ -22,12 +23,13 @@ object Canvas {
     canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     document.body.appendChild(canvas)
     ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = 500 //window.innerWidth
+    canvas.height = 500 //window.innerHeight
     val w = canvas.width
     val h = canvas.height
     width = w
     height = h
+    println(s"canvas width: $width height: $height")
     ctx.strokeStyle = "red"
     ctx.lineWidth = 2;
     // Fill the path
@@ -67,6 +69,7 @@ object Canvas {
   }
 
   def setCanvasDataFromBytes(byteArray: Uint8Array) = {
+    println("set canvas data")
     for (i <- 8 until defaultImageDataLength) {
       val bval = byteArray(i)
       defaultImageData.data(i) = bval.toInt
@@ -76,11 +79,20 @@ object Canvas {
 
 
   def setCanvasData(me: MessageEvent) = {
-    val validMessage = me.data.isInstanceOf[dom.ArrayBuffer]
-    if (validMessage) {
-      val byteArray = new Uint8Array(me.data.cast[dom.ArrayBuffer])
-      setCanvasDataFromBytes(byteArray)
-    }
-    validMessage
+      val validMessage = me.data.cast[dom.ArrayBuffer]
+      println(s"validMessage " + validMessage)
+    //  println(s"validMessagebyteLength " + validMessage.byteLength)
+      println(s"validMessageslice " + validMessage.slice(0, 10))
+
+     val byteArray1 = new Uint8Array(validMessage) //me.data.cast[dom.ArrayBuffer])
+    println(s"byteArray1 " + byteArray1)
+
+    //  if (validMessage) {
+    //  println("set canvas data")
+    //  val uint = me.data.cast[js.Array[Int]]
+   //   val byteArray = new Uint8Array(uint) //me.data.cast[dom.ArrayBuffer])
+   //   setCanvasDataFromBytes(byteArray1)
+  //  }
+//    validMessage
   }
 }

@@ -50,7 +50,13 @@ object ImageUtils {
     def byteString = bufferedImageToByteString(image)
 
   }
-
+  implicit class BufferedImageExtensions(bi: BufferedImage) {
+    def save(path: String) = {
+      val ri = bi.asInstanceOf[RenderedImage]
+      val fi = new java.io.File(path)
+      ImageIO.write(ri, "PNG", fi)
+    }
+  }
   def bufferedImageToByteString(bi: BufferedImage) = {
     val w = bi.getWidth
     val h = bi.getHeight
