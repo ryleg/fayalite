@@ -21,7 +21,7 @@ object Canvas {
   def initCanvas() = {
     canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     document.body.appendChild(canvas)
-    val ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
+    ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
     canvas.width = window.innerWidth
     canvas.height = window.innerHeight
     val w = canvas.width
@@ -35,6 +35,24 @@ object Canvas {
     ctx.fillRect(0, 0, w, h)
     defaultImageData = ctx.getImageData(0,0,width,height)
     defaultImageDataLength = defaultImageData.data.length
+
+   // testBijectiveImageDataTransform()
+  }
+
+  def testBijectiveImageDataTransform() = {
+    println("testBijectiveImageDataTransform")
+
+    val byteArray = getCanvasData
+    ctx.moveTo(0,0)
+    ctx.lineTo(200,100)
+    ctx.stroke()
+    def run = {
+      println("ran")
+      setCanvasDataFromBytes(byteArray)
+    }
+
+    org.scalajs.dom.setTimeout(() => run, 3000)
+
   }
 
   def getCanvasData = {
@@ -48,15 +66,20 @@ object Canvas {
     bytearray
   }
 
+  def setCanvasDataFromBytes(byteArray: Uint8Array) = {
+    for (i <- 8 until defaultImageDataLength) {
+      val bval = byteArray(i)
+      defaultImageData.data(i) = bval.toInt
+    }
+    ctx.putImageData(defaultImageData, 0, 0)
+  }
+
+
   def setCanvasData(me: MessageEvent) = {
     val validMessage = me.data.isInstanceOf[dom.ArrayBuffer]
     if (validMessage) {
-      var bytearray = new Uint8Array(me.data.cast[dom.ArrayBuffer])
-      for (i <- 8 until defaultImageDataLength) {
-        val bval = bytearray(i)
-        defaultImageData.data(i) = bval.toInt
-      }
-      ctx.putImageData(defaultImageData, 0, 0)
+      val byteArray = new Uint8Array(me.data.cast[dom.ArrayBuffer])
+      setCanvasDataFromBytes(byteArray)
     }
     validMessage
   }

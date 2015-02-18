@@ -146,12 +146,13 @@ println(ids)
   }
 }
 
-class SparkREPLManager(replId: Int, classPath: String = "") extends REPLManagerLike with Logging {
+class SparkREPLManager(replId: Int, classPath: Option[String] = None) extends REPLManagerLike with Logging {
 
   val iloop = new MagicSparkILoop(Some(br), pw)
 
   var cp = s"::${Common.SPARK_HOME}conf:" +
-    s"${Common.SPARK_HOME}lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar:" + classPath
+    s"${Common.SPARK_HOME}lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar:" +
+    classPath.getOrElse("") // fixme to map
 
   val args = Array("-nowarn", "false", "-encoding", "UTF-8", "-classpath", cp)
 
