@@ -23,21 +23,21 @@ class TestImagePipeToBrowser extends FunSuite {
       import java.awt.image.BufferedImage
       val image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
       val g = image.createGraphics()
-      g.setColor(Color.RED)
+      g.setColor(Color.BLACK)
       g.fillRect(0, 0, width, height)
-      g.setColor(Color.cyan)
-      g.drawString("yo", 100, 100)
+      g.setColor(Color.white)
+      g.drawString("yo " + scala.util.Random.nextString(10), 100, 100)
       image
     }
-      val img = createTestImage()
-
     val cli = new WebsocketPipeClient()
-      val frame = BinaryFrame(bufferedImageToByteString(img))
-      while (true) {
 
-        Thread.sleep(3000)
+   //   while (true) {
+        val img = createTestImage()
+
+        val frame = BinaryFrame(bufferedImageToByteString(img))
+    //    Thread.sleep(3000)
         cli.sendFrame(frame)
-      }
+   //   }
     }
 }
 

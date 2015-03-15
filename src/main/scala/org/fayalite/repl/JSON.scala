@@ -16,12 +16,14 @@ object JSON {
 
   def caseClassToJson(message: Any) = {
     implicit val formats = DefaultFormats
-    compact(render(Extraction.decompose(message)))
+    compactRender(Extraction.decompose(message))
   }
 
   def parse4s(msg: String) = parse(msg)
 
   def parseSuperInstruction(msg: String) = parse(msg).extract[SuperInstruction]
+
+  def compactRender(msg: JValue) = compact(render(msg))
 
 //  def parseAs[T](msg: String)(implicit ev: ClassTag[T]) = parse(msg).extract[T]
 

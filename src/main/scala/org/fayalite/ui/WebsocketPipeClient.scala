@@ -1,6 +1,6 @@
 package org.fayalite.ui
 
-import org.fayalite.ui.SimpleServer.{SprayFrame, WebsocketPipeMessage, SenderMap, RequestClients}
+import org.fayalite.ui.WSServer.{SprayFrame, WebsocketPipeMessage, SenderMap, RequestClients}
 import org.fayalite.util.RemoteClient
 import org.fayalite.repl.REPL._
 import spray.can.websocket.frame.TextFrame
@@ -25,7 +25,7 @@ class WebsocketPipeClient {
 
 object WebsocketPipeClient {
 
-  import SimpleServer.pipePort
+  import WSServer.pipePort
 
   def sendBinary(binary: Int) = {}
 

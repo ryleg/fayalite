@@ -10,8 +10,9 @@ import org.scalajs.dom._
 import org.scalajs.dom.extensions._
 
 import scala.scalajs.js.Dynamic.{global => g}
-import scala.scalajs.js.JSApp
+import scala.scalajs.js.{JSON, JSApp}
 import org.fayalite.ui.app.Canvas
+import upickle._
 
 object EntryApp extends JSApp {
 
@@ -22,6 +23,9 @@ object EntryApp extends JSApp {
 
     Canvas.initCanvas()
     implicit val wsw = new WSWrapper(WS_URI)
+    //val tjson = """{"yo": 1}"""
+  //  println(JSON.parse(tjson).yo)
+
 
   }
 }

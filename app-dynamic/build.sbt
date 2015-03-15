@@ -1,6 +1,6 @@
 scalaJSSettings
 
-name := "fayalite-app"
+name := "fayalite-app-dynamic"
 
 organization := "fayalite"
 

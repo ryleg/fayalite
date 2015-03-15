@@ -7,8 +7,9 @@ import org.scalajs.dom.extensions._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSApp
+import scala.util.{Failure, Try}
 
-
+// send JS over websocket, then eval inside browser.
 object Canvas {
 
   var canvas : dom.HTMLCanvasElement = _
@@ -19,26 +20,78 @@ object Canvas {
   var width = 0
   var height = 0
 
+  def resetCanvasAfterResize = {
+    cursor = 50
+    curText.map{
+      chr =>
+        draw(chr.toString)
+        cursor += dx
+    }
+
+  }
+
   def initCanvas() = {
     canvas = dom.document.createElement("canvas").cast[dom.HTMLCanvasElement]
     document.body.appendChild(canvas)
     ctx = canvas.getContext("2d").cast[dom.CanvasRenderingContext2D]
-    canvas.width = 500 //window.innerWidth
-    canvas.height = 500 //window.innerHeight
-    val w = canvas.width
-    val h = canvas.height
-    width = w
-    height = h
-    println(s"canvas width: $width height: $height")
-    ctx.strokeStyle = "red"
-    ctx.lineWidth = 2;
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    width = canvas.width
+    height = canvas.height
+
+    window.onresize = (uie : UIEvent) => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+      width = canvas.width
+      height = canvas.height
+//      println(s"resize canvas width: $width height: $height")
+      resetCanvasAfterResize
+    }
+
+ //   ctx.strokeStyle = "red"
+ //   ctx.lineWidth = 2;
     // Fill the path
-    ctx.fillStyle = "#9ea7b8"
-    ctx.fillRect(0, 0, w, h)
+ //   ctx.fillStyle = "black" //#9ea7b8"
+ //   ctx.fillRect(0, 0, w, h)
     defaultImageData = ctx.getImageData(0,0,width,height)
     defaultImageDataLength = defaultImageData.data.length
 
    // testBijectiveImageDataTransform()
+    testKeyBind()
+  }
+
+  var cursor = 50
+/*
+  ctx.font = "bold 10pt Calibri";
+  ctx.fillText("Hello World!", 150, 100);
+  ctx.font = "italic 40pt Times Roman";
+  ctx.fillStyle = "blue";
+  ctx.fillText("Hello World!", 200, 150);
+  ctx.font = "60pt Calibri";
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "blue";
+  ctx.strokeText("Hello World!", 70, 70);
+ */
+
+  def draw(s: String) = {
+    ctx.font = "14pt Calibri"
+    ctx.fillStyle = "white"
+    ctx.fillText(s, cursor, 100)
+  }
+
+  val dx = 50
+  var curText = ""
+  def testKeyBind() = {
+    val attempt = Try {
+      window.onkeypress = (ke: KeyboardEvent) => {
+        val k = ke.keyCode.toChar.toString
+        println("kp " + k)
+        draw(k)
+        cursor += dx
+        curText += k
+      }
+    }
+    attempt match { case Failure(e) => e.printStackTrace(); case _ =>}
   }
 
   def testBijectiveImageDataTransform() = {
@@ -86,12 +139,12 @@ object Canvas {
 
      val byteArray1 = new Uint8Array(validMessage) //me.data.cast[dom.ArrayBuffer])
     println(s"byteArray1 " + byteArray1)
-
+    println("mod")
     //  if (validMessage) {
     //  println("set canvas data")
     //  val uint = me.data.cast[js.Array[Int]]
    //   val byteArray = new Uint8Array(uint) //me.data.cast[dom.ArrayBuffer])
-   //   setCanvasDataFromBytes(byteArray1)
+      setCanvasDataFromBytes(byteArray1)
   //  }
 //    validMessage
   }

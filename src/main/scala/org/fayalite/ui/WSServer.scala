@@ -5,6 +5,7 @@ import javax.imageio.ImageIO
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.io.IO
+import org.fayalite.ui.io.ImagePipe
 import org.fayalite.util.RemoteAkkaUtils._
 import org.fayalite.util.{SimpleRemoteServer, SparkReference}
 import org.scalajs.dom.{ArrayBuffer, Uint8Array}
@@ -21,7 +22,7 @@ import java.io._
 
 import scala.util.Try
 
-object SimpleServer extends App with MySslConfiguration {
+object WSServer extends App with MySslConfiguration {
 
   final case class Push(msg: String)
 
@@ -88,6 +89,9 @@ object SimpleServer extends App with MySslConfiguration {
          //case TextFrame(msg)
           x match {
             case TextFrame(msg) =>
+              val utfm = msg.utf8String
+              println("textframe " + utfm)
+              ImagePipe.parseMessage(utfm, sender)
          //     println("echoing " + msg.utf8String)
        /*       println(sender().path)
               println(serverConnection.path)
