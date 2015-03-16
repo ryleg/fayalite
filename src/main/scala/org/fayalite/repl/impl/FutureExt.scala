@@ -13,6 +13,8 @@ trait FutureExt {
 
   implicit class getAsFuture(some: Future[Any]) {
     def getAs[T] = Await.result(some, 15.seconds).asInstanceOf[T]
+    def getAs[T](timeout: Int = 3) = Await.result(some, timeout.seconds).asInstanceOf[T]
+
   }
 
   implicit class getAsFutureT[T](some: Future[T]) {

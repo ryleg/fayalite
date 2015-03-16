@@ -1,8 +1,7 @@
 package org.fayalite.ui
 
 import java.awt.Color
-
-import org.fayalite.repl.JSON
+import org.fayalite.util.JSON
 import org.scalatest.FunSuite
 import spray.can.websocket.frame.{TextFrame, BinaryFrame}
 

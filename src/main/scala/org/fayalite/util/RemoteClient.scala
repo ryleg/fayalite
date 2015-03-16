@@ -6,7 +6,7 @@ import org.fayalite.util.RemoteAkkaUtils._
 
 import scala.util.{Failure, Try}
 
-class RemoteClient(port: Int) {
+class RemoteClient(port: Int=scala.util.Random.nextInt(20000) + 10000) {
   val actorSystem = createActorSystem(clientActorSystemName, defaultHost, port)
 
   def getServerRef(remotePort: Int) = {

@@ -1,13 +1,8 @@
-package org.fayalite.repl
-
+package org.fayalite.util
 
 import org.fayalite.repl.REPL.SuperInstruction
 import org.json4s.jackson.JsonMethods._
-import org.json4s.{Extraction, JsonAST, DefaultFormats}
-import org.json4s.JsonDSL._
-import org.json4s._
-
-import scala.reflect.ClassTag
+import org.json4s.{DefaultFormats, Extraction, _}
 
 
 object JSON {

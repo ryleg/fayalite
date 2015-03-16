@@ -22,7 +22,7 @@ import scala.io.Source
 import scala.util.Try
 
 
-object Main {
+object AWS {
 
   def getKeys = {
     Source.fromFile("/Users/ryle/rootkey.csv")
@@ -52,6 +52,7 @@ object Main {
         i => println(i.getLaunchTime)
       }
     }
+    ServerManager.requestServerInfo()
   }
 
   def main(args: Array[String]) {

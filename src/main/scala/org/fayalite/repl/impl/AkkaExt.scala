@@ -1,13 +1,13 @@
 package org.fayalite.repl.impl
 
 import akka.util.{ByteString, Timeout}
+import org.fayalite.util.JSON
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
 import akka.actor.{ActorSystem, ActorRef}
 import akka.pattern.ask
-import org.fayalite.repl.JSON
 import org.fayalite.repl.REPL._
 
 
@@ -18,11 +18,18 @@ import scala.reflect.ClassTag
 
 trait AkkaExt {
 
-  implicit val timeout = Timeout(5 seconds)
+  implicit val akkaTimeout = Timeout(5 seconds)
 
   implicit class ActorExt(actor: ActorRef) {
 
-    def ??[T](msg: Any) = (actor ? msg).getAs[T]
+    def ??[T](msg: Any) = {
+      (actor ? msg).getAs[T]
+    }
+
+
+    def ??[T](msg: Any, timeout: Int=3) = {
+      (actor ? msg).getAs[T](timeout)
+    }
 
     /**
      * Listener actor receives actual data.

@@ -1,6 +1,5 @@
-package org.fayalite.ui.app.io
+package org.fayalite.ui.app
 
-import org.fayalite.ui.app.Canvas
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 import org.scalajs.dom
 import org.scalajs.dom._
@@ -9,54 +8,31 @@ import org.scalajs.dom.extensions._
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.{JSON, JSApp}
-import org.fayalite.ui.app.io.InputCapture.registerInputListeners
 
 import scala.util.{Failure, Try}
 
-class WSWrapper(wsUri: String) {
+class WebSocketWrapper(wsUri: String) {
 
   var open = false
-
+  var reconnectionAttempts = 0
   implicit var ws = new WebSocket(wsUri)
   initWS()
-
-  def defaultParseMessageEvent = Unit
-
-  var reconnectionAttempts = 0
-
-  def attemptReconnect() = {
-  //  if (reconnectionAttempts() < MAX_RECONNECT_ATTEMPTS)
-    reconnectionAttempts += 1
-    ws = new WebSocket(wsUri)
-    ws.binaryType = "arraybuffer"
-    initWS()
- //   Thread.sleep(1000)
-  }
 
   def initWS(): Unit = {
     ws.onopen = (e: Event) => {
       open = true; reconnectionAttempts = 0
-      ws.send("init")
-      registerInputListeners(ws)
+      ws.send("reload")
       //ws.send(new Uint8Array(1).buffer)
       ws.binaryType = "arraybuffer"
     }
     ws.onclose = (e: Event) => {
-      println("websocket closed")
+      println("dynamicwebsocket closed")
       open = false
     }
     ws.onerror = (e: Event) =>
-      println("websocket error")
+      println("dynamicwebsocket error")
       open = false; //attemptReconnect()
     ws.onmessage = (me: MessageEvent) => {
- //     println("ws onmessage")
-      val isBinaryFrame = me.data.isInstanceOf[dom.ArrayBuffer]
-      if (isBinaryFrame) {
-        val validMessage = me.data.cast[dom.ArrayBuffer]
-        val byteArray1 = new Uint8Array(validMessage)
-        Canvas.setCanvasDataFromBytes(byteArray1)
-      }
-      else{
         val attempt = Try{
       //    println("me.data " + me.data.toString)
           val pm = JSON.parse(me.data.toString)
@@ -67,13 +43,12 @@ class WSWrapper(wsUri: String) {
              // val retVal =
      //         js.eval("org.fayalite.ui.app.DynamicEntryApp().main();")
        //       println("main dynamic call2")
-              val curBridge = org.fayalite.ui.app.Bridge.x
-              println("fromBridge call using curBridge: " + curBridge)
+              val curBridge = "dynamic-bridge"
               //js.eval("org.fayalite.ui.app.DynamicEntryApp().fromBridge('yo');")
               val retVal = js.eval(s"org.fayalite.ui.app.DynamicEntryApp().fromBridge('$curBridge');")
                   //                s"fromBridge(${org.fayalite.ui.app.Bridge.x});")
               println("retVal " + retVal)
-            case "heartbeat" => println{"heartbeat"}
+            case "heartbeat" => println{"dynamic heartbeat"}
             case _ =>
               println("can't recognize command code from: " + me.data.toString)
           }
@@ -84,7 +59,7 @@ class WSWrapper(wsUri: String) {
           case _ => println("eval success")
         }
 
-      }
+
     }
   }
 
