@@ -11,7 +11,7 @@ import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.{JSON, JSApp}
-import scala.util.{Failure, Success, Try}
+import scala.util.{Random, Failure, Success, Try}
 
 
 object HeaderNavBar {
@@ -31,11 +31,15 @@ object HeaderNavBar {
   import PersistentWebSocket._
 
   val subTabs = Map(
-    "Servers" ->
-      ("Launch", () =>
-      {
+    ("Servers",("Launch", () => {
         println("Launch")
-      })
+      })),
+    ("Account", ("OAuth", () => {
+      dom.document.cookie = "a=12; b=13"
+        document.cookie = "browserId=" +
+          Array.fill(10)(Random.nextPrintableChar()).mkString
+        window.location.href = OAuth.getURL()
+      }))
   )
 
   val subTabSpacing = 42

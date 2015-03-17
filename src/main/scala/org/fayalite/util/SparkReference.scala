@@ -9,11 +9,12 @@ import org.apache.spark.{SparkConf, SparkContext}
 object SparkReference {
 
   var sc: SparkContext = _
+  var sparkConf: SparkConf = _
   implicit var master = "local[*]" //"spark://ubuntu:7077" //
 
   def getSC = {
     if (sc == null) {
-      val sparkConf = new SparkConf()
+      sparkConf = new SparkConf()
       sparkConf.set("spark.scheduler.mode", "FAIR")
       sparkConf.set("spark.speculation", "true")
       sparkConf.setMaster(master)

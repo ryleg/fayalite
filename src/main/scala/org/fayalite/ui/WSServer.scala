@@ -13,7 +13,7 @@ import spray.can.server.UHttp
 import spray.can.{Http, websocket}
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{TextFrame, BinaryFrame}
-import spray.http.HttpRequest
+import spray.http.{HttpResponse, HttpRequest}
 import spray.routing.HttpServiceActor
 
 import scala.collection.mutable
@@ -219,9 +219,34 @@ object WSServer extends App with MySslConfiguration {
     def businessLogicNoUpgrade: Receive = {
       implicit val refFactory: ActorRefFactory = context
       runRoute {
-      //  path("hello") {
-        pathPrefix("css") { get { getFromResourceDirectory("css") } } ~
-          pathPrefix("js") { get { getFromResourceDirectory("js") } } //~
+        //  path("hello") {
+        pathPrefix("css") {
+          get {
+            getFromResourceDirectory("css")
+          }
+        } ~
+          pathPrefix("js") {
+            get {
+              getFromResourceDirectory("js")
+            }
+          } ~
+        path("oauth_callback") {
+          get {
+            getFromResource("oauth.html")
+          }
+        } ~
+          path("oauth_catch") {
+            get {
+              //          parameters('state, 'access_token, 'token_type, 'expires_in) { (state, access_token, token_type, expires_in) =>
+              parameters('access_token) { (access_token) =>
+                val authResponse =  oauth.OAuth.performGoogleOAuthRequest(access_token).getAsTry(10).printOpt
+                authResponse.map(oauth.OAuth.handleAuthResponse)
+                getFromResource("index-fastopt.html")
+              }
+            }
+          } ~
+          getFromResource("index-fastopt.html")
+      }
         //TODO: Fix serving of pages -- testing websocket directly for now on static html.
     //      getFromResource("websocket.html") ~
 /*
@@ -244,7 +269,7 @@ object WSServer extends App with MySslConfiguration {
        // }
         //getFromResourceDirectory("webapp")
     //
-      }
+
     }
   }
 
