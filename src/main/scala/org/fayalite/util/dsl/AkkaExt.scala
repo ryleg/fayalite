@@ -1,4 +1,4 @@
-package org.fayalite.repl.impl
+package org.fayalite.util.dsl
 
 import akka.util.{ByteString, Timeout}
 import org.fayalite.util.JSON

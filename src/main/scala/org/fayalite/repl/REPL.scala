@@ -2,10 +2,10 @@ package org.fayalite.repl
 
 
 
-import impl._
+import org.fayalite.util.dsl._
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 
-object REPL extends AkkaExt with FutureExt {
+object REPL extends AkkaExt with CommonMonadExt {
 
   trait Instruction
 

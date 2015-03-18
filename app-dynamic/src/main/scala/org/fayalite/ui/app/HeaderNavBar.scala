@@ -13,6 +13,7 @@ import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.{JSON, JSApp}
 import scala.util.{Random, Failure, Success, Try}
 
+import org.scalajs.jquery.jQuery
 
 object HeaderNavBar {
 
@@ -35,9 +36,16 @@ object HeaderNavBar {
         println("Launch")
       })),
     ("Account", ("OAuth", () => {
-      dom.document.cookie = "a=12; b=13"
+      //jQuery
+        println("cookies: " + document.cookie)
+        val cookies = document.cookie.split(";").map{
+          _.split("=") match { case Array(x,y) => (x,y)}
+        }.toMap
+        val token = cookies.get("randomToken")
+        println("token: " + cookies.get("randomToken"))
+/*      dom.document.cookie = "a=12; b=13"
         document.cookie = "browserId=" +
-          Array.fill(10)(Random.nextPrintableChar()).mkString
+          Array.fill(10)(Random.nextPrintableChar()).mkString*/
         window.location.href = OAuth.getURL()
       }))
   )
@@ -79,6 +87,10 @@ object HeaderNavBar {
     addTab("Servers", () => {
       println("Servers")
     })
+    addTab("Account", () => {
+      println("Account")
+    })
+
   }
 
 }

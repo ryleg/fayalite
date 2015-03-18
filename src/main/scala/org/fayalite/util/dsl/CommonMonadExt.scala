@@ -1,4 +1,4 @@
-package org.fayalite.repl.impl
+package org.fayalite.util.dsl
 
 import akka.util.Timeout
 import scala.concurrent.duration._
@@ -6,7 +6,7 @@ import scala.concurrent._
 import scala.util.{Success, Failure, Try}
 
 
-trait FutureExt {
+trait CommonMonadExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
@@ -19,16 +19,18 @@ trait FutureExt {
     }
   }
 
-
     implicit class getAsFuture(some: Future[Any]) {
     def getAs[T] = Await.result(some, 15.seconds).asInstanceOf[T]
     def getAs[T](timeout: Int = 3) = Await.result(some, timeout.seconds).asInstanceOf[T]
-    def getAsTry[T](timeout: Int = 3) = Try{Await.result(some, timeout.seconds).asInstanceOf[T]}
+  //  def getAsTry[T](timeout: Int = 3) = Try{Await.result(some, timeout.seconds).asInstanceOf[T]}
 
   }
 
   implicit class getAsFutureT[T](some: Future[T]) {
     def get = Await.result(some, 15.seconds).asInstanceOf[T]
+    def getAsTry(timeout: Int = 3) = Try {
+      Await.result(some, timeout.seconds).asInstanceOf[T]
+    }
   }
 
 

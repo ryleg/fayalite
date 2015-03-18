@@ -1,6 +1,7 @@
 package org.fayalite.ui
 
 import java.awt.image.RenderedImage
+import java.util.Random
 import javax.imageio.ImageIO
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, Props}
@@ -13,7 +14,7 @@ import spray.can.server.UHttp
 import spray.can.{Http, websocket}
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{TextFrame, BinaryFrame}
-import spray.http.{HttpResponse, HttpRequest}
+import spray.http.{HttpCookie, HttpResponse, HttpRequest}
 import spray.routing.HttpServiceActor
 
 import scala.collection.mutable
@@ -22,6 +23,7 @@ import java.io._
 
 import scala.concurrent.Future
 import scala.io.Source
+import scala.util
 import scala.util.Try
 
 object WSServer extends App with MySslConfiguration {
@@ -231,21 +233,27 @@ object WSServer extends App with MySslConfiguration {
             }
           } ~
         path("oauth_callback") {
+       //   setCookie(HttpCookie("randomToken", Array.fill(10)(util.Random.nextInt(10).toString).mkString)) {
           get {
-            getFromResource("oauth.html")
+              getFromResource("oauth.html")
           }
+    //    }
         } ~
           path("oauth_catch") {
             get {
               //          parameters('state, 'access_token, 'token_type, 'expires_in) { (state, access_token, token_type, expires_in) =>
               parameters('access_token) { (access_token) =>
                 val authResponse =  oauth.OAuth.performGoogleOAuthRequest(access_token).getAsTry(10).printOpt
-                authResponse.map(oauth.OAuth.handleAuthResponse)
-                getFromResource("index-fastopt.html")
+                setCookie(HttpCookie("access_token", access_token)) {
+                  authResponse.map(oauth.OAuth.handleAuthResponse).foreach{
+                    r => setCookie(HttpCookie("authResponse", "placeholder"))
+                    }
+                  getFromResource("index-fastopt.html")
+                }
               }
             }
-          } ~
-          getFromResource("index-fastopt.html")
+          } ~  //setCookie(HttpCookie("initToken", Array.fill(10)(util.Random.nextInt(10).toString).mkString)) {
+          getFromResource("index-fastopt.html")}
       }
         //TODO: Fix serving of pages -- testing websocket directly for now on static html.
     //      getFromResource("websocket.html") ~
