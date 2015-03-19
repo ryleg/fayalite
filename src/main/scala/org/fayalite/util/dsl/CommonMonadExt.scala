@@ -1,8 +1,12 @@
 package org.fayalite.util.dsl
 
+import java.io.FileWriter
+
 import akka.util.Timeout
+import org.fayalite.util.{SparkReference, JSON, Common}
 import scala.concurrent.duration._
 import scala.concurrent._
+import scala.reflect.ClassTag
 import scala.util.{Success, Failure, Try}
 
 
@@ -35,5 +39,18 @@ trait CommonMonadExt {
 
 
   implicit def getFutureAsString(some: Future[Any]): String = some.getAs[String]
+
+  implicit class StringExt(str: String) {
+    def append(path: String) = {
+      val fw = new FileWriter(path, true)
+      try {
+        fw.write(str)
+      }
+      finally fw.close()
+    }
+    def appendHome(path: String) = append(Common.home + "/" + path)
+  }
+
+
 
 }

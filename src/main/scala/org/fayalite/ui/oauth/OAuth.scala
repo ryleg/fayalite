@@ -7,7 +7,11 @@ import scala.concurrent.Await
 
 import org.fayalite.repl.REPL._
 
+import scala.util.Try
+
 object OAuth {
+
+
 
   /*
   {
@@ -29,17 +33,19 @@ object OAuth {
                           scope: String,
                           expires_in: Int,
                           email: String,
-                          verified_email: String,
+                          verified_email: Boolean,
                           access_type: String
                             )
 
   //def initializeOAuthDB
 
-  def handleAuthResponse(authResponse : String) : String = {
-    println("handleAuthResponse \n" + authResponse)
-    val response = JSON.parseExtract[OAuthResponse](authResponse)
+  case class OAuthInfo(accessToken: String, authResponse: OAuthResponse)
 
-    authResponse
+  def handleAuthResponse(authResponse : String, accessToken: String) = {
+    println("handleAuthResponse \n" + authResponse)
+    implicit val formats = JSON.formats
+    val response = Try{JSON.parse4s(authResponse).extract[OAuthResponse]}.printOpt
+    response.map{r => OAuthInfo(accessToken, r)}
   }
 
 

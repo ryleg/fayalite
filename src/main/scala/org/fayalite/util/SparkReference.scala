@@ -1,6 +1,7 @@
 package org.fayalite.util
 
 
+import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**
@@ -9,6 +10,7 @@ import org.apache.spark.{SparkConf, SparkContext}
 object SparkReference {
 
   var sc: SparkContext = _
+  var sqlContext: SQLContext = _
   var sparkConf: SparkConf = _
   implicit var master = "local[*]" //"spark://ubuntu:7077" //
 
@@ -22,6 +24,7 @@ object SparkReference {
       sparkConf.set("spark.executor.memory", "512M")
       sparkConf.set("spark.driver.memory", "1G")
       sc = new SparkContext(sparkConf)
+      sqlContext = new SQLContext(sc)
     }
     sc
   }

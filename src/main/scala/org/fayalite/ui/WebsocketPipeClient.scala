@@ -1,6 +1,7 @@
 package org.fayalite.ui
 
-import org.fayalite.ui.WSServer.{SprayFrame, WebsocketPipeMessage, SenderMap, RequestClients}
+import org.fayalite.ui.ws.WSServer
+import WSServer.{SprayFrame, WebsocketPipeMessage, SenderMap, RequestClients}
 import org.fayalite.util.RemoteClient
 import org.fayalite.repl.REPL._
 import spray.can.websocket.frame.TextFrame

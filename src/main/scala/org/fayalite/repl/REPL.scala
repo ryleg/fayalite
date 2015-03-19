@@ -5,7 +5,7 @@ package org.fayalite.repl
 import org.fayalite.util.dsl._
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 
-object REPL extends AkkaExt with CommonMonadExt {
+object REPL extends AkkaExt with CommonMonadExt with ScaryExt {
 
   trait Instruction
 

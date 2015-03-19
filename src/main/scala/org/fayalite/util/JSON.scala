@@ -18,14 +18,14 @@ object JSON {
     compactRender(Extraction.decompose(message))
   }
 
-  def parseExtract[T](msg: String) = {
+/*  def parseExtract[T](msg: String) = {
     implicit val formats = DefaultFormats
     parse(msg).extract[T]
   }
 
   def tryParseExtract[T](msg: String) : Option[T] = {
     Try{parseExtract[T](msg)}.printOpt
-  }
+  }*/
 
   def parse4s(msg: String) = parse(msg)
 

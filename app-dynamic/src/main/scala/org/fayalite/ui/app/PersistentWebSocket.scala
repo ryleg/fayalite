@@ -20,6 +20,8 @@ object PersistentWebSocket {
 
   // def send(msg: js.Any) = pws.ws.send(JSON.stringify(msg))
 
+  def sendV(v: String) = sendKV("tab", v)
+
   def sendKV(k: String, v: String) : Unit = {
     def send() = pws.ws.send(
       s"""{"$k": "$v", "cookies":"${document.cookie}"}"""
@@ -45,7 +47,19 @@ class PersistentWebSocket(
                            ) {
 
   var onmessage = (me: MessageEvent) => {
+    JSON.parse(me.data.toString)
     println("Persistent default msg " + me.data.toString)
+    val pm = JSON.parse(me.data.toString)
+    pm.flag.toString match {
+      case "heartbeat" => //println{"dynamic heartbeat"}
+      case "auth" => pm.email
+
+        val email = pm.email.toString
+        println("auth email: " + email)
+      case _ =>
+        println("can't recognize command code from: " + me.data.toString)
+    }
+
   }
   var open = false
 

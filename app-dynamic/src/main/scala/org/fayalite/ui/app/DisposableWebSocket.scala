@@ -13,6 +13,8 @@ object DisposableWebSocket {
   def reload(command: String = "reload"
                      ) = {
 
+    PersistentWebSocket.pws.ws.close()
+
     val ds = new DisposableWebSocket(command,
       (me: MessageEvent) =>
       {

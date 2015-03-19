@@ -31,6 +31,8 @@ object HeaderNavBar {
 
   import PersistentWebSocket._
 
+  sendV("Init")
+
   val subTabs = Map(
     ("Servers",("Launch", () => {
         println("Launch")
@@ -38,11 +40,11 @@ object HeaderNavBar {
     ("Account", ("OAuth", () => {
       //jQuery
         println("cookies: " + document.cookie)
-        val cookies = document.cookie.split(";").map{
+    /*    val cookies = document.cookie.split(";").map{
           _.split("=") match { case Array(x,y) => (x,y)}
         }.toMap
         val token = cookies.get("randomToken")
-        println("token: " + cookies.get("randomToken"))
+        println("token: " + cookies.get("randomToken"))*/
 /*      dom.document.cookie = "a=12; b=13"
         document.cookie = "browserId=" +
           Array.fill(10)(Random.nextPrintableChar()).mkString*/
