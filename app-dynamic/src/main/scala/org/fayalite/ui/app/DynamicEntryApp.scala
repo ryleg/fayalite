@@ -23,21 +23,17 @@ object DynamicEntryApp extends JSApp {
 
   @JSExport
   def fromBridge(bridge: String): String = {
-    //println("From Bridge: " + bridge)
     val attempt = Try {
-      // setInterval(_ => println("hhey"), 1000)
-      // .cast[dom.HTMLCanvasElement]
       Canvas.initCanvas()
-   //   println("YO N12222222")
-      import Canvas._
-
+      import PersistentWebSocket._
+      sendV("Init")
       HeaderNavBar.setupButtons()
+      StateSync.processBridge(bridge)
     }
     attempt match {
-      case Success(x) => println("bridge success")
-      case Failure(e) => e.printStackTrace()
+      case Success(x) => println("bridge success"); x
+      case Failure(e) => e.printStackTrace() "Failure"
     }
-    "Visited bridge"
   }
 
   def main(): Unit = {

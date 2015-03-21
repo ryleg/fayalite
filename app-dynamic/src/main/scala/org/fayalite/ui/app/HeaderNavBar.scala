@@ -1,7 +1,8 @@
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.Canvas
+import org.fayalite.ui.app.canvas.{ButtonFactory, Canvas}
 import org.fayalite.ui.app.canvas.Canvas._
+import org.fayalite.ui.app.canvas.Schema.{Act, Elem}
 import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.extensions._
@@ -15,44 +16,27 @@ import scala.util.{Random, Failure, Success, Try}
 
 import org.scalajs.jquery.jQuery
 
+import org.fayalite.ui.app.canvas.Schema._
+
 object HeaderNavBar {
 
   val spacingX = 112
   val xOffset = 42
   val yOffset = 42
-
   var curX = xOffset
   var curY = yOffset
+  val subTabSpacing = 42
 
-  def add(text: String, func: () => Unit) = {
-    addButton(Elem(text, curX, curY), func)
-    curX += spacingX
+
+  def setupButtons() = {
+    buttons.foreach{
+      case ((tabName, trigger), subTabs) =>
+      val buttonF = ButtonFactory(tabName, curX, curY, trigger)
+      curX += spacingX
+    }
+
   }
 
-  import PersistentWebSocket._
-
-  sendV("Init")
-
-  val subTabs = Map(
-    ("Servers",("Launch", () => {
-        println("Launch")
-      })),
-    ("Account", ("OAuth", () => {
-      //jQuery
-        println("cookies: " + document.cookie)
-    /*    val cookies = document.cookie.split(";").map{
-          _.split("=") match { case Array(x,y) => (x,y)}
-        }.toMap
-        val token = cookies.get("randomToken")
-        println("token: " + cookies.get("randomToken"))*/
-/*      dom.document.cookie = "a=12; b=13"
-        document.cookie = "browserId=" +
-          Array.fill(10)(Random.nextPrintableChar()).mkString*/
-        window.location.href = OAuth.getURL()
-      }))
-  )
-
-  val subTabSpacing = 42
 
   def addTab(text: String, func: () => Unit) = {
     add(text, () => {
@@ -68,31 +52,30 @@ object HeaderNavBar {
     })
   }
 
-  class SubTab {
+  case class Tab(tab: Elem, subTabs: List[Elem])
 
-  }
 
-  class SubTabManager {
-    var subTabs = List[SubTab]()
-    def clearTabs() = {
-
-    }
-
-  }
-
-  def setupButtons() = {
-    add("ReloadJS", {() =>
-      println("ReloadJS3")
+  val buttons = List(
+    "ReloadJS" -> Act0 -> {
+      () => {
+        import PersistentWebSocket._
       pws.ws.close()
       DisposableWebSocket.reload()
-    })
-    addTab("Servers", () => {
-      println("Servers")
-    })
-    addTab("Account", () => {
-      println("Account")
-    })
-
-  }
+        ()
+    }: Unit},
+   /* "Servers" -> { () => {
+      List(
+      "Launch" ->
+        ()
+      )
+    },*/
+    "Account" -> Act0 -> { () =>
+      "OAuth" -> {
+         () =>
+           window.location.href = OAuth.getURL()
+           ()
+      } : Unit
+    }
+  )
 
 }

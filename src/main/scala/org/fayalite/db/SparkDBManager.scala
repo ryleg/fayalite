@@ -28,8 +28,10 @@ import org.apache.spark.executor.Executor
 
 object SparkDBManager{
 
-  case class CreateDB(
+  val sqlc = SparkReference.sqlContext
+  import sqlc._
 
+  case class CreateDB(
                        )
 
   case class Insert(dbId: Int, rawJson: String)
@@ -46,11 +48,15 @@ object SparkDBManager{
     oai.insert("oauth")
   }
 
+  def queryAccessTokenToEmail(accessToken: String) = {
+    oauthDB.where('accessToken.startsWith(accessToken))
+      .select('authResponse.getField("email")).collect().toList.map{_.getString(0)}.headOption
+  }
+
   def main(args: Array[String]) {
 
     val atk = "ya29.OwG-n69XyAEPL7y2F87roQjV853ISpx4QltnyQeF_O1vKi49N9RECqzCC_5hPoHWQYLkd66OKdeTWg"
-    val sqlc = SparkReference.sqlContext
-    import sqlc._
+
     println(oauthDB.cache().count())
   //  oauthDB.registerTempTable("oauth")
     println(oauthDB.collect().toList.map{_.toList})

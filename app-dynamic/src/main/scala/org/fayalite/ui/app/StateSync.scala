@@ -13,3 +13,11 @@ import scala.util.{Failure, Try}
 class StateSync {
 
 }
+
+object StateSync {
+
+  def processBridge(bridge: String) = {
+    bridge
+  }
+
+}

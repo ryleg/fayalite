@@ -54,10 +54,9 @@ class ParseServer extends Actor{
           None
       }
       val em = pmsg.accessToken.map{
-        a =>
-          val oauth = SparkDBManager.
-      }
-      val ret = ParseResponse("auth", em.getOrElse("guest@login.com")) : String
+   SparkDBManager.queryAccessTokenToEmail
+      }.flatten.getOrElse("guest@login.com")
+      val ret = ParseResponse("auth", em) : String
       sender() ! TextFrame(ret)
       //response.foreach{r => sender() ! TextFrame(r)}
     case TextFrame(msg) =>
