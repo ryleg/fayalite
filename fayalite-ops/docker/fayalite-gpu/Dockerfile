@@ -1,0 +1,2 @@
+FROM fayalite:base
+

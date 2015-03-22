@@ -32,7 +32,7 @@ object DynamicEntryApp extends JSApp {
     }
     attempt match {
       case Success(x) => println("bridge success"); x
-      case Failure(e) => e.printStackTrace() "Failure"
+      case Failure(e) => e.printStackTrace(); "Failure"
     }
   }
 

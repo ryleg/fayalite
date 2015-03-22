@@ -20,6 +20,31 @@ import org.fayalite.ui.app.canvas.Schema._
 
 object HeaderNavBar {
 
+  case class Tab(tab: Elem, subTabs: List[Elem])
+
+  val reloadF : Act = { () =>
+    import PersistentWebSocket._
+    pws.ws.close()
+    DisposableWebSocket.reload()
+    ()
+  }
+
+  type ButtonSpec = (String, Act)
+  type NavSpec = (ButtonSpec, List[ButtonSpec])
+
+  val reload : NavSpec = "ReloadJS" -> reloadF -> List[(String, Act)](
+    "Blank" -> Act0
+  )
+
+  val account : NavSpec = "Account" -> Act0 -> List[(String, Act)](
+    "OAuth" -> OAuth.redirect
+  )
+
+  val buttons : List[NavSpec] = List(
+    reload,
+    account
+  )
+
   val spacingX = 112
   val xOffset = 42
   val yOffset = 42
@@ -27,55 +52,39 @@ object HeaderNavBar {
   var curY = yOffset
   val subTabSpacing = 42
 
+  object ButtonType extends Enumeration {
+    type ButtonType = Value
+    val Tab, SubTab = Value
+  }
+
+  def clearSubTabs() : Unit = {
+    Canvas.elementTriggers.filter{
+      _._1.flag == ButtonType.SubTab}.foreach{
+      _._1.deregister()
+    }
+  }
 
   def setupButtons() = {
-    buttons.foreach{
-      case ((tabName, trigger), subTabs) =>
-      val buttonF = ButtonFactory(tabName, curX, curY, trigger)
-      curX += spacingX
-    }
-
-  }
-
-
-  def addTab(text: String, func: () => Unit) = {
-    add(text, () => {
-      sendKV("tab", text)
-      val curSubX = 20
-      var curSubY = 120
-      subTabs.get(text).foreach{
-        case (stName, stTrigger) =>
-          addButton(Elem(stName, curSubX, curSubY), stTrigger)
-          curSubY += subTabSpacing
+    buttons.zipWithIndex.foreach{
+      case (((tabName, trigger), subTabs), bIdx) =>
+        val curX = xOffset + spacingX*bIdx
+        subTabs.zipWithIndex.map{
+          case ((stName, stTrigger), stIdx) =>
+            val curSubX = 25
+            val curSubY = 120 + stIdx*subTabSpacing
+            ButtonFactory(
+              stName, curSubX, curSubY, stTrigger,
+              flag=ButtonType.SubTab)
+       }
+      val exclusionTrigger = () => {
+          clearSubTabs()
+          trigger()
       }
-      func()
-    })
-  }
-
-  case class Tab(tab: Elem, subTabs: List[Elem])
-
-
-  val buttons = List(
-    "ReloadJS" -> Act0 -> {
-      () => {
-        import PersistentWebSocket._
-      pws.ws.close()
-      DisposableWebSocket.reload()
-        ()
-    }: Unit},
-   /* "Servers" -> { () => {
-      List(
-      "Launch" ->
-        ()
+      val buttonF = ButtonFactory(
+        tabName, curX, curY, exclusionTrigger, flag=
+      ButtonType.Tab
       )
-    },*/
-    "Account" -> Act0 -> { () =>
-      "OAuth" -> {
-         () =>
-           window.location.href = OAuth.getURL()
-           ()
-      } : Unit
+      val button = buttonF()
     }
-  )
-
+  }
 }

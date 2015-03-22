@@ -31,7 +31,8 @@ object Schema {
                   position: Position,
                   trigger: Act,
                   draw: Act = Act0,
-                  tabSync: Boolean = true
+                  tabSync: Boolean = true,
+                  flag: Enumeration#Value
                    ) {
     def register() = {
       draw()

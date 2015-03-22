@@ -9,15 +9,16 @@ object ButtonFactory {
              text: String,
              x: Int,
              y: Int,
-             trigger: Act
-             ) = {
+             trigger: Act,
+              flag: Enumeration#Value
+             ) : () => Elem = {
     apply(Elem(text, Position(
-      x, y), trigger))
+      x, y), trigger, flag=flag))
   }
 
   def apply(
              elem: Elem
-             ) = {
+             ) : () => Elem = {
     // add font and color implicits here on returned anon func.
     val draw = () => {
       ctx.font = s"15pt Calibri"
