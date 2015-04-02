@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, 
 import akka.io.IO
 import org.fayalite.ui.{MySslConfiguration, oauth}
 import org.fayalite.util.RemoteAkkaUtils._
-import org.fayalite.util.{JSON, RemoteClient, SimpleRemoteServer}
+import org.fayalite.util.{Common, JSON, RemoteClient, SimpleRemoteServer}
 import spray.can.server.UHttp
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{BinaryFrame, TextFrame}
@@ -116,15 +116,16 @@ object WSServer extends App with MySslConfiguration {
           case TextFrame(msg) =>
             val utfm = msg.utf8String
             println("textframe " + utfm)
+            attemptParse(utfm, sender())
             utfm match {
               case xs if xs == "reload" || xs == "init" =>
-                val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.10/fayalite-app-dynamic-fastopt.js")
+    /*            val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
                   .mkString
                 val msg = JSON.caseClassToJson(TestEval("eval", sampleJS))
                 val frame = TextFrame(msg)
                 //    Thread.sleep(3000)
-                sender() ! frame
-              case _ => attemptParse(utfm, sender())
+                sender() ! frame*/
+              case _ =>  //attemptParse(utfm, sender())
             }
           case _ =>
             println("binary frame")
@@ -172,6 +173,7 @@ object WSServer extends App with MySslConfiguration {
               //              (state : String, access_token: String, token_type: String, expires_in : String) =>
               parameters('access_token) { access_token =>
                 import org.fayalite.Fayalite._
+                // Put these in OAuth session from parseServer, return access token set as cookie
                 val authResponse = oauth.OAuth.performGoogleOAuthRequest(access_token).getAsTry(10).printOpt
                 setCookie(
                   HttpCookie(
@@ -179,15 +181,21 @@ object WSServer extends App with MySslConfiguration {
                     access_token,
                     expires=Some(DateTime(2020,1,1,1,1,1))
                     )) {
-                  authResponse.map(ar => oauth.OAuth.handleAuthResponse(ar, access_token)).foreach {
+                  authResponse.map(ar => oauth.OAuth.handleAuthResponse(ar, access_token)).flatten.foreach {
                     r => parseServer.foreach{p => p ! r }
                   }
-                  getFromResource("index-fastopt.html")
+                  getFromFile(Common.currentDir + "index-fastopt.html")
                 }
               }
             }
-          } ~
-          getFromResource("index-fastopt.html")
+          } ~   pathPrefix("app/target/scala-2.10/fayalite-app-") {
+          get {
+            getFromDirectory(Common.currentDir + "app/target/scala-2.10/")
+          }
+        } ~ {
+          println("file: ==" + Common.currentDir + "index-fastopt.html")
+          getFromFile(Common.currentDir + "index-fastopt.html")
+        }
       }
     }
   }

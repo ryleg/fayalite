@@ -1,5 +1,6 @@
 package org.fayalite.ui.app
 
+import org.fayalite.ui.app.canvas.Canvas
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 
 import scala.scalajs.js
@@ -14,6 +15,9 @@ object DisposableWebSocket {
                      ) = {
 
     PersistentWebSocket.pws.ws.close()
+    Canvas.elementTriggers.foreach{
+      _._1.position.clear()
+    }
 
     val ds = new DisposableWebSocket(command,
       (me: MessageEvent) =>
@@ -30,8 +34,8 @@ object DisposableWebSocket {
         //js.eval("org.fayalite.ui.app.DynamicEntryApp().fromBridge('yo');")
         val retVal = js.eval(s"org.fayalite.ui.app.DynamicEntryApp().fromBridge('$curBridge');")
         //                s"fromBridge(${org.fayalite.ui.app.Bridge.x});")
-        println("retVal " + retVal)
-      case "heartbeat" => println{"dynamic heartbeat"}
+    //    println("retVal " + retVal)
+      case "heartbeat" => //println{"dynamic heartbeat"}
       case _ =>
         println("can't recognize command code from: " + me.data.toString)
     }

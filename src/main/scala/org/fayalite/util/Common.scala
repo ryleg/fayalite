@@ -6,4 +6,5 @@ package org.fayalite.util
 object Common {
   val home = System.getProperty("user.home")
   val SPARK_HOME = s"$home/Documents/repo/spark-dynamic/dist/"
+  val currentDir = new java.io.File(".").getCanonicalPath + "/"
 }

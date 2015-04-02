@@ -21,9 +21,7 @@ import scala.util.Try
 
 object ServerManager {
 
-  case class ServerStatus(
-
-                           )
+  case class ServerStatus()
 
   def requestServerInfo() = {
     val inst = ec2.describeInstances()

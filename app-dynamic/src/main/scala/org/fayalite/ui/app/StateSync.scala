@@ -1,21 +1,20 @@
 package org.fayalite.ui.app
 
-import org.scalajs.dom.{Event, MessageEvent, WebSocket}
-import scala.scalajs.js
-import org.scalajs.dom
-import org.scalajs.dom._
-import org.scalajs.dom.extensions._
-
-import scala.scalajs.js._
-import scala.scalajs.js.Dynamic.{global => g}
-import scala.util.{Failure, Try}
+import org.fayalite.ui.app.canvas.Schema.ParseResponse
+import rx._
 
 class StateSync {
+
 
 }
 
 object StateSync {
-
+  import PersistentWebSocket._
+  lazy val parseResponse = Rx {
+    import upickle._
+    val str = messageStr()
+    read[ParseResponse](str)
+  }
   def processBridge(bridge: String) = {
     bridge
   }

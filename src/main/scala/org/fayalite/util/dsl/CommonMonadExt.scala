@@ -41,10 +41,11 @@ trait CommonMonadExt {
   implicit def getFutureAsString(some: Future[Any]): String = some.getAs[String]
 
   implicit class StringExt(str: String) {
-    def append(path: String) = {
-      val fw = new FileWriter(path, true)
+    def append(toWrite: String) = {
+      println("appending to " + str + "\n" + toWrite)
+      val fw = new FileWriter(str, true)
       try {
-        fw.write(str)
+        fw.write(toWrite + "\n")
       }
       finally fw.close()
     }

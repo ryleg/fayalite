@@ -46,6 +46,8 @@ libraryDependencies ++= Seq(
   "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
   "org.scala-lang.modules.scalajs" %%% "scalajs-dom" % "0.6" withSources() withJavadoc(),
   "org.scala-lang.modules.scalajs" %%% "scalajs-jquery" % "0.6" withSources() withJavadoc(),
-  "com.lihaoyi" %% "scalarx" % "0.2.7",
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1"
+  "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+  "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
+  "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc()
 )

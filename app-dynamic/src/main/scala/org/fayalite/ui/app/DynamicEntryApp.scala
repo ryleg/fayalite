@@ -7,8 +7,8 @@ package org.fayalite.ui.app
 import org.fayalite.ui.app.canvas.Canvas
 import org.scalajs.dom
 import org.scalajs.dom._
-import org.scalajs.dom.extensions._
 
+import scala.concurrent.Future
 import scala.io.Source
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -24,14 +24,22 @@ object DynamicEntryApp extends JSApp {
   @JSExport
   def fromBridge(bridge: String): String = {
     val attempt = Try {
-      Canvas.initCanvas()
-      import PersistentWebSocket._
-      sendV("Init")
-      HeaderNavBar.setupButtons()
-      StateSync.processBridge(bridge)
+      if (window.location.href.contains("access")) {
+        println("reloading due to oauth catch url")
+        window.location.href = "http://localhost:8080"
+        bridge
+      } else {
+        Canvas.initCanvas()
+        import PersistentWebSocket._
+        sendV("Init")
+        HeaderNavBar.setupButtons()
+        Editor.apply()
+        StateSync.processBridge(bridge)
+      }
     }
     attempt match {
-      case Success(x) => println("bridge success"); x
+      case Success(x) => //println("bridge success");
+       x
       case Failure(e) => e.printStackTrace(); "Failure"
     }
   }

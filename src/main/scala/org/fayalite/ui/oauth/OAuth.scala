@@ -50,9 +50,13 @@ object OAuth {
 
 
   def performGoogleOAuthRequest(access_token: String) = {
+    println("performing oauth request with at : " + access_token )
     val myRequest = url(s"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=$access_token")
     val request = Http(myRequest.GET);
-    request.map{_.getResponseBody}
+
+    val ret = request.map{_.getResponseBody}
+    ret.foreach{q => println("oauth response" + q)}
+    ret
   }
 
 }

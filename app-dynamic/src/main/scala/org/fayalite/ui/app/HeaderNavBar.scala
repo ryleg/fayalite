@@ -1,11 +1,12 @@
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.{ButtonFactory, Canvas}
+import org.fayalite.ui.app.canvas.{Input, ElementFactory, Canvas}
 import org.fayalite.ui.app.canvas.Canvas._
 import org.fayalite.ui.app.canvas.Schema.{Act, Elem}
 import org.scalajs.dom
 import org.scalajs.dom._
-import org.scalajs.dom.extensions._
+import rx.core.Obs
+import sun.net.www.content.text.plain
 
 import scala.io.Source
 import scala.scalajs.js
@@ -14,11 +15,19 @@ import scala.scalajs.js.annotation.JSExport
 import scala.scalajs.js.{JSON, JSApp}
 import scala.util.{Random, Failure, Success, Try}
 
-import org.scalajs.jquery.jQuery
 
 import org.fayalite.ui.app.canvas.Schema._
 
 object HeaderNavBar {
+
+
+  val spacingX = 112
+  val xOffset = 42
+  val yOffset = 42
+  var curX = xOffset
+  var curY = yOffset
+  val subTabOffset = 120
+  val subTabSpacing = 42
 
   case class Tab(tab: Elem, subTabs: List[Elem])
 
@@ -32,7 +41,7 @@ object HeaderNavBar {
   type ButtonSpec = (String, Act)
   type NavSpec = (ButtonSpec, List[ButtonSpec])
 
-  val reload : NavSpec = "ReloadJS" -> reloadF -> List[(String, Act)](
+  val reload : NavSpec = "ReloadJS3" -> reloadF -> List[(String, Act)](
     "Blank" -> Act0
   )
 
@@ -40,49 +49,132 @@ object HeaderNavBar {
     "OAuth" -> OAuth.redirect
   )
 
-  val buttons : List[NavSpec] = List(
-    reload,
-    account
-  )
+  /*
+  Canvas.ctx.fillStyle = "red"
+      Canvas.elementTriggers.foreach{
+        case (e, i) =>
+          Canvas.ctx.fillRect(
+            e.position.x , e.position.y
+            , e.position.dx, e.position.dy)
+   */
 
-  val spacingX = 112
-  val xOffset = 42
-  val yOffset = 42
-  var curX = xOffset
-  var curY = yOffset
-  val subTabSpacing = 42
+//  var pasteEvent = new ClipboardEvent('paste', { dataType: 'text/plain', data: 'My string' } );
+//  document.dispatchEvent(pasteEvent);
 
-  object ButtonType extends Enumeration {
-    type ButtonType = Value
-    val Tab, SubTab = Value
+  def kvInputMat(kv: Array[(String, String)]) = {
+    kv.zipWithIndex.foreach{
+      case ((k, v), idx) =>
+        ElementFactory(
+          k,
+          xOffset + spacingX,
+          subTabOffset+subTabSpacing*idx,
+          Act0,
+          flag=Element.BodyObject
+        )() -> {
+          val elemV = ElementFactory(
+            v,
+            xOffset + spacingX * 2,
+            subTabOffset + subTabSpacing * idx,
+            () => {
+              println("v " + v)
+              Canvas.activeElem.foreach {
+                e =>
+                  val c = Input.getClipboard
+                  val clipStripId = k + "=" + c.split(":").tail.mkString(":")
+                  e.redrawText(clipStripId)
+                  PersistentWebSocket.sendKV(k, clipStripId)
+              }
+            },
+            flag = Element.BodyObject,
+            key = v,
+            setActiveOnTrigger = true,
+            tabSync = false
+          )()
+
+          elemV
+        }
+    }
   }
 
-  def clearSubTabs() : Unit = {
+
+
+
+
+  val uiAct = () => {
+    Editor.apply()
+    ()
+  }
+
+  val buttons : List[NavSpec] = List(
+    reload,
+    account,
+    "UI" -> uiAct -> List[(String, Act)]()
+    /*"Servers" -> {() =>
+        kvInputMat(Array(
+        "access",
+        "secret",
+        "pem"
+        ).map{x => (x,x)})
+      ()
+    } -> List("FakeS" -> Act0)*/
+
+  )
+
+
+  object Element extends Enumeration {
+    type Element = Value
+    val Tab, SubTab, Status, BodyObject = Value
+  }
+
+  def tabSwitchClear() : Unit = {
     Canvas.elementTriggers.filter{
-      _._1.flag == ButtonType.SubTab}.foreach{
+      case (elem, act) =>
+        val flag = elem.flag
+        flag == Element.SubTab ||
+          flag == Element.BodyObject
+    }.foreach{
       _._1.deregister()
     }
   }
 
+  def makeEmail(email: String) = {
+    ElementFactory(
+      email,
+      xOffset + spacingX*4, curY, Act0, flag=
+        Element.Status
+    )()
+  }
+  
+  var emailStatus = makeEmail("yourEmail")
+
+  def setEmail(email: String) = {
+    emailStatus.deregister()
+    makeEmail(email)
+   }
+
   def setupButtons() = {
+
     buttons.zipWithIndex.foreach{
       case (((tabName, trigger), subTabs), bIdx) =>
         val curX = xOffset + spacingX*bIdx
-        subTabs.zipWithIndex.map{
+        val subTabSetup = subTabs.zipWithIndex.map{
           case ((stName, stTrigger), stIdx) =>
             val curSubX = 25
             val curSubY = 120 + stIdx*subTabSpacing
-            ButtonFactory(
+            ElementFactory(
               stName, curSubX, curSubY, stTrigger,
-              flag=ButtonType.SubTab)
+              flag=Element.SubTab)
        }
       val exclusionTrigger = () => {
-          clearSubTabs()
+      //  println("exclusivetrigger")
+          //if (Canvas.activeElem.map{_.name} == Some(tabName))
+          tabSwitchClear()
+          subTabSetup.foreach{sts => sts()}
           trigger()
       }
-      val buttonF = ButtonFactory(
+      val buttonF = ElementFactory(
         tabName, curX, curY, exclusionTrigger, flag=
-      ButtonType.Tab
+      Element.Tab
       )
       val button = buttonF()
     }

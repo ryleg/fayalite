@@ -9843,24 +9843,9 @@ ScalaJS.c.Lorg_fayalite_ui_app_io_WSWrapper$$anonfun$initWS$4.prototype.apply__L
       if (ScalaJS.anyRefEqEq("eval", x1)) {
         ScalaJS.g["eval"](ScalaJS.objectToString(pm["code"]));
         var curBridge = ScalaJS.m.Lorg_fayalite_ui_app_Bridge().x$1;
-        var x$1 = ("fromBridge call using curBridge: " + curBridge);
-        var this$4 = ScalaJS.m.s_Console();
-        var this$5 = this$4.outVar$1;
-        ScalaJS.as.Ljava_io_PrintStream(this$5.tl$1.get__O()).println__O__V(x$1);
-        var retVal = ScalaJS.g["eval"](new ScalaJS.c.s_StringContext().init___sc_Seq(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array(["org.fayalite.ui.app.DynamicEntryApp().fromBridge('", "');"])).s__sc_Seq__T(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([curBridge])));
-        var x$2 = ("retVal " + retVal);
-        var this$7 = ScalaJS.m.s_Console();
-        var this$8 = this$7.outVar$1;
-        ScalaJS.as.Ljava_io_PrintStream(this$8.tl$1.get__O()).println__O__V(x$2)
-      } else if (ScalaJS.anyRefEqEq("heartbeat", x1)) {
-        var this$10 = ScalaJS.m.s_Console();
-        var this$11 = this$10.outVar$1;
-        ScalaJS.as.Ljava_io_PrintStream(this$11.tl$1.get__O()).println__O__V("heartbeat")
+        ScalaJS.g["eval"](new ScalaJS.c.s_StringContext().init___sc_Seq(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array(["org.fayalite.ui.app.DynamicEntryApp().fromBridge('", "');"])).s__sc_Seq__T(new ScalaJS.c.sjs_js_WrappedArray().init___sjs_js_Array([curBridge])))
       } else {
-        var x$3 = ("can't recognize command code from: " + ScalaJS.objectToString(me["data"]));
-        var this$13 = ScalaJS.m.s_Console();
-        var this$14 = this$13.outVar$1;
-        ScalaJS.as.Ljava_io_PrintStream(this$14.tl$1.get__O()).println__O__V(x$3)
+        ScalaJS.anyRefEqEq("heartbeat", x1)
       };
       var attempt = new ScalaJS.c.s_util_Success().init___O((void 0))
     } catch (ex) {
@@ -9880,14 +9865,10 @@ ScalaJS.c.Lorg_fayalite_ui_app_io_WSWrapper$$anonfun$initWS$4.prototype.apply__L
     if (ScalaJS.is.s_util_Failure(attempt)) {
       var x2 = ScalaJS.as.s_util_Failure(attempt);
       var e$1 = x2.exception$2;
-      var this$16 = ScalaJS.m.s_Console();
-      var this$17 = this$16.outVar$1;
-      ScalaJS.as.Ljava_io_PrintStream(this$17.tl$1.get__O()).println__O__V("eval failure");
+      var this$4 = ScalaJS.m.s_Console();
+      var this$5 = this$4.outVar$1;
+      ScalaJS.as.Ljava_io_PrintStream(this$5.tl$1.get__O()).println__O__V("eval failure");
       e$1.printStackTrace__Ljava_io_PrintStream__V(ScalaJS.m.jl_System().err$1)
-    } else {
-      var this$19 = ScalaJS.m.s_Console();
-      var this$20 = this$19.outVar$1;
-      ScalaJS.as.Ljava_io_PrintStream(this$20.tl$1.get__O()).println__O__V("eval success")
     }
   }
 });

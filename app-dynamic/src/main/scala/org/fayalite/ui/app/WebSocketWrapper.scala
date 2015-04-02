@@ -3,7 +3,6 @@ package org.fayalite.ui.app
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 import org.scalajs.dom
 import org.scalajs.dom._
-import org.scalajs.dom.extensions._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}

@@ -68,20 +68,20 @@ class WSWrapper(wsUri: String) {
      //         js.eval("org.fayalite.ui.app.DynamicEntryApp().main();")
        //       println("main dynamic call2")
               val curBridge = org.fayalite.ui.app.Bridge.x
-              println("fromBridge call using curBridge: " + curBridge)
+          //    println("fromBridge call using curBridge: " + curBridge)
               //js.eval("org.fayalite.ui.app.DynamicEntryApp().fromBridge('yo');")
               val retVal = js.eval(s"org.fayalite.ui.app.DynamicEntryApp().fromBridge('$curBridge');")
                   //                s"fromBridge(${org.fayalite.ui.app.Bridge.x});")
-              println("retVal " + retVal)
-            case "heartbeat" => println{"heartbeat"}
+            //  println("retVal " + retVal)
+            case "heartbeat" => //println{"heartbeat"}
             case _ =>
-              println("can't recognize command code from: " + me.data.toString)
+            //  println("can't recognize command code from: " + me.data.toString)
           }
         }
 
         attempt match {
           case Failure(e) => println("eval failure") ; e.printStackTrace()
-          case _ => println("eval success")
+          case _ => //println("eval success")
         }
 
       }
