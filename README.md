@@ -1,12 +1,12 @@
 I'm testing a bunch of dynamic scala.js stuff right now. Highly unstable.
 I put app (static) and app-dynamic in separate folders,
-not multi-project until I can fix scala.js.rx dependency issues
+
+Need to switch out SparkSQL usage for postgres. SparkSQL is too unstable,
+and the hive requirements for real use case in a web app are frustrating.
+
+SparkSQL will work as a toy example but it's not scalable for serving an app
 
 #Run
-
-to compile static-js page
-
-cd fayalite/app
 
 sbt ~fastOptJS
 
@@ -16,40 +16,27 @@ cd fayalite/app-dynamic
 
 sbt ~fastOptJS
 
-to start websocket server
+Run org.fayalite.ui.ParseServer to handle state management / synchronization
 Run org.fayalite.ui.WSServer to handle websocket management / serving page
 
-to copy over dynamic resources to make them accessible
-(easy to fix this later to be over WS)
+Open http://localhost:8080 in browser
 
-Use fswatch to check for changes
-fswatch app-dynamic/target/ ./update-dynamic.sh
 
-Or manually copy it
-cp ./app-dynamic/target/scala-2.10/*.js* ./app/target/scala-2.10/
+#Notes
 
-Open fayalite/app/index-fastopt.html in browser
 
-Run TestRemoteEval to send dynamic js to get evaluated by client.
+to compile static-js page
 
-#Test
+cd fayalite/app
+
+It's bundled in resources since it never really needs to change that much.
 
 to start additional servers to test other components.
 Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
-Run org.fayalite.ui.ParseServer to handle state management / synchronization
-^ Parse server not really implemented. SparkSupervisor is more finished.
 
-All of these should be restartable independently of one another ideally, we'll see if thats
-true in testing
-
-
-#NOTES:
-put js in jar for use with served html instead of debug
-copy compiled js to resources. Should be served via SimpleServer / route
 
 This all should switch to play but there are dependency conflicts that must be
 resolved the way that spark-notebook resolved them. Did not want to modify
 build.sbt yet so I'm using spray.
-
 
 // Data lead tags - data agg classes - data source.
