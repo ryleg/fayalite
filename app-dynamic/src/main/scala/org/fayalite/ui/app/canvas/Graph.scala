@@ -23,8 +23,8 @@ object Graph {
     val vp = ver.map {
       v: Dynamic => Vtx(v.id, v.vd)
     }
-    println(vp.toList)
-    println(ep.toList)
+   // println(vp.toList)
+  //  println(ep.toList)
     GraphData(vp, ep)
   }
 }

@@ -55,15 +55,15 @@ object FSMan {
       lsq.map{ p =>
         val seg = p.-(cwd).segments
         if (!ignore.exists(i => seg.last.contains(i))) {
-          val id = gb.addV(p.last.toString(), parentIds)
+          val id = gb.addV(p.last.toString().replaceAll(".scala", ""), parentIds)
           println(seg)
           if (p.isDir) {
             innerExplore(ls ! p, Seq(id))
           } else {
-            /*Try {
-              val contents = read.lines.!!(p)
-              gb.addV(contents.toSeq.mkString, Seq(id))
-            }*/
+            Try {
+      //        val contents = read.lines.!!(p)
+    //          gb.addV(contents.toSeq.mkString, Seq(id))
+            }
           }
         }
       }

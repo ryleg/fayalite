@@ -33,24 +33,58 @@ object ElementFactory {
                 val y: Var[Int]
               ) {
 
-    def style() = {
-      ctx.font = font()
-      ctx.fillStyle = fillStyle()
+    val splitText = Rx {
+      val st = text().split("\n")
+      println("splitTextlen" + st.length)
+      st
     }
 
-    val metrics = Rx {
-      style(); ctx.measureText(text())
+    def style[T](f : => T): T = {
+      val prevFont = ctx.font
+      val prevFillStyle = ctx.fillStyle
+      ctx.font = font()
+      ctx.fillStyle = fillStyle()
+      val ret = f
+      ctx.font = prevFont
+      ctx.fillStyle = prevFillStyle
+      ret
+    }
+
+    val width = Rx { style { ctx.measureText(text()).width}}
+
+    val widths = Rx {
+      style { splitText().map{t => ctx.measureText(t).width} }
+    }
+
+    val maxWidthActual = Rx { maxWidth().getOrElse(width())}
+      //widths().max}
+
+    def drawActual(tex: String, x: Int, y: Int, mxWidth: Option[Double]) = {
+      style { mxWidth.foreach { mw => ctx.fillText(tex, x, y, maxWidth = mw)}
+      if (mxWidth.isEmpty) ctx.fillText(tex, x, y) }
     }
 
     val draw = Rx { () => {
-      maxWidth().foreach { mw => ctx.fillText(text(), x(), y(), maxWidth = mw)}
-      if (maxWidth().isEmpty) ctx.fillText(text(), x(), y())
+      style {
+        println(s"draw called ${text()} " + x() + " " + y())
+        drawActual(text(), x(), y(), maxWidth())
+/*        var yo = x()
+        splitText().foreach { st =>
+          maxWidth().foreach { mw => ctx.fillText(st, x(), yo, maxWidth = mw)}
+          if (maxWidth().isEmpty) ctx.fillText(st, x(), yo)
+          yo += 20
+        }*/
+      }
     }
     }
 
     val position = Rx {
-      val posWidth = maxWidth().getOrElse(metrics().width)
-      Position(x(), y() - 17, posWidth, 22)
+      val posWidth = maxWidth().getOrElse(maxWidthActual())
+      Position(x(),
+        y() - 17,  //*splitText().length
+        posWidth,
+        22)
+        //*splitText().length)
     }
 
     def redraw() = {
