@@ -31,7 +31,7 @@ import scala.reflect.runtime.{currentMirror => m, universe => ru}
 
 class SparkDBManager[T <: Product](tableS: String)(implicit evt: ru.TypeTag[T]) {
 
-  val sqlc = SparkReference.sqlContext
+  val sqlc = SparkRef.sqlContext
   import sqlc._
   createParquetFile[T](s"$tableS.parquet").registerTempTable(tableS)
   val schemaRDD = table(tableS)
@@ -42,9 +42,9 @@ class SparkDBManager[T <: Product](tableS: String)(implicit evt: ru.TypeTag[T]) 
 
 object SparkDBManager{
 
-  SparkReference.getSC
+  SparkRef.getSC
 
-  val sqlc = SparkReference.sqlContext
+  val sqlc = SparkRef.sqlContext
   import sqlc._
 
   // unsafe, make temp file.
@@ -70,7 +70,7 @@ object SparkDBManager{
   }
 
   def loadLocalStream = {
-    SparkReference.sc.textFile(
+    SparkRef.sc.textFile(
       ParseServer.tempOAuthLocalFileStream).collect()
       .map { ar =>
       implicit val formats = JSON.formats

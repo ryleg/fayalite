@@ -9,7 +9,7 @@ import rx._
 
 object FSMan {
   def main(args: Array[String]) {
-    //fileGraph().length.p
+    fileGraph().p
   }
   case class Vertex(id: Long, vd: String)
 
@@ -45,7 +45,9 @@ object FSMan {
   val ignore = List("target", ".idea", "lib", ".git", ".DS_Store", ".dll", ".js")
 
   def fileGraph(
-                 startPath: Path = cwd //./(RelPath("app-dynamic")) / 'src
+                 startPath: Path = cwd./(RelPath("app-dynamic")) /
+                   'src / 'main / 'scala / 'org / 'fayalite / 'ui / 'app ,
+                  procFile: Path => Unit = (pf: Path) => ()
                  ) = {
     val processingStart = ls ! startPath
     val gb = new GraphBuilder()

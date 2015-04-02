@@ -1,6 +1,6 @@
 package org.fayalite.repl
 
-import org.fayalite.util.SparkReference
+import org.fayalite.util.SparkRef
 import org.scalatest.FunSuite
 
 

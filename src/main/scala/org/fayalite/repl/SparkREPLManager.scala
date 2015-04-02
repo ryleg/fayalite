@@ -3,7 +3,7 @@ package org.fayalite.repl
 
 import org.apache.spark.rdd.RDD
 import org.fayalite.repl.REPL._
-import org.fayalite.util.{SparkReference, Common}
+import org.fayalite.util.{SparkRef, Common}
 
 import org.apache.spark.{Logging, SparkConf, SparkContext}
 import org.apache.spark.repl.{MagicSparkILoop, SparkCommandLine, SparkILoop}
@@ -67,7 +67,7 @@ object SparkREPLManager {
 
 
   def testEvaluation() : Unit = {
-    val sc = SparkReference.getSC
+    val sc = SparkRef.getSC
 
     class TestM(uid: Int) {
 
@@ -149,7 +149,7 @@ class SparkREPLManager(replId: Int, classPath: Option[String] = None) extends RE
   }
   logInfo("Manager finished attempting start REPL loop Success? " + maybeFailed)
 
-  rebindSC(SparkReference.sc)
+  rebindSC(SparkRef.sc)
 
   def run(code: String, doRead: Boolean = true) = {
     logInfo("Manager code to run " + code)

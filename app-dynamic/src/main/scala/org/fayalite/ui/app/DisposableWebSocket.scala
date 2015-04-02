@@ -11,6 +11,8 @@ import scala.util.{Failure, Try}
 object DisposableWebSocket {
   val WS_URI = "ws://localhost:8080/"
 
+
+
   def reload(command: String = "reload"
                      ) = {
 

@@ -23,6 +23,47 @@ object ElementFactory {
       setActiveOnTrigger=setActiveOnTrigger, tabSync = tabSync))
   }
 
+  import rx._
+  class Text(
+              val   text: Var[String],
+              val   maxWidth: Var[Option[Double]] = Var(None),
+              val     font: Var[String] =Var(s"11pt Calibri"),
+              val    fillStyle: Var[String] = Var("white"),
+                val x : Var[Int],
+                val y: Var[Int]
+              ) {
+
+    def style() = {
+      ctx.font = font()
+      ctx.fillStyle = fillStyle()
+    }
+
+    val metrics = Rx {
+      style(); ctx.measureText(text())
+    }
+
+    val draw = Rx { () => {
+      maxWidth().foreach { mw => ctx.fillText(text(), x(), y(), maxWidth = mw)}
+      if (maxWidth().isEmpty) ctx.fillText(text(), x(), y())
+    }
+    }
+
+    val position = Rx {
+      val posWidth = maxWidth().getOrElse(metrics().width)
+      Position(x(), y() - 17, posWidth, 22)
+    }
+
+    def redraw() = {
+      position().clear()
+      draw()()
+    }
+
+    val widthAdjustment = Obs(maxWidth, skipInitial = true) {
+      maxWidth().foreach{_ => redraw()}
+    }
+
+  }
+
   def getDrawText(text: String, maxWidth: Option[Double] = None, font: String =
   s"15pt Calibri", fillStyle: String = "white") = {
     val draw = (x: Int, y: Int) => {

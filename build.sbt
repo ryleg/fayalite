@@ -49,5 +49,6 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
   "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
   "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
-  "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc()
+  "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc(),
+  "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc()
 )

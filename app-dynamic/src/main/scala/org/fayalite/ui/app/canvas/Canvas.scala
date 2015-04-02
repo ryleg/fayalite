@@ -80,7 +80,16 @@ object Canvas {
   val onclick = Var(null.asInstanceOf[MouseEvent])
   val onresize = Var(null.asInstanceOf[UIEvent])
 
+  val rightClick = Var(null.asInstanceOf[MouseEvent])
+
+
   def resetCanvasTriggers() = {
+
+    window.oncontextmenu = (me: MouseEvent) => {
+      me.preventDefault()
+      rightClick() = me
+    }
+
     window.onclick = (me: MouseEvent) =>
     {
       onclick() = me
@@ -121,7 +130,6 @@ object Canvas {
     width = canvas.width
     height = canvas.height
     window.onresize = (uie: UIEvent) => {
-      onresize() = uie
       canvas.width = window.innerWidth
       canvas.height = window.innerHeight
       width = canvas.width
@@ -129,6 +137,8 @@ object Canvas {
       DrawManager.onresize(uie)
       elementTriggers.foreach{_._1.draw()}
       //      println(s"resize canvas width: $width height: $height")
+      onresize() = uie
+
     }
 
     testKeyBind()

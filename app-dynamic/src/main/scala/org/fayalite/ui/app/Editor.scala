@@ -1,6 +1,7 @@
 
 package org.fayalite.ui.app
 
+import org.fayalite.ui.app.canvas.ElementFactory.Text
 import org.fayalite.ui.app.canvas.{Canvas, ElementFactory, Schema, Graph}
 import org.fayalite.ui.app.canvas.Schema.{Position, GraphData, ParseResponse}
 import rx._
@@ -29,28 +30,13 @@ object Editor{
 }
 
 class Node(
-            val text: Var[String],
-            val x: Var[Int],
-            val y: Var[Int]
+            val text: Var[ElementFactory.Text]
             ) {
   import Editor._
 
-  val drawText = Rx{
-    ElementFactory.getDrawText(text(),
-      //Some(maxNodeWidth())
-       font=s"12pt Calibri"
-    )(x(), y())._1
-  }
-
-  val position = Rx {
-    ElementFactory.getDrawText(text()//,
-     // Some(maxNodeWidth())
-    )(x(), y())._2
-  }
-
   val resize = Obs(Canvas.onresize, skipInitial = true) {
-    position().clear()
-    drawText()()
+    println("OnResize")
+    text().redraw()
   }
 
 
@@ -67,19 +53,31 @@ class Editor() {
     val emap = g.edges.map{ e => e.id -> e}.toMap
     val ves = g.vertices.map{v => (v, emap.get(v.id))}
     val curX = Var(bodyOffset())
-    ves.filter{_._2.isEmpty}.slice(0, numColumns()).map{_._1}.zipWithIndex.map{
-      case (vtx, idx) =>
-        println("draw node " + vtx + idx)
-       //   + idx*maxNodeWidth().toInt
-        val n = new Node(Var(vtx.vd), Var(curX()), bodyOffsetY)
-        n.drawText()()
-        curX() += n.position().dx.toInt
-     /*   ElementFactory.getDrawText(vtx.vd, font=s"12pt Calibri")(
+    val curY = Var(bodyOffsetY())
+
+    ves.filter{_._2.isEmpty}.grouped(numColumns()).toList.map {
+      gro =>
+      curY() += 17
+      gro.map {
+        _._1
+      }.zipWithIndex.map {
+        case (vtx, idx) =>
+          println("draw node " + vtx + idx)
+          //   + idx*maxNodeWidth().toInt
+
+          val tex = new Text(Var(vtx.vd), x = Var(curX()), y = Var(bodyOffsetY()))
+          val n = new Node(Var(tex))
+
+          n.text().redraw()
+          //  n.drawText()()
+          curX() += n.text().position().dx.toInt
+          /*   ElementFactory.getDrawText(vtx.vd, font=s"12pt Calibri")(
           bodyOffset() + idx*maxNodeWidth().toInt,
           bodyOffsetY())._1()*/
-    //
-    //    n.drawText()
-        n
+          //
+          //    n.drawText()
+          n
+      }
     }
 
   }

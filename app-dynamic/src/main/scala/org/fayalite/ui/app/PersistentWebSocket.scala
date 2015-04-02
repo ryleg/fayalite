@@ -57,6 +57,9 @@ object PersistentWebSocket {
         send()
       }
     }
+
+    // return future of function here on timeout also.
+    // set an obs on the future to terminate the obs on parsed message
     val o: Obs = Obs(parsedMessage) {
       Try {
           if (parsedMessage().requestId.toString == id) {
@@ -95,6 +98,7 @@ class PersistentWebSocket(
     parsedMessage() = pm
 
     pm.flag.toString match {
+      case "eval" => Dynamo.eval(pm)
       case "heartbeat" => //println{"dynamic heartbeat"}
       case "auth" => pm.email
         val email = pm.email.toString
@@ -104,7 +108,7 @@ class PersistentWebSocket(
 
      //   println("auth email: " + email)
       case _ =>
-        println("can't recognize command code from: " + me.data.toString)
+        println("can't recognize command2 code from: " + me.data.toString.slice(0,200))
     }
 
   }

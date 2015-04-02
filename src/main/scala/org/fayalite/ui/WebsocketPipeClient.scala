@@ -8,7 +8,7 @@ import spray.can.websocket.frame.TextFrame
 
 class WebsocketPipeClient {
 
-  val rc = new RemoteClient(15909)
+  val rc = new RemoteClient(scala.util.Random.nextInt(30000) + 10000)
   val sr = rc.getServerRef(16348)
 
   def sendFrame(sprayFrame: SprayFrame) = {
@@ -32,7 +32,7 @@ object WebsocketPipeClient {
 
   def sendFrame(sprayFrame: SprayFrame) = {
 
-    val rc = new RemoteClient(15909)
+    val rc = new RemoteClient(scala.util.Random.nextInt(30000) + 10000)
     val sr = rc.getServerRef(16348)
     sr.map{
       s =>

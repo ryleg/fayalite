@@ -5,7 +5,7 @@ import akka.io.Tcp.{Write, Received}
 import akka.util.{ByteString, Timeout}
 import org.apache.spark.Logging
 import org.apache.spark.repl.SparkIMain
-import org.fayalite.util.{SimpleRemoteServer, SparkReference}
+import org.fayalite.util.{SimpleRemoteServer, SparkRef}
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 import scala.concurrent.Future
 import scala.concurrent.duration._

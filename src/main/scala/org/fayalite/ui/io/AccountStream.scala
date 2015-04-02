@@ -1,6 +1,6 @@
 package org.fayalite.ui.io
 
-import org.fayalite.util.SparkReference
+import org.fayalite.util.SparkRef
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.apache.spark.rdd.RDD

@@ -127,6 +127,13 @@ object ParseServer {
     users.filter{_.email == ui.email}.collect().sortBy{_.updateTime}.reverse.headOption
   }
 
+  def evalUIFrame = {
+    val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
+      .mkString
+    val msg = JSON.caseClassToJson(TestEval("eval", sampleJS))
+    val frame = TextFrame(msg)
+    frame
+  }
 
 
 }

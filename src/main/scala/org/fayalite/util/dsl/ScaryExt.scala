@@ -1,7 +1,7 @@
 package org.fayalite.util.dsl
 
 import org.apache.spark.sql.SchemaRDD
-import org.fayalite.util.{JSON, SparkReference}
+import org.fayalite.util.{JSON, SparkRef}
 
 import scala.reflect.ClassTag
 import scala.reflect.runtime._
@@ -9,13 +9,13 @@ import scala.reflect.runtime.{currentMirror => m, universe => ru}
 
 trait ScaryExt {
 
-  val sqlc = SparkReference.sqlContext
+  val sqlc = SparkRef.sqlContext
 
   implicit def AnyJSON(any: Any) : String = any.json
 
   implicit class BatchSQL[T <: Product](t: Seq[T]) (implicit evct: ClassTag[T],
                                                 evtt: ru.TypeTag[T]){
-    def sql = SparkReference.sqlContext.createSchemaRDD(SparkReference.sc.makeRDD(t))
+    def sql = SparkRef.sqlContext.createSchemaRDD(SparkRef.sc.makeRDD(t))
     def insert(table: String, overwrite: Boolean = true) = sql.insertInto(table, overwrite)
   }
 
@@ -26,7 +26,7 @@ trait ScaryExt {
 
   implicit class scExt(s: String) {
     def text = {
-      SparkReference.sc.textFile(s)
+      SparkRef.sc.textFile(s)
     }
   }
 
@@ -57,9 +57,9 @@ trait ScaryExt {
   //  println(s"type of $t has type arguments $targs")
     def ++(scr : SchemaRDD) = sql.mergeU(scr)
 
-    def rdd = SparkReference.sc.makeRDD(Seq(t))
+    def rdd = SparkRef.sc.makeRDD(Seq(t))
 
-    def sql = SparkReference.sqlContext.createSchemaRDD(rdd)
+    def sql = SparkRef.sqlContext.createSchemaRDD(rdd)
     def insert(table: String, overwrite: Boolean = true) = {
       val sq = sql
       val u = sqlc.table(tableName).unionAll(sq)

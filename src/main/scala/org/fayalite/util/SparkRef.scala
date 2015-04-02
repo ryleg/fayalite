@@ -4,10 +4,8 @@ package org.fayalite.util
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.{SparkConf, SparkContext}
 
-/**
- * Created by ryle on 12/2/2014.
- */
-object SparkReference {
+
+object SparkRef {
 
   var sc: SparkContext = _
   var sqlContext: SQLContext = _
