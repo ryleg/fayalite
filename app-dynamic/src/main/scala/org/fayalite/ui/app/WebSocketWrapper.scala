@@ -10,6 +10,7 @@ import scala.scalajs.js.{JSON, JSApp}
 
 import scala.util.{Failure, Try}
 
+@deprecated
 class WebSocketWrapper(wsUri: String) {
 
   var open = false

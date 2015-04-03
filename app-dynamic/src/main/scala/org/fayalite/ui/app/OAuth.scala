@@ -3,15 +3,15 @@ package org.fayalite.ui.app
 import org.fayalite.ui.app.canvas.Schema.Act
 import org.scalajs.dom._
 
+
 object OAuth {
 
-
+  // TODO: Pickup from configs or DB
   val clientId = "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com"
   val redirectURI = "http://localhost:8080/oauth_callback"
 
   val redirect : Act = () => {
     window.location.href = getURL()
-
   }
 
   // Pass an optional userId generated in here to the redirectUri?

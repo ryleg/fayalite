@@ -8,6 +8,7 @@ import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSON
 import scala.util.{Failure, Try}
 
+@deprecated
 object DisposableWebSocket {
   val WS_URI = "ws://localhost:8080/"
 
@@ -47,6 +48,7 @@ object DisposableWebSocket {
 
 }
 
+@deprecated
 class DisposableWebSocket(
                           message: js.Any,
                            onmessage: (MessageEvent => Unit),

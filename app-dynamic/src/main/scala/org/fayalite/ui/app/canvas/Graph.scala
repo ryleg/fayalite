@@ -7,8 +7,12 @@ import scala.scalajs.js
 
 import scala.util.{Failure, Try}
 
-object Graph {
 
+/**
+ * Really need upickle to make this clean.
+ */
+@deprecated
+object Graph {
 
   def fromJSON(g: Dynamic) = {
    // println("graphjson")

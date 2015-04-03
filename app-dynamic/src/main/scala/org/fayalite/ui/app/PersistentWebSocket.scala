@@ -37,6 +37,7 @@ object PersistentWebSocket {
 
   // def send(msg: js.Any) = pws.ws.send(JSON.stringify(msg))
 
+  // TODO : Switch to upickle once errors are resolved.
   def sendV(v: String) = sendKV("tab", v)
 
   def sendKV(k: String, v: String, f: Dynamic => Unit = (d: Dynamic) => (),

@@ -61,8 +61,8 @@ object FSMan {
             innerExplore(ls ! p, Seq(id))
           } else {
             Try {
-      //        val contents = read.lines.!!(p)
-    //          gb.addV(contents.toSeq.mkString, Seq(id))
+              val contents = read.lines.!!(p)
+              gb.addV(contents.toSeq.mkString("\n").slice(0, 200), Seq(id))
             }
           }
         }

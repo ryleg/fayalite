@@ -3,6 +3,10 @@ package org.fayalite.ui.app
 import scala.scalajs.js
 import js._
 
+/**
+ * Handler for contract between static / dynamic scala.js classloaders.
+ * Incomplete.
+ */
 object Dynamo {
   
   def eval(pm: Dynamic) = {

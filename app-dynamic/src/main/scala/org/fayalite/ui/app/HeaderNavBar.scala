@@ -1,6 +1,7 @@
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.{Input, ElementFactory, Canvas}
+import org.fayalite.ui.app.canvas.elem.ElementFactory
+import org.fayalite.ui.app.canvas.{Input, Canvas}
 import org.fayalite.ui.app.canvas.Canvas._
 import org.fayalite.ui.app.canvas.Schema.{Act, Elem}
 import org.scalajs.dom
@@ -18,6 +19,12 @@ import scala.util.{Random, Failure, Success, Try}
 
 import org.fayalite.ui.app.canvas.Schema._
 
+
+/**
+ * Need to rewrite this to use scala.rx. Leaving it alone for now because it works
+ * and it's basically just for OAuth at this point.
+ */
+@deprecated
 object HeaderNavBar {
 
 

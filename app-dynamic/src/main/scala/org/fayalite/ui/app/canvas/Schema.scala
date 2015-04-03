@@ -2,11 +2,15 @@ package org.fayalite.ui.app.canvas
 
 import org.fayalite.ui.app.PersistentWebSocket
 import org.fayalite.ui.app.canvas.Canvas._
+import org.fayalite.ui.app.canvas.elem.ElementFactory
 
 import scala.scalajs.js
 import scala.scalajs.js.Array
 import scala.util.{Failure, Success, Try}
 
+/**
+ * Contracts for understanding websocket messages.
+ */
 object Schema {
 
   case class Vtx(id: Long, vd: String)
@@ -70,6 +74,7 @@ object Schema {
 
   val Act0: Act = () => ()
 
+  @deprecated
   case class Elem(
                   name: String,
                   position: Position,

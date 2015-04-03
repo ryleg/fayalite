@@ -1,8 +1,8 @@
 
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.ElementFactory.Text
-import org.fayalite.ui.app.canvas.{Canvas, ElementFactory, Schema, Graph}
+import org.fayalite.ui.app.canvas.elem.{Node, ElementFactory, Text}
+import org.fayalite.ui.app.canvas.{Canvas, Schema, Graph}
 import org.fayalite.ui.app.canvas.Schema.{Position, GraphData, ParseResponse}
 import org.scalajs.dom.raw.MouseEvent
 import rx._
@@ -32,57 +32,22 @@ object Editor {
     ((Canvas.width - bodyOffset() - rightOffset()) / maxNodeWidth()).toInt
   }
 
-  val xButtonBuffer = 10
-  val yButtonBuffer = 10
-
-  def checkInside(position: Position, me: MouseEvent) = {
-    Try {
-      val sxi = me.screenX
-      val syi = me.screenY
-      val cxi = me.clientX
-      val cyi = me.clientY
-      (cxi > position.x - xButtonBuffer) &&
-        (cxi < position.x2 + xButtonBuffer) &&
-        (cyi > position.y - yButtonBuffer) &&
-        (cyi < position.y2 + yButtonBuffer)
-    }.toOption.getOrElse(false)
-  }
 
   val editOffsetY = Var(400)
 }
 
-class Node(
-            val text: Var[ElementFactory.Text],
-            val editable: Var[Option[ElementFactory.Text]] = Var(None)
-        //    val subText: Var[ElementFactory.Text]
-            ) {
-  import Editor._
 
-  val resize = Obs(Canvas.onresize, skipInitial = true) {
-    println("OnResize")
-    text().redraw()
-  }
-  
-  def isInside = checkInside(text().position(), Canvas.onclick())
-
-  def drawEditable() = {
-    editable().map{e =>
-      e.redraw()
-    }
-  }
-
-  val click = Obs(Canvas.onclick) {
-    if (isInside) {
-      println("click on " + text().text())
-     // drawEditable()
-    }
-    }
-}
 
 //class EditNode(val text: Var[ElementFactory.Text])
 
 class Editor() {
 
+
+  val test = Text("test", 200, 200)
+  test.redraw()
+  val nodet = new Node(Var(test), Var(Some(Text("testline\ntestlinet\n\nasdf", 200, 300))))
+
+  println("new editor")
   import Editor._
 
   val graph = Var(GraphData(Array(), Array()))
@@ -94,8 +59,6 @@ class Editor() {
     val emap3 = g.edges.map{ e => e.id -> e}.groupBy{_._1}.toMap
 
     val i2v = g.vertices.map{v => v.id -> v}.toMap
-
-
     val vesl = g.vertices.map{v => emap.get(v.id).map{_ -> v}}.flatten.toMap
 
   //  val ves = g.vertices.map{v => (v, emap.get(v.id))}
@@ -106,20 +69,16 @@ class Editor() {
 
     val classF = g.vertices.filter{q => q.vd.charAt(0).isUpper && q.vd.length < 100}
 
-    classF.grouped(numColumns()).toList.foreach {
+/*    val nodes = classF.grouped(numColumns()).toList.map {
       gro =>
         val curX = Var(bodyOffset())
         curY() += 37
-        println("curY " + curY())
+     //   println("curY " + curY())
         Schema.TryPrintOpt {
-          gro.zipWithIndex.foreach {
+          gro.zipWithIndex.map {
             case (vtx, idx) =>
-              println("draw node " + vtx + idx)
               val childs = emap3.get(vtx.id).map {
                 c =>
-                  println("child nodes " + c.map {
-                    _._2.dstId
-                  }.toList)
                   c.map {
                     _._2.dstId
                   }.map {
@@ -127,26 +86,32 @@ class Editor() {
                   }.head
               }.flatten.map {
                 cv =>
-                  new Text(Var(cv.vd), x = Var(curX()), y = Var(editOffsetY())) // x y not used
+                  new Text(Var(cv.vd), x = Var(100), y = Var(400)) // x y not used
               }
-              //   + idx*maxNodeWidth().toInt
-
               val tex = new Text(Var(vtx.vd), x = Var(curX()), y = Var(curY()))
               val n = new Node(Var(tex), editable = Var(childs))
-
               n.text().redraw()
-              //  n.drawText()()
               curX() += n.text().position().dx.toInt + 30
-              /*   ElementFactory.getDrawText(vtx.vd, font=s"12pt Calibri")(
-          bodyOffset() + idx*maxNodeWidth().toInt,
-          bodyOffsetY())._1()*/
-              //
-              //    n.drawText()
               n
           }
         }
-
     }
+
+    val flatNodes = nodes.flatten.flatten.toSet
+
+    flatNodes.foreach{n => println(n.text().text())}*/
+/*
+    flatNodes.foreach{
+      n =>
+        n.editable().map{e => Obs(e.onRedraw, skipInitial=true){
+          flatNodes.filter{_ != n}.foreach{
+            ne =>
+              ne.editable().map{_.position().clear()}
+          }
+        }}
+    }*/
+
+
   }
 
   PersistentWebSocket.sendKV("tab", "Editor",

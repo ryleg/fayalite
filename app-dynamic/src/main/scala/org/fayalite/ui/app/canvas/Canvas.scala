@@ -12,6 +12,11 @@ import scala.util.{Failure, Try}
 
 import org.fayalite.ui.app.canvas.Schema._
 
+/**
+ * We're only using a single canvas / context to start with for simplicity, this will eventually become
+ * the 'background' canvas when we move to multiple contexts. For now this is the sole
+ * bottleneck to all canvas interactions.
+ */
 object Canvas {
 
   var canvas : dom.raw.HTMLCanvasElement = _
@@ -82,6 +87,9 @@ object Canvas {
 
   val rightClick = Var(null.asInstanceOf[MouseEvent])
 
+  Obs(onclick) {
+    println("obsonclickpure")
+  }
 
   def resetCanvasTriggers() = {
 
@@ -93,6 +101,7 @@ object Canvas {
     window.onclick = (me: MouseEvent) =>
     {
       onclick() = me
+      println("onclick")
       val sxi = me.screenX
       val syi = me.screenY
       val cxi = me.clientX
@@ -117,6 +126,12 @@ object Canvas {
     }
   }
 
+  def w = document.documentElement.clientWidth - 50 // wtf? it makes a scroll bar without this offset
+  def h = document.documentElement.clientHeight - 50
+
+
+  // TODO : Change to reactive.
+  @deprecated
   def initCanvas() = {
     val elem = document.body.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
@@ -125,13 +140,13 @@ object Canvas {
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = w
+    canvas.height = h
     width = canvas.width
     height = canvas.height
     window.onresize = (uie: UIEvent) => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      canvas.width = w
+      canvas.height = h
       width = canvas.width
       height = canvas.height
       DrawManager.onresize(uie)
