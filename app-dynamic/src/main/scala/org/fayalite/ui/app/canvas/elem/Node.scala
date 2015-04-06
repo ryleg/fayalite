@@ -81,15 +81,16 @@ class Node(
   val click = Obs(Canvas.onclick) {
     //val textAtTime = text()
     val me = Canvas.onclick()
-    println("Bad Obs canvas")
+    println("Bad Obs canvas" +
+      s"${me.clientX} ${me.clientY}"
+    )
 
    editable().foreach{t => if
    (checkInside(t.position(), me)){
-        val cp = t.splitText().map{st => st.canvasIdx}
-        val ils = interLineSpacing()
-       cp.map{
-         c =>
-       }
+
+
+
+
       }
 
 
@@ -100,7 +101,7 @@ class Node(
       if (checkInside(text().position(), me)) {
 
       //  if (isInside) {
-      println(" Bad isinside")
+   //   println(" Bad isinside")
       drawEditable()
 
     }

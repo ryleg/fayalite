@@ -13,9 +13,15 @@ object Text {
   implicit class Measure(text: String) {
     def measure = ctx.measureText(text)
     def width = measure.width
-    def canvasIdx = text.zipWithIndex.foldLeft(List[CharTextIdx]()) { case (acc, (nv, nvidx)) =>
-      val curs = acc.headOption.map{_.text.+(nv)}.getOrElse(nv.toString)
+    def canvasIdx = text.zipWithIndex.foldLeft(List[CharTextIdx]()) {
+      case (acc, (nv, nvidx)) =>
+      val curs = acc.lastOption.map{_.text.+(nv)}.getOrElse(nv.toString)
       acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
+    }
+    def charTextIdx = text.zipWithIndex.foldLeft(List[CharTextIdx]()) {
+      case (acc, (nv, nvidx)) =>
+        val curs = acc.lastOption.map{_.text.+(nv)}.getOrElse(nv.toString)
+        acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
     }
   }
 
@@ -43,12 +49,12 @@ object Text {
  * @param y: Y offset
  */
 class Text(
-            val   text: Var[String], // change to styled text to absorb styling monad ops
+            val text: Var[String], // change to styled text to absorb styling monad ops
             val x : Var[Int],
             val y: Var[Int],
-            val   widthCutoff: Var[Option[Double]] = Var(None),
-            val     font: Var[String] =Var(s"11pt Calibri"),
-            val    fillStyle: Var[String] = Var("white")
+            val widthCutoff: Var[Option[Double]] = Var(None),
+            val font: Var[String] =Var(s"14pt Calibri"),
+            val fillStyle: Var[String] = Var("white")
             ) {
 
 
@@ -60,15 +66,12 @@ class Text(
   // i.e. onclick should be subdivided where elements index according to what quadrant of the screen they're in
   // to avoid checking every element. Can use any number of subdivisions moreso than quadrants.
 
-  println("new text")
+  println("new text " + s"${text()} ${x()} ${y()}")
   val charPosition = Rx {
-    println("char Pos")
-      val cp = text().zipWithIndex.foldLeft(List[CharTextIdx]()) { case (acc, (nv, nvidx)) =>
-        val curs = acc.headOption.map{_.text.+(nv)}.getOrElse(nv.toString)
-         acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
-      }
-      println("char pos " + cp)
-    cp
+    //println("char Pos")
+
+    //println("char pos " + cp)
+    //cp
   }
 
   val splitText = Rx {
@@ -128,7 +131,7 @@ class Text(
       } else {
         splitText().toList.zipWithIndex.foreach { case (tex, idx) =>
           val ya = y() + idx*interLineSpacing()
-        //  println("draw call " + tex + s" $idx ${x()} ${ya}")
+     //     println("draw call " + tex + s" $idx ${x()} ${ya}")
           drawActual(tex, x(), ya, widthCutoff())
         }
       }

@@ -86,10 +86,10 @@ object Canvas {
   val onresize = Var(null.asInstanceOf[UIEvent])
 
   val rightClick = Var(null.asInstanceOf[MouseEvent])
-
+/*
   Obs(onclick) {
     println("obsonclickpure")
-  }
+  }*/
 
   def resetCanvasTriggers() = {
 
@@ -101,7 +101,7 @@ object Canvas {
     window.onclick = (me: MouseEvent) =>
     {
       onclick() = me
-      println("onclick")
+    //  println("onclick")
       val sxi = me.screenX
       val syi = me.screenY
       val cxi = me.clientX

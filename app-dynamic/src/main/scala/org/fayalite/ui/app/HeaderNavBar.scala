@@ -48,7 +48,7 @@ object HeaderNavBar {
   type ButtonSpec = (String, Act)
   type NavSpec = (ButtonSpec, List[ButtonSpec])
 
-  val reload : NavSpec = "ReloadJS3" -> reloadF -> List[(String, Act)](
+  val reload : NavSpec = "Grace" -> reloadF -> List[(String, Act)](
     "Blank" -> Act0
   )
 
