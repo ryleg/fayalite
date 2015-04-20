@@ -11,6 +11,8 @@ import com.amazonaws.internal.StaticCredentialsProvider
 import com.amazonaws.regions.{Region, ServiceAbbreviations, Regions}
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model.{LaunchSpecification, RequestSpotInstancesRequest, RunInstancesRequest}
+import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient
+import com.amazonaws.services.rds.{AmazonRDSClient, AmazonRDS}
 
 import scala.collection.JavaConversions._
 import com.amazonaws.auth.{EnvironmentVariableCredentialsProvider, DefaultAWSCredentialsProviderChain}
@@ -44,6 +46,11 @@ object AWS {
     classOf[AmazonEC2Client], cred, clientConfig)
 
   val s3 = new AmazonS3Client(credentials)
+
+  val rds = new AmazonRDSClient(credentials)
+
+  val elb = new AmazonElasticLoadBalancingClient(credentials)
+
 
   def testDescribeInstances() = {
     val inst = ec2.describeInstances()

@@ -48,12 +48,12 @@ object HeaderNavBar {
   type ButtonSpec = (String, Act)
   type NavSpec = (ButtonSpec, List[ButtonSpec])
 
-  val reload : NavSpec = "Grace" -> reloadF -> List[(String, Act)](
+  val reload : NavSpec = "R" -> reloadF -> List[(String, Act)](
     "Blank" -> Act0
   )
 
-  val account : NavSpec = "Account" -> Act0 -> List[(String, Act)](
-    "OAuth" -> OAuth.redirect
+  val account : NavSpec = "A" -> Act0 -> List[(String, Act)](
+    "O" -> OAuth.redirect
   )
 
   /*
@@ -115,7 +115,7 @@ object HeaderNavBar {
   val buttons : List[NavSpec] = List(
     reload,
     account,
-    "UI" -> uiAct -> List[(String, Act)]()
+    "U" -> uiAct -> List[(String, Act)]()
     /*"Servers" -> {() =>
         kvInputMat(Array(
         "access",

@@ -1,17 +1,17 @@
 
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.elem.{Node, ElementFactory, Text}
+import org.fayalite.ui.app.canvas.elem.{Grid, Node, ElementFactory, Text}
 import org.fayalite.ui.app.canvas.{Canvas, Schema, Graph}
 import org.fayalite.ui.app.canvas.Schema.{Position, GraphData, ParseResponse}
 import org.scalajs.dom.raw.MouseEvent
 import rx._
+import scala.scalajs.js
 import scala.scalajs.js._
 
 import scala.util.Try
 
 object Editor {
-
 
   val editor = Var(null.asInstanceOf[Editor])
 
@@ -19,20 +19,15 @@ object Editor {
     editor() = new Editor()
   }
 
+
+
   val bodyOffset = Var(122)
-
   val bodyOffsetY = Var(122)
-
-
   val maxNodeWidth = Var(100D)
-
   val rightOffset = Var(300)
-
   val numColumns = Rx {
     ((Canvas.width - bodyOffset() - rightOffset()) / maxNodeWidth()).toInt
   }
-
-
   val editOffsetY = Var(400)
 }
 
@@ -42,10 +37,26 @@ object Editor {
 
 class Editor() {
 
+  //val plusZoom = Text("ZoomText2", 50, 50)
+  //plusZoom.redraw()
+  val grid = Grid()
 
-  val test = Text("test", 200, 200)
-  test.redraw()
-  val nodet = new Node(Var(test), Var(Some(Text("testline\ntestlinet\n\nasdf", 200, 300))))
+  Obs(Canvas.pasteEvent, skipInitial = true) {
+    println("cavnas paste event" + Canvas.pasteEvent())
+  }
+/*  Obs(Canvas.onKeyDown, skipInitial = true) {
+    if (Canvas.onKeyDown().keyCode == 86  && // v
+      Canvas.ctrlKey() )
+    //scala.util.Try{println( "Ctrl key " + Canvas.onKeyDown().ctrlKey)}
+   // println(Canvas.onKeyDown().hasOwnProperty("key"))
+  //  scala.util.Try{println("  other keys " + Canvas.onKeyDown().keyCode)}
+   // scala.util.Try{println("  other keys " + Canvas.onKeyDown().charCode)}
+
+  }*/
+
+ // val test = Text("test", 200, 200)
+ // test.redraw()
+ // val nodet = new Node(Var(test), Var(Some(Text("testline\ntestlinet\n\nasdf", 200, 300))))
 
   println("new editor")
   import Editor._

@@ -26,27 +26,7 @@ object Canvas {
 
   var activeElem : Option[Elem] = None
   var elementTriggers : Map[Elem, () => Unit] = Map()
-/*
 
-  window.oninput = (e: Event) => {
-    println("oninput" + e)
-  }
-  window.addEventListener("paste",
-    (e: Event) => {
-      println(e.valueOf())
-      println(e.hasOwnProperty("clipboardData"))
-    //  e.cast[ClipboardEvent]
-  //    val dt = e.cast[dom.DataTransfer]
-  //    println("dt types " + dt.types)
-  //    println(dt.types.length)
-  //    println(Array.tabulate(dt.types.length){i => dt.types.apply(i)})
-//      println("dt " + dt.getData("pasteundefined"))
-      println("paste" + e.cast[dom.DataTransfer].types )
-      println("len " +  e.cast[dom.DataTransfer].getData("text/plain"))
-
-  })
-  //var elementListeners : Map
-*/
 
   def drawText(s: String, x: Int, y: Int) = {
     ctx.font = "15pt Calibri"
@@ -64,19 +44,46 @@ object Canvas {
   var cursor = 50
   val cursorDx = 50
   var curText = ""
-  
-  def testKeyBind() = {
-    val attempt = Try {
-      window.onkeypress = (ke: KeyboardEvent) => {
-        val k = ke.keyCode.toChar.toString
-        println("kp " + k)
-        draw(k)
-        cursor += cursorDx
-        curText += k
-      }
+
+  import rx._
+  // change to lift
+  val onKeyDown = Var(null.asInstanceOf[KeyboardEvent])
+  window.onkeydown = (ke: KeyboardEvent) => onKeyDown() = ke
+
+  val onKeyUp = Var(null.asInstanceOf[KeyboardEvent])
+  window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
+
+  val pasteEvent = Var(null.asInstanceOf[Event])
+  window.addEventListener("paste",
+    (e: Event) => {
+     // def clipboardData(event: dom.Event): dom.DataTransfer = js.native
+      pasteEvent() = e
+/*
+      //  e.cast[ClipboardEvent]
+          val dt = e.asInstanceOf[dom.DataTransfer]
+          println("dt types " + dt.types)
+          println(dt.types.length)
+      //    println(Array.tabulate(dt.types.length){i => dt.types.apply(i)})
+      //      println("dt " + dt.getData("pasteundefined"))
+          println("len " +  dt.getData("text/plain"))*/
     }
-    attempt match { case Failure(e) => e.printStackTrace(); case _ =>}
+  )
+
+
+
+/*  Obs(onKeyDown) {
+    println("onkeypress")
+   // TryPrintOpt{println(onKeyDown().keyCode)}
+  }*/
+  val ctrlKey = Var(false)
+
+  Obs(onKeyDown, skipInitial = true) {
+    if (onKeyDown().ctrlKey) ctrlKey() = true
   }
+  Obs(onKeyUp, skipInitial = true) {
+    if (onKeyUp().ctrlKey) ctrlKey() = false
+  }
+
 
   val xButtonBuffer = 10
   val yButtonBuffer = 10
@@ -84,64 +91,49 @@ object Canvas {
   import rx._
   val onclick = Var(null.asInstanceOf[MouseEvent])
   val onresize = Var(null.asInstanceOf[UIEvent])
-
   val rightClick = Var(null.asInstanceOf[MouseEvent])
-/*
-  Obs(onclick) {
-    println("obsonclickpure")
-  }*/
 
-  def resetCanvasTriggers() = {
+  window.oncontextmenu = (me: MouseEvent) => {
+    me.preventDefault()
+    rightClick() = me
+  }
 
-    window.oncontextmenu = (me: MouseEvent) => {
-      me.preventDefault()
-      rightClick() = me
-    }
-
-    window.onclick = (me: MouseEvent) =>
-    {
-      onclick() = me
-    //  println("onclick")
-      val sxi = me.screenX
-      val syi = me.screenY
-      val cxi = me.clientX
-      val cyi = me.clientY
-  /*    println(s"Window onclick " + //screenX $sxi "screenY $syi  " +
-        s"clientX $cxi clientY $cyi " +
-        s"numTriggers: ${elementTriggers.size}")*/
-      elementTriggers.foreach{
-        case (elem, trigger) =>
-          val isInside =
-            (cxi > elem.position.x - xButtonBuffer) &&
-            (cxi < elem.position.x2 + xButtonBuffer) &&
-            (cyi > elem.position.y - yButtonBuffer) &&
-            (cyi < elem.position.y2 + yButtonBuffer)
-/*          println(s"isInside: $isInside $elem x2,y2" +
-            s" ${elem.position.x2},${elem.position.y2}")*/
-          if (isInside) {
-            activeElem = Some(elem)
-            trigger()
-          }
-      }
-    }
+  window.onclick = (me: MouseEvent) => {
+    onclick() = me
   }
 
   def w = document.documentElement.clientWidth - 50 // wtf? it makes a scroll bar without this offset
   def h = document.documentElement.clientHeight - 50
 
+  val canvasR = Var(null.asInstanceOf[dom.raw.HTMLCanvasElement])
+  val ctxR = Var(null.asInstanceOf[dom.CanvasRenderingContext2D])
+  val heightR = Var(0D)
+  Obs(canvasR, skipInitial = true) {
+    if (canvasR() != null) {
+      heightR() = canvasR().height.toDouble
+      widthR() = canvasR().width.toDouble
+    }
+  }
+
+  val widthR = Var(0D)
 
   // TODO : Change to reactive.
   @deprecated
   def initCanvas() = {
-    val elem = document.body.getElementsByTagName("canvas")
+    val elem = document.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
       val obj = dom.document.createElement("canvas")
-      document.body.getElementsByTagName("div")(0).appendChild(obj)
+      document.appendChild(obj)
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
+
+
     canvas.width = w
     canvas.height = h
+    canvasR() = canvas
+    ctxR() = ctx
+
     width = canvas.width
     height = canvas.height
     window.onresize = (uie: UIEvent) => {
@@ -155,8 +147,6 @@ object Canvas {
       onresize() = uie
 
     }
-
-    testKeyBind()
   }
 
 }

@@ -41,7 +41,7 @@ class SparkDBManager[T <: Product](tableS: String)(implicit evt: ru.TypeTag[T]) 
 }
 
 object SparkDBManager{
-
+/*
   SparkRef.getSC
 
   val sqlc = SparkRef.sqlContext
@@ -137,7 +137,7 @@ object SparkDBManager{
 
     println(sqlc.table("oauth2").collect().toList)
     */
-  }
+  }*/
 
   def main(args: Array[String]) {
 
@@ -163,8 +163,8 @@ object SparkDBManager{
     addUpdateUser(fakeu32)
 
     addUpdateUser(fakeu2)*/
-    println(ParseServer.users.collect().toList)
-    println(oauthDB.collect().toList)
+   // println(ParseServer.users.collect().toList)
+//    println(oauthDB.collect().toList)
 
 
 

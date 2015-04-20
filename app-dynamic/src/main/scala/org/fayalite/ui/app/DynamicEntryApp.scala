@@ -4,7 +4,7 @@
  */
 package org.fayalite.ui.app
 
-import org.fayalite.ui.app.canvas.Canvas
+import org.fayalite.ui.app.canvas.{Input, Canvas}
 import org.scalajs.dom
 import org.scalajs.dom._
 
@@ -32,9 +32,11 @@ object DynamicEntryApp extends JSApp {
         Canvas.initCanvas()
         import PersistentWebSocket._
         sendV("Init")
-        HeaderNavBar.setupButtons()
+      //  HeaderNavBar.setupButtons()
         Editor.apply()
+        println(Input.t)
         StateSync.processBridge(bridge)
+
       }
     }
     attempt match {

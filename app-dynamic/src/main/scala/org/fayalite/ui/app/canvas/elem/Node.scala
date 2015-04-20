@@ -28,6 +28,11 @@ object Node{
 
   import scala.concurrent.duration._
 
+  @deprecated
+  implicit def posToPosition(pos: Pos) : Position = {
+    Position(pos.x(), pos.y().toInt, pos.dx(), pos.dy().toInt)
+  }
+
   def checkInside(position: Position, me: MouseEvent) = {
     Try {
       val sxi = me.screenX
@@ -88,8 +93,7 @@ class Node(
    editable().foreach{t => if
    (checkInside(t.position(), me)){
 
-
-
+     Cursor(t, me)
 
       }
 
@@ -100,6 +104,7 @@ class Node(
 
       if (checkInside(text().position(), me)) {
 
+        Cursor.cursor.show() = false
       //  if (isInside) {
    //   println(" Bad isinside")
       drawEditable()

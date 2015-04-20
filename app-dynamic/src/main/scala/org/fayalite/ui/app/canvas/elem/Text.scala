@@ -7,25 +7,24 @@ import rx._
 
 import scala.scalajs.js
 import scala.scalajs.js.JSStringOps
+import Schema._
 
 object Text {
+  /*
+  seriously need to split these into MultiTextBox[Text]
+   */
 
   implicit class Measure(text: String) {
     def measure = ctx.measureText(text)
     def width = measure.width
-    def canvasIdx = text.zipWithIndex.foldLeft(List[CharTextIdx]()) {
-      case (acc, (nv, nvidx)) =>
-      val curs = acc.lastOption.map{_.text.+(nv)}.getOrElse(nv.toString)
-      acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
-    }
-    def charTextIdx = text.zipWithIndex.foldLeft(List[CharTextIdx]()) {
-      case (acc, (nv, nvidx)) =>
-        val curs = acc.lastOption.map{_.text.+(nv)}.getOrElse(nv.toString)
-        acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
-    }
   }
 
   val interLineSpacing = Var(20)
+  val interCharSpacing = 10
+
+  val defaultSpacing = apply("a", 50,50).width()
+
+  val textColor = "#A9B7C6"
 
   def apply(text: String, x: Int, y: Int) = new Text(Var(text),Var(x), Var(y))
 
@@ -53,8 +52,9 @@ class Text(
             val x : Var[Int],
             val y: Var[Int],
             val widthCutoff: Var[Option[Double]] = Var(None),
-            val font: Var[String] =Var(s"14pt Calibri"),
-            val fillStyle: Var[String] = Var("white")
+            val font: Var[String] =Var(s"13pt monospace"),
+            val fillStyle: Var[String] = Var(Text.textColor),
+            val hardMonospaceDeltaX : Var[Int] = Var(12)
             ) {
 
 
@@ -66,7 +66,7 @@ class Text(
   // i.e. onclick should be subdivided where elements index according to what quadrant of the screen they're in
   // to avoid checking every element. Can use any number of subdivisions moreso than quadrants.
 
-  println("new text " + s"${text()} ${x()} ${y()}")
+  //println("new text " + s"${text()} ${x()} ${y()}")
   val charPosition = Rx {
     //println("char Pos")
 
@@ -81,6 +81,22 @@ class Text(
  //   st.zipWithIndex.foreach{println}
    //      println("splitTextlen" + st.toList)
     st
+  }
+
+
+    def canvasIdx(tex: String
+                   ) = style{ tex.zipWithIndex.foldLeft(List[CharTextIdx]()) {
+      case (acc, (nv, nvidx)) =>
+        val curs = acc.lastOption.map{_.text.+(nv)}.getOrElse(nv.toString)
+        acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
+    } }
+
+  def perCharWidth(tex: String) = style {
+    tex.zipWithIndex.foldLeft(List[CharTextIdx]()) {
+      case (acc, (nv, nvidx)) =>
+        val curs = nv.toString
+        acc :+ CharTextIdx(curs, nvidx, curs.measure.width)
+    }
   }
 
   /**
@@ -119,12 +135,27 @@ class Text(
    */
   def drawActual(tex: String, xi: Int, yi: Int, mxWidth: Option[Double]) = {
     //println("draw drawActual " + tex + s" $xi $yi")
+    def innerDraw() =     style {
+      //monospace
+      /*      tex.zipWithIndex.foreach{case (tch, chrIdx) =>
+              ctx.fillText(tch.toString, xi + chrIdx*interCharSpacing, yi)
+            }*/
 
-    style { mxWidth.foreach { mw => ctx.fillText(tex, xi, yi, maxWidth = mw)}
-      if (mxWidth.isEmpty) ctx.fillText(tex, xi, yi) }
+      tex.zipWithIndex.map { case (ttt, tidx) =>
+        ctx.fillText(ttt.toString, xi + tidx * hardMonospaceDeltaX(), yi)
+        /*     mxWidth.foreach { mw => ctx.fillText(tex, xi, yi,
+        maxWidth = mw)}
+      if (mxWidth.isEmpty) ctx.fillText(tex, xi, yi)*/
+      }
+    }
+
+    // it looks better with a double draw, wtf.
+    innerDraw()
+    innerDraw()
+
   }
 
-  val draw = Rx { () => {
+  val draw : Rx[Act] = Rx { () => {
     style {
       if (splitText().length == 1) {
         drawActual(text(), x(), y(), widthCutoff())

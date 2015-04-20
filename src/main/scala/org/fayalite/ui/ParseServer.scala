@@ -21,6 +21,8 @@ object ParseServer {
     val sr = new SimpleRemoteServer({new ParseServer()} ,20000)
     Thread.sleep(Long.MaxValue)
   }
+
+
   case class ParseRequest(
                          tab: Option[String],
                          requestId: Option[String],
@@ -43,10 +45,10 @@ object ParseServer {
 
   // switch to rolling s3 once this is more stable
   // instantly deprecated from inception.
-  @deprecated
+/*  @deprecated
   val tempOAuthLocalFileStream = Common.home + "/oauthfstream"
 
-  val oauthDB = SparkDBManager.oauthDB
+  val oauthDB = SparkDBManager.oauthDB*/
 /*
             val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
                   .mkString
@@ -82,7 +84,7 @@ object ParseServer {
                               )
 
 
-  val userFStream = Common.home + "/userFStream"
+  /*val userFStream = Common.home + "/userFStream"
 
   def loadUsers = {
     val ret = Try{userFStream.text.map{
@@ -125,7 +127,7 @@ object ParseServer {
 
   def queryUser(ui: UserCredentials) = {
     users.filter{_.email == ui.email}.collect().sortBy{_.updateTime}.reverse.headOption
-  }
+  }*/
 
   def evalUIFrame = {
     val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
@@ -162,9 +164,10 @@ class ParseServer extends Actor{
             None
         }.flatten
 
-        val em = pmsg.accessToken.map{
+/*        val em = pmsg.accessToken.map{
         SparkDBManager.queryAccessTokenToEmail
-      }.flatten
+      }.flatten*/
+/*
 
         val user = em.map{e =>
           val access = getField(msg, "awsAccess")
@@ -175,6 +178,7 @@ class ParseServer extends Actor{
           val uc = UserCredentials(e, awsc)
           addUpdateUser(uc)
         }.flatten
+*/
 
         val graph = pmsg.tab.filter{_ == "Editor"}.map{
           _ => FSMan.fileGraph()
@@ -182,7 +186,8 @@ class ParseServer extends Actor{
 
         val ret = ParseResponse(
           "auth",
-          em.getOrElse("guest@login.com"),
+          //em.getOrElse(
+            "guest@login.com",
         //  user=user,
           requestId=pmsg.requestId.getOrElse("0"),
         graph=graph.getOrElse(Graph(List(),List()))
@@ -199,8 +204,8 @@ class ParseServer extends Actor{
       println("binaryframe.")
     case oai : OAuthInfo =>
       println("oauth parse " + oai)
-      tempOAuthLocalFileStream.append(oai)
-      SparkDBManager.queryInfoResponse(oai)
+   //   tempOAuthLocalFileStream.append(oai)
+  //    SparkDBManager.queryInfoResponse(oai)
     case x => println("prse" + x)
   }
 }

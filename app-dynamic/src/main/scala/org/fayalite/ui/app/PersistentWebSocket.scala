@@ -103,7 +103,7 @@ class PersistentWebSocket(
       case "heartbeat" => //println{"dynamic heartbeat"}
       case "auth" => pm.email
         val email = pm.email.toString
-        HeaderNavBar.setEmail(email)
+       // HeaderNavBar.setEmail(email)
         metaData() = pm
       // Try{ println("metaData pseudoObs " + metaData().toString)}
 

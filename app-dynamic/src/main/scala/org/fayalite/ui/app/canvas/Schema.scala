@@ -53,7 +53,7 @@ object Schema {
   }
 
   case class Position(
-                       x: Int,
+                       x: Double,
                        y: Int,
                        dx: Double = null.asInstanceOf[Double],
                        dy: Int = null.asInstanceOf[Int]
@@ -110,12 +110,12 @@ object Schema {
           trigger()
         }
     } )
-      resetCanvasTriggers()
+      //resetCanvasTriggers()
     }
     def deregister() = {
       position.clear()
       elementTriggers = elementTriggers.-(this)
-      resetCanvasTriggers()
+      //resetCanvasTriggers()
     }
 
 
