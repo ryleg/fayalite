@@ -10,10 +10,8 @@ import scala.reflect.ClassTag
 import language.experimental.macros
 import Fayalite._
 import experimental.macros.info.DebugMacros
-/**
- * Copyright 2015, Radius Intelligence, Inc.
- * All Rights Reserved
- */
+
+
 class FRDD[T: ClassTag](inputRDD : Future[RDD[T]]) extends Serializable {
 
   def map[U: ClassTag](f: T => U): FRDD[U] = {

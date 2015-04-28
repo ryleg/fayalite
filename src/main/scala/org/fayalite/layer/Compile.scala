@@ -36,11 +36,11 @@ object Compile {
     Obs(stdOut, skipInitial = true) {
       println(stdOut())
       if (stdOut().contains("Set current project to fayalite-app-dynamic")) {
-        stdIn() = "~fastOptJS\n"
+  //      stdIn() = "~fastOptJS\n"
       }
     }
 
-    val pb = Process("""sbt""", new java.io.File("./app-dynamic"))
+    val pb = Process(Seq("sbt", "~fastOptJS"), new java.io.File("./app-dynamic"))
     import scala.sys.process.ProcessIO
     val pio = new ProcessIO({q  =>
       Obs(stdIn, skipInitial = true) {

@@ -6,13 +6,20 @@ import rx._
 
 object Pos {
 
-
+  def apply(
+             x: Double, y: Double, dx: Double, dy: Double
+             ) = new Pos(Var(x), Var(y), Var(dx), Var(dy))
 
 }
 
-case class Pos(x: Var[Double], y: Var[Double], dx: Var[Double], dy: Var[Double]) {
+class Pos(
+          val x: Var[Double],
+          val y: Var[Double],
+          val dx: Var[Double],
+          val dy: Var[Double]
+           ) {
   def clearAll() = {
-    Canvas.ctxR().clearRect(//rekt
+    Canvas.ctxR().clearRect( //rekt
       x(),
       y(),
       dx(),

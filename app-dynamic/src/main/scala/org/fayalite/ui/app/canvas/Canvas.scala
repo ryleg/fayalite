@@ -91,6 +91,11 @@ object Canvas {
   import rx._
   val onclick = Var(null.asInstanceOf[MouseEvent])
   val onresize = Var(null.asInstanceOf[UIEvent])
+  Obs(onresize, skipInitial = true) {
+    widthR() = canvas.width
+    heightR() = canvas.height
+  }
+
   val rightClick = Var(null.asInstanceOf[MouseEvent])
 
   window.oncontextmenu = (me: MouseEvent) => {
@@ -102,8 +107,8 @@ object Canvas {
     onclick() = me
   }
 
-  def w = document.documentElement.clientWidth - 50 // wtf? it makes a scroll bar without this offset
-  def h = document.documentElement.clientHeight - 50
+  def w = document.documentElement.clientWidth - 18 // wtf? it makes a scroll bar without this offset
+  def h = document.documentElement.clientHeight - 22
 
   val canvasR = Var(null.asInstanceOf[dom.raw.HTMLCanvasElement])
   val ctxR = Var(null.asInstanceOf[dom.CanvasRenderingContext2D])
@@ -120,10 +125,10 @@ object Canvas {
   // TODO : Change to reactive.
   @deprecated
   def initCanvas() = {
-    val elem = document.getElementsByTagName("canvas")
+    val elem = document.body.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
       val obj = dom.document.createElement("canvas")
-      document.appendChild(obj)
+      document.body.appendChild(obj)
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]

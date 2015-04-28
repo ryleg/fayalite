@@ -50,13 +50,13 @@ object Node{
 }
 
 class Node(
-            val text: Var[Text],
-            val editable: Var[Option[Text]] = Var(None)
+        //    val text: Var[Text],
+     //       val editable: Var[Option[Text]] = Var(None)
             ) {
 
   import Node._
   import Text._
-
+/*
   val resize = Obs(Canvas.onresize, skipInitial = true) {
     //  println("OnResize")
     text().redraw()
@@ -89,7 +89,7 @@ class Node(
     println("Bad Obs canvas" +
       s"${me.clientX} ${me.clientY}"
     )
-
+/*
    editable().foreach{t => if
    (checkInside(t.position(), me)){
 
@@ -109,7 +109,7 @@ class Node(
    //   println(" Bad isinside")
       drawEditable()
 
-    }
+    }*/
       /*     if (time > lastClickTime + 300) {
              println( " Bad click on ")
              println(time)
@@ -118,6 +118,6 @@ class Node(
              lastClickTime = time
              //  }
            }
-         }*/
-  }
+         }*/*/
+
 }
