@@ -1,10 +1,13 @@
 package org.fayalite.ui.app.canvas.elem
 
 import org.fayalite.ui.app.canvas.Input.{Key, Mouse}
+import org.fayalite.ui.app.canvas.elem.Drawable.CanvasStyling
 import org.fayalite.ui.app.canvas.{Input, Schema, Canvas}
 
 import rx.ops._
 import rx._
+
+import scala.util.{Failure, Success}
 
 object Grid {
 
@@ -16,34 +19,50 @@ object Grid {
 
 }
 import Grid._
+import PositionHelpers._
+
 
 class Grid(
-            val pos: Pos = new Pos(Var(0D), Var(0D), Canvas.widthR, Canvas.heightR),
-            val spacingX: Var[Double] = Var(16D),
-            val spacingY: Var[Double] = Var(16D)
-            )
+     //       override val pos: Pos = new Pos(Var(0D), Var(0D), Canvas.widthR, Canvas.heightR),
+            val spacingX: Var[Double] = Var(16D), // Change to spacingXY
+            val spacingY: Var[Double] = Var(16D),
+            val elementBuffer: Var[Int] = Var(1)
+            )(implicit cs : CanvasStyling = CanvasStyling(fillStyle="#6897BB",globalAlpha = .8))
 extends Element with Drawable
 {
+  implicit val grid_ = this
 
-  val elementBuffer = Var(1)
+  pos().dx() = Canvas.widthR()
+  pos().dy() = Canvas.heightR()
 
-  val xActive = Var(0)
-  val yActive = Var(0)
+  implicit def latCoordTransl(latCoord: Rx[LatCoord]): Rx[LatCoordD] = {
+    latCoord.map{
+      lc => LatCoordD(lc.x*spacingX(), lc.y*spacingY())
+    }
+  } // Switch to monad transformer. Functor -> Functor Inverse
+  // Def TypeFunctorCoordinateTranslatorInverse
+  implicit def latCoordTranslT(latCoord: Rx[LatCoordD]): Rx[LatCoord] = {
+    latCoord.map{
+      lc => LatCoord((pos().dx()/lc.x).toInt, (pos().dy()/lc.x()).toInt)
+    }
+  }
 
-  //Key.Arrow.
-
+  /**
+   * Find nearest line between characters.
+   */
   val cursorXY = Mouse.click.map{
     c =>
       val x = c.x()
       val y = c.y()
       val cellX = ((x-spacingX()/2) / spacingX()).toInt + 1
       val cellY = (y / spacingY()).toInt
-      val xO = cellX*spacingX() - 1
+      xyi(cellX, cellY)
+/*      val xO = cellX*spacingX() - 1
       val yO = cellY*spacingY()
-      Pos(xO, yO, 1, spacingY() - 1)
+      Pos(xO, yO, 1, spacingY() - 1)*/
   }
 
-  val cursor = new ArbitraryCursor(cursorXY)
+ /* val cursor = new GridRectFlash(cursorXY)
 
   val hoverCoords = Rx {
     val xO = xActive.map{x => spacingX()*x + 1}()
@@ -51,47 +70,56 @@ extends Element with Drawable
     Pos(xO, yO, spacingX.map{s => s - 1}(), 1D)
   }
 
-  val hoverCursor = new ArbitraryCursor(hoverCoords)
+*/
+  /*
+  scala.util.Try {
+    val hoverCursor = new GridRectFlash(xyi(5, 5), xy(), xy(spacingX() - 1, 1D))
+  } match {
+    case Success(x) => println("made hover")
+    case Failure(e) => e.printStackTrace(); println("hover failed")
+  }*/
+/*
 
+  val hoverCoords = Rx {
+   val cxy = cellXY()
+
+ }*/
+
+  /**
+   * Find what cell mouse is currently on.
+   */
   val cellXY = Rx {
     val (x, y) = Mouse.move()
       val cellX = (x / spacingX()).toInt
       val cellY = (y / spacingY()).toInt + 1
-      // xActive.update(cellX)
+      xyi(cellX, cellY)
+    /*  // xActive.update(cellX)
       if (xActive() != cellX) xActive() = cellX
       if (yActive() != cellY) yActive() = cellY
       val xO = cellX*spacingX()
-      val yO = cellY*spacingY()
-     // Canvas.ctxR().fillStyle = "red"
-    //  Canvas.ctxR().globalAlpha = .7
-    //  Canvas.ctxR().fillRect(xO+1, yO-1, spacingX()-1, 1)
+      val yO = cellY*spacingY()*/
   }
 
   val numColumns = Rx {
-    (pos.dx() / spacingX()).toInt + 1
+    (pos().dx() / spacingX()).toInt + 1
   }
 
   val numRows = Rx {
-    (pos.dy() / spacingY()).toInt + 1
+    (pos().dy() / spacingY()).toInt + 1
   }
-
-  redraw()
 
   // TODO : Change to Pos based clear
   def clear() : Unit = {}
   def draw() : Unit = {
-   // Schema.TryPrintOpt { println(numColumns() + " " + numRows() + " wtf")}
-    //println("draw called ")
-    Canvas.ctxR().fillStyle = "#6897BB"
-    Canvas.ctxR().globalAlpha = .8
+    // TODO : Make pretty
     for (row <- 0 until numRows()) {
-      Canvas.ctxR().fillRect(0, row*spacingX(), pos.dx(), 1)
+      Canvas.ctxR().fillRect(0, row*spacingX(), pos().dx(), 1)
     }
     for (col <- 0 until numColumns()) {
-      Canvas.ctxR().fillRect(col*spacingY(), 0, 1, pos.dy())
+      Canvas.ctxR().fillRect(col*spacingY(), 0, 1, pos().dy())
     }
-
-
-
   }
+
+  redraw()
+
 }

@@ -85,7 +85,9 @@ down arrow	40
       val right = Var(time)
       val up = Var(time)
       val down = Var(time)
+      val onDown = Var(0)
       def apply(keyCode: Int) : Unit = {
+        onDown() = keyCode
         keyCode match {
           case 37 => left() = time
           case 38 => up() = time

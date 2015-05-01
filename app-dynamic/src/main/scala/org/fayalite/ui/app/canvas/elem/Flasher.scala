@@ -9,11 +9,15 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Try
 import scala.concurrent.duration._
 
+object Flasher {
+  implicit val doms = new DomScheduler()
+}
+
 trait Flasher extends Drawable {
+  import Flasher._
 
   val active = Var(false)
-  val flash = Var(false)
-  implicit val doms = new DomScheduler()
+  val flash = Var(true)
   val blinkRate = 650 // in millis
 
   val t = Timer(blinkRate.milliseconds)

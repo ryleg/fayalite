@@ -9,7 +9,7 @@ import rx._
 import scala.scalajs.js
 import scala.scalajs.js._
 
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 object Editor {
 
@@ -44,9 +44,24 @@ class Editor() {
   implicit val grid_ = grid
 
 
-  val s = new elem.Symbol(Var('c'), XYI(Var(5), Var(5)))
+    scala.util.Try {
+      val s = new elem.Symbol(Var('c'), XYI(Var(5), Var(5)))
+      Canvas.ctx.fillStyle = "red"
+      s.move(xyi(10,10))
 
-  s.draw()
+      s.pos().fillRect()
+      s.drawActual()
+      //s.pos().clearAll()
+     // println(s.pos().x())
+    //  println(s.pos().x())
+      //s.move(xyi(15,15))
+
+
+    } match {
+      case Success(x) => println("made hover")
+      case Failure(e) => e.printStackTrace(); println("hover failed")
+    }
+
   //val textagon = new Textagon()
 
 

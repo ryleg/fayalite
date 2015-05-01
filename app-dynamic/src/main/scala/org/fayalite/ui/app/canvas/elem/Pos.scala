@@ -18,8 +18,17 @@ class Pos(
           val dx: Var[Double],
           val dy: Var[Double]
            ) {
+  def c = Canvas.ctxR
   def clearAll() = {
     Canvas.ctxR().clearRect( //rekt
+      x(),
+      y(),
+      dx(),
+      dy()
+    )
+  }
+  def fillRect() = {
+    c().fillRect(
       x(),
       y(),
       dx(),
