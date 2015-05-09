@@ -10,11 +10,11 @@ import scala.util.Try
 import scala.concurrent.duration._
 
 object Flasher {
-  implicit val doms = new DomScheduler()
 }
 
 trait Flasher extends Drawable {
   import Flasher._
+  implicit val doms = new DomScheduler()
 
   val active = Var(false)
   val flash = Var(true)

@@ -22,5 +22,13 @@ class RemoteClient(port: Int=scala.util.Random.nextInt(20000) + 10000) {
     at match { case Failure(e) => e.printStackTrace(); case _ => }
     at.toOption
   }
-
+/*
+Map[Long SK, int Group]
+OR just Array[Long, skip NaN]
+Take the Bools first
+take all combinations(2) of them that appear on places.
+zipwithlongindex
+countminsketch, preserve good ones.
+continue.
+ */
 }

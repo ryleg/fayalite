@@ -7,7 +7,7 @@ import org.fayalite.ui.app.canvas.{Input, Schema, Canvas}
 import rx.ops._
 import rx._
 
-import scala.util.{Failure, Success}
+import scala.util.{Try, Failure, Success}
 
 object Grid {
 
@@ -22,55 +22,78 @@ import Grid._
 import PositionHelpers._
 
 
-class Grid(
-     //       override val pos: Pos = new Pos(Var(0D), Var(0D), Canvas.widthR, Canvas.heightR),
-            val spacingX: Var[Double] = Var(16D), // Change to spacingXY
-            val spacingY: Var[Double] = Var(16D),
-            val elementBuffer: Var[Int] = Var(1)
-            )(implicit cs : CanvasStyling = CanvasStyling(fillStyle="#6897BB",globalAlpha = .8))
-extends Element with Drawable
-{
-  implicit val grid_ = this
-
-  pos().dx() = Canvas.widthR()
-  pos().dy() = Canvas.heightR()
-
+class GridTranslator(pos: Rx[LatCoord2D],
+                     spacing: Rx[LatCoordD]
+                      ) {
+  implicit def latCoordTranslNR(lc: LatCoord): LatCoordD = {
+    LatCoordD(lc.x*spacing().x, lc.y*spacing().y)
+  } // Switch to monad transformer. Functor -> Functor Inverse
+  // Def TypeFunctorCoordinateTranslatorInverse
+  implicit def latCoordTranslTNR(lc: LatCoordD): LatCoord = {
+    LatCoord(
+      // grid width divBy
+      (pos().xy2.x/lc.x).toInt,
+      (pos().xy2.y/lc.y()).toInt)
+  }
+  // TODO: Move to translator trait and add implicit grid param
   implicit def latCoordTransl(latCoord: Rx[LatCoord]): Rx[LatCoordD] = {
     latCoord.map{
-      lc => LatCoordD(lc.x*spacingX(), lc.y*spacingY())
+      lc => lc : LatCoordD
     }
   } // Switch to monad transformer. Functor -> Functor Inverse
   // Def TypeFunctorCoordinateTranslatorInverse
   implicit def latCoordTranslT(latCoord: Rx[LatCoordD]): Rx[LatCoord] = {
     latCoord.map{
-      lc => LatCoord((pos().dx()/lc.x).toInt, (pos().dy()/lc.x()).toInt)
+      lc => lc : LatCoord
     }
   }
+}
+
+class Grid(
+            //       override val pos: Pos = new Pos(Var(0D), Var(0D), Canvas.widthR, Canvas.heightR),
+            val spacingX: Var[Double] = Var(16D), // Change to spacingXY
+            val spacingY: Var[Double] = Var(16D),
+            val elementBuffer: Var[Int] = Var(1)
+            )(implicit cs : CanvasStyling = CanvasStyling(
+  fillStyle="#6897BB",
+  globalAlpha = .8)
+            )
+  extends Element with Drawable
+{
+
+  val spacing = Rx{LatCoordD(spacingX(), spacingY())}
+
+  override val pos = ld20.map{
+    _.copy(xy2=LatCoordD(Canvas.heightR(), Canvas.widthR()))
+  }
+
+  val gridTranslator = new GridTranslator(pos, spacing)
+  import gridTranslator._
+
+  implicit val grid_ = this
+  val cursorDxDy =Var(
+    spacing.map{_.-(1)}())
 
   /**
    * Find nearest line between characters.
    */
-  val cursorXY = Mouse.click.map{
-    c =>
-      val x = c.x()
-      val y = c.y()
-      val cellX = ((x-spacingX()/2) / spacingX()).toInt + 1
-      val cellY = (y / spacingY()).toInt
-      xyi(cellX, cellY)
-/*      val xO = cellX*spacingX() - 1
-      val yO = cellY*spacingY()
-      Pos(xO, yO, 1, spacingY() - 1)*/
+  val cursorXY = Mouse.click.map{c =>
+    //cursor.xyi() =
+/*      style {
+        c.fillRect(xy(20D, 20D))
+      }*/
+      c: LatCoord
+
   }
 
- /* val cursor = new GridRectFlash(cursorXY)
+/*
+   val hoverCoords = Rx {
+     val xO = xActive.map{x => spacingX()*x + 1}()
+     val yO = yActive.map{y => spacingY()*y - 1}()
+     Pos(xO, yO, spacingX.map{s => s - 1}(), 1D)
+   }
 
-  val hoverCoords = Rx {
-    val xO = xActive.map{x => spacingX()*x + 1}()
-    val yO = yActive.map{y => spacingY()*y - 1}()
-    Pos(xO, yO, spacingX.map{s => s - 1}(), 1D)
-  }
-
-*/
+ */
   /*
   scala.util.Try {
     val hoverCursor = new GridRectFlash(xyi(5, 5), xy(), xy(spacingX() - 1, 1D))
@@ -78,27 +101,43 @@ extends Element with Drawable
     case Success(x) => println("made hover")
     case Failure(e) => e.printStackTrace(); println("hover failed")
   }*/
-/*
+  /*
 
-  val hoverCoords = Rx {
-   val cxy = cellXY()
+    val hoverCoords = Rx {
+     val cxy = cellXY()
 
- }*/
+   }*/
 
   /**
    * Find what cell mouse is currently on.
    */
   val cellXY = Rx {
-    val (x, y) = Mouse.move()
-      val cellX = (x / spacingX()).toInt
-      val cellY = (y / spacingY()).toInt + 1
-      xyi(cellX, cellY)
+
+    val mev = Mouse.move()
+ //z   Canvas.ctxR().fillStyle = "red"
+   // Canvas.ctxR().fillRect(mev.x, mev.y, 10, 10)
+
+     val lmve = mev : LatCoord
+    Canvas.ctxR().fillStyle = "yellow"
+    Canvas.ctxR().fillRect(lmve.x, lmve.y, 10, 10)
+
     /*  // xActive.update(cellX)
       if (xActive() != cellX) xActive() = cellX
       if (yActive() != cellY) yActive() = cellY
       val xO = cellX*spacingX()
       val yO = cellY*spacingY()*/
   }
+
+/*  val cursor = Try { new GridRect(flashing=false, dxDy = cursorDxDy)
+  }
+  cursor match {
+    case Failure(e) => e.printStackTrace(); case Success(x) => x
+  }
+
+  cellXY.foreach{q =>
+    println("cellXY Obs: " + q.str)
+    cursor.toOption.get.xyi() = q
+  }*/
 
   val numColumns = Rx {
     (pos().dx() / spacingX()).toInt + 1

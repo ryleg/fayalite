@@ -48,7 +48,7 @@ object Canvas {
   import rx._
   // change to lift
   val onKeyDown = Var(null.asInstanceOf[KeyboardEvent])
-  window.onkeydown = (ke: KeyboardEvent) => onKeyDown() = ke
+  window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke ; ke.stopPropagation()}
 
   val onKeyUp = Var(null.asInstanceOf[KeyboardEvent])
   window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
@@ -108,7 +108,7 @@ object Canvas {
   }
 
   def w = document.documentElement.clientWidth - 18 // wtf? it makes a scroll bar without this offset
-  def h = document.documentElement.clientHeight - 22
+  def h = document.documentElement.clientHeight - 50
 
   val canvasR = Var(null.asInstanceOf[dom.raw.HTMLCanvasElement])
   val ctxR = Var(null.asInstanceOf[dom.CanvasRenderingContext2D])

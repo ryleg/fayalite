@@ -4,6 +4,7 @@ import org.fayalite.ui.app.canvas.Canvas
 import org.fayalite.ui.app.canvas.Canvas._
 import org.fayalite.ui.app.canvas.elem.Drawable.CanvasStyling
 import rx._
+import PositionHelpers._
 
 import scala.util.Try
 
@@ -23,10 +24,16 @@ trait Drawable {
 
   def clear() : Unit
   def draw() : Unit
-  def drawActual(): Unit = style { draw () }
+//  def drawActual(): Unit = if (visible()) style{draw()}
+  def drawActual(): Unit = style{draw()}
+
   def redraw() : Unit = { clear() ; drawActual() }
 
-  val pos : Rx[Pos] = Rx { Pos(0D, 0D, 0D, 0D)}
+  val visible : Rx[Boolean] = Rx{true}
+
+ // visible.foreach{q => if (q) redraw() else clear()}
+
+  val pos : Rx[LC2D] = ld20
 
   val resize = Obs(Canvas.onresize, skipInitial = true) {
     redraw()

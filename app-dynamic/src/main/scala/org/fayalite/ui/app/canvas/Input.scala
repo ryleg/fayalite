@@ -2,6 +2,7 @@ package org.fayalite.ui.app.canvas
 
 import org.fayalite.ui.app.canvas.Schema._
 import org.fayalite.ui.app.canvas.elem.PositionHelpers
+import org.fayalite.ui.app.canvas.elem.PositionHelpers.LatCoordD
 import org.scalajs.dom._
 import org.scalajs.dom
 import scala.util.Try
@@ -23,6 +24,9 @@ import rx.ops._
  * Need to figure out a workaround to access clipboard data directly.
  * Wasn't available in previous scala.js versions, maybe now or soon?
  */
+
+import PositionHelpers._
+
 object Input {
 
   def time = {
@@ -34,37 +38,43 @@ object Input {
 
   // Need to kill clipboard Obs on dynamic class reload.
 
-  object Mouse extends PositionHelpers {
 
-    implicit def mouseEventXY(me: MouseEvent) : XY =
+
+  object Mouse {
+
+    implicit def mouseEventXY(me: MouseEvent) : LatCoordD =
       Try{adjustOffset(xy(me.clientX, me.clientY))}.toOption.getOrElse(xy(0D, 0D))
 
-    def adjustOffset(xyi: XY) = {
-      val bb = dom.document.body.getBoundingClientRect()
-      xyi.x() -= bb.left
-      xyi.y() -= bb.top
-      xyi
+    def adjustOffset(xyd: LatCoordD) = {
+    //  val bb = dom.document.body.getBoundingClientRect()
+      xyd//.-(xy(bb.left, bb.top))
     }
 
     val moveRaw = Var(null.asInstanceOf[MouseEvent])
-    val move = Var((0D, 0D))
+    val move = Var(LatCoordD(0D, 0D))
     val click = Var(xy())
 
-    dom.window.onmousemove = (me: MouseEvent) => {
-      moveRaw() = me
-      move() = {
-        /*val bb = dom.document.body.getBoundingClientRect()
-        (me.clientX - bb.left, me.clientY - bb.top)*/
-        val ao : XY = me
-        ao.x() -> ao.y()
-      }
+    val onScroll = Var(null.asInstanceOf[UIEvent])
+    dom.window.onscroll = (uie: UIEvent) => {
+      uie.preventDefault()
+      uie.stopPropagation()
+      onScroll() = uie
+    }
+
+    dom.window.onmousemove = (me: MouseEvent) => {      moveRaw() = me
+      me.preventDefault()
+      //me.stopPropagation()
+
+      val lcdq = me : LatCoordD
+
+      move() = {lcdq }
     }
 
 /*    Obs(downKeyCode, skipInitial = true) {
       println("downKeyCode OBS " + downKeyCode())
     }*/
 
-    val to = Canvas.onclick.foreach{ me => click() = me : XY }
+    val to = Canvas.onclick.foreach{ me => click() = me : LatCoordD }
 
   }
 
@@ -96,7 +106,7 @@ down arrow	40
           case _ =>
         }
       }
-      downKeyCode.foreach{d => Arrow(d)}
+      downKeyCode.foreach{d => ;Arrow(d)}
     }
 
     val keyDownCode = keyDown.map{q =>

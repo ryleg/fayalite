@@ -42,15 +42,19 @@ class Editor() {
   val grid = Grid()
 
   implicit val grid_ = grid
-
+    import rx.ops._
 
     scala.util.Try {
-      val s = new elem.Symbol(Var('c'), XYI(Var(5), Var(5)))
-      Canvas.ctx.fillStyle = "red"
-      s.move(xyi(10,10))
-
-      s.pos().fillRect()
+      val lc = Var(LatCoord(0,0))
+  //    val lci = lc.map{x => x}
+      val s = new elem.Symbol(Var('c'), lc)
       s.drawActual()
+      //Canvas.ctx.fillStyle = "red"
+      //s.pos().clearAll()
+    //  lc() = LatCoord(10,10)
+   //   lci.reset(LatCoord(2,2))
+  //    lci.parents.map{q => q.asInstanceOf[Var[LatCoord]]() = LatCoord(1,1)}
+      //s.drawActual()
       //s.pos().clearAll()
      // println(s.pos().x())
     //  println(s.pos().x())

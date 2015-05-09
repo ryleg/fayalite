@@ -88,7 +88,9 @@ class ToStringAdder1 extends ToStringAdder {
     val div = nums.map(f)
 
    // val div = a.map(res => nums.map(_ / res))
+/*
 
+ */
     println("defined")
   //  div.onComplete(_.get.take(5).onComplete(_.get.foreach(println)))
     println("complete")

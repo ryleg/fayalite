@@ -3,6 +3,7 @@ package org.fayalite.ui.app.canvas.elem
 import org.fayalite.ui.app.canvas.Canvas._
 import org.fayalite.ui.app.canvas.Schema
 import org.fayalite.ui.app.canvas.Schema.Position
+import org.fayalite.ui.app.canvas.elem.Drawable.CanvasStyling
 import rx._
 
 import scala.scalajs.js
@@ -25,91 +26,71 @@ import rx.ops._
 
 import PositionHelpers._
 
-trait Movable extends Drawable {
-
-  override val pos : Rx[Pos]
-
-}
-
 /**
  * A single interactable container for UI elements that fit neatly into a box.
  * @param xyi: Lattice offset, grid element 5,0 for instance, not pixels.
  * @param extraBuffer : Interior pixel offset from grid lines in all directions.
  * @param offset : Double based offset from bottom left buffered from gridline.
- * @param dxDy : Fill space of element by default, not strictly required in all cases for
- *             custom elements.
  * @param grid : Measurement system this element is based on.
  */
 abstract class GridElement(
-                            val xyi: Rx[LatCoord] = l0,
+                            val xyi: Var[LatCoord] = l0,
                             val extraBuffer: Int = 0,
-                            val offset: Rx[LatCoordD] = ld0,
-                            val dxDy: Rx[LatCoordD] = ld0
+                            val offset: Var[LatCoordD] = ld0//,
                             )(implicit grid: Grid) extends Drawable {
-/*
-  def move(xyiPrime: XYI) = {
-    xyi.x() = xyiPrime.x(); xyi.y() = xyiPrime.y()
-  }
-*/
   import grid._
+  import gridTranslator._
 
-  val buffer = grid.elementBuffer.map{_ + extraBuffer}
-  
-  val bottomLeft = xyi.map{ lc =>
-    lc.x * grid.spacingX()
-    lc.y * grid.spacingY()
-  }
-  
-  val bottomLeftBuffered = Rx {
-    val bl = bottomLeft()
-    xy(bl.x() + buffer(),
-    bl.y() - buffer())
-  }
+  val area = spacing.map{_.-(LatCoordD(extraBuffer.toInt, extraBuffer.toInt))}
 
-  val bottomLeftBufferedWithOffset = Rx {
-    bottomLeftBuffered().plus(offset)
+  val topLeftB = xyi map {
+    q => q : LatCoordD
+  } // map {_ - bufferLC()}
+
+  val gridCenterArea = topLeftB.map{
+    o =>
+      LatCoord2D(o, area())
   }
 
-  override val pos : Rx[Pos] = Rx {
-    val blbwo = bottomLeftBufferedWithOffset()
-    Pos(blbwo.x() + offset.x(), blbwo.y() + offset.y(), dxDy.x(), dxDy.y())
-  }
+  override val pos = gridCenterArea
 
-  val deltaPos = Try{ pos.reduce{
-    (posA : Pos, posB : Pos) =>
-      println("pos reduce " + posA.x())
+  val deltaPos = pos.reduce{
+    (posA : LC2D, posB : LC2D) =>
+      println("pos reduce " + posA.str + " " + posB.str)
       val p = posA
       posA.clearAll()
-      draw()
+      drawActual()
       posB
-  }}
+  }
 
-  val gridCenterArea = bottomLeftBuffered.map{
-    o =>
-      val eb = buffer()*2
-      Pos(o.x(), o.y(), grid.spacingX() - eb, grid.spacingY() - eb)
+  def clear() : Unit = {
+    pos().clearAll()
   }
 
 }
 
-
 class Symbol(
             val char: Var[Char], // change to styled text to absorb styling monad ops
-            val latticeCoordinates : XYI
+            val latticeCoordinates : Var[LatCoord]
             )(implicit grid: Grid) extends GridElement(
   latticeCoordinates,
-  extraBuffer = 1,
-  dxDy = xy(
-    grid.spacingX() - 4, -1*(grid.spacingY() - 4)
-  )
+  extraBuffer = 0,
+  offset = Var { LatCoordD(0D, 0D) }
 ) {
+  import grid._
+  import gridTranslator._
 
-  def clear() : Unit = {
-    gridCenterArea().clearAll()
-  }
+ // char.foreach{_ => redraw()}
 
   def draw() = {
     val c = char()
-    ctx.fillText(c.toString, bottomLeftBuffered().x(), bottomLeftBuffered().y())
+    val coords = xyi() + LatCoord(0,1) : LatCoordD
+    println("draw coords " + coords.x + " " + coords.y)
+    ctx.fillText(c.toString,
+      coords.x, coords.y)//bottomLeftBufferedWithOffset().x,
+      //bottomLeftBufferedWithOffset().y)
+    style{
+      pos().fillRect()
+    }(CanvasStyling(globalAlpha = .5, fillStyle="red"))
   }
 }
