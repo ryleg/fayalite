@@ -46,13 +46,14 @@ object Input {
       Try{adjustOffset(xy(me.clientX, me.clientY))}.toOption.getOrElse(xy(0D, 0D))
 
     def adjustOffset(xyd: LatCoordD) = {
-    //  val bb = dom.document.body.getBoundingClientRect()
-      xyd//.-(xy(bb.left, bb.top))
+      val bb = dom.document.body.getBoundingClientRect()
+      xyd.-(xy(bb.left, bb.top))
     }
 
     val moveRaw = Var(null.asInstanceOf[MouseEvent])
     val move = Var(LatCoordD(0D, 0D))
     val click = Var(xy())
+    val moveScreen = Var(LatCoordD(0D, 0D))
 
     val onScroll = Var(null.asInstanceOf[UIEvent])
     dom.window.onscroll = (uie: UIEvent) => {
@@ -62,12 +63,12 @@ object Input {
     }
 
     dom.window.onmousemove = (me: MouseEvent) => {      moveRaw() = me
-      me.preventDefault()
+      //me.preventDefault()
       //me.stopPropagation()
-
       val lcdq = me : LatCoordD
 
-      move() = {lcdq }
+      move() = lcdq //LatCoordD(me.clientX, me.clientY)
+   //   moveScreen() = LatCoordD(me.screenX, me.screenY)
     }
 
 /*    Obs(downKeyCode, skipInitial = true) {
@@ -78,7 +79,7 @@ object Input {
 
   }
 
-  object Key extends PositionHelpers {
+  object Key {
 
     val keyDown = Canvas.onKeyDown
 
@@ -109,8 +110,11 @@ down arrow	40
       downKeyCode.foreach{d => ;Arrow(d)}
     }
 
+    val downKey = Var("")
+
     val keyDownCode = keyDown.map{q =>
-      downKeyCode() = q.keyCode
+      Try{downKeyCode() = q.keyCode}
+      Try{downKey() = q.key}
       q.keyCode
     }
 
@@ -123,6 +127,7 @@ down arrow	40
   val clipboard = Var("")
 
   val t = Timer(100.milliseconds)
+  val flashRate = Timer(650.milliseconds)
 
   Obs(t) {
     //println("timer")

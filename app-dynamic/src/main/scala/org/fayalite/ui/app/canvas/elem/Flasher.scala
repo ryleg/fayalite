@@ -1,6 +1,6 @@
 package org.fayalite.ui.app.canvas.elem
 
-import org.fayalite.ui.app.canvas.Canvas
+import org.fayalite.ui.app.canvas.{Input, Canvas}
 import org.fayalite.ui.app.canvas.Schema._
 import rx._
 import rx.ops.{Timer, DomScheduler}
@@ -14,23 +14,19 @@ object Flasher {
 
 trait Flasher extends Drawable {
   import Flasher._
-  implicit val doms = new DomScheduler()
+  import rx.ops._
 
-  val active = Var(false)
   val flash = Var(true)
-  val blinkRate = 650 // in millis
 
-  val t = Timer(blinkRate.milliseconds)
-  val o = Obs(t) {
+  val o = Obs(Input.flashRate) {
     if (flash()) {
-      val a = active()
-      active() = !a
-      if (a) draw()
-      else {
-        clear()
-      }
+      val prev = !visible()
+      visible() = prev
     }
   }
+  flash.foreach{
+    f =>
+      if (!f) visible() = true
+  }
+
 }
-
-

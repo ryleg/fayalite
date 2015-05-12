@@ -1,3 +1,4 @@
+import org.fayalite.ui.app.canvas.elem.PositionHelpers._
 import org.fayalite.ui.app.canvas.elem.Text
 import org.scalajs.dom.Text
 import org.scalajs.dom._
@@ -439,3 +440,68 @@ object Cursor {
 
 /*    val xj = t.x() + dxi
     println(s"xj yj, $xj, $yj $ctidxi $xIdx $prevChar")*/
+
+
+Canvas.ctxR().fillStyle = "red"
+Canvas.ctxR().fillRect(mev.x, mev.y, 10, 3)
+// grid width divBy
+val w = width()
+val h = height()
+val offsetLat = LatCoord((w/mev.x).toInt, (h/mev.y).toInt)
+val sx = spacing().x
+val sy = spacing().y
+val cx = (mev.x/sx).toInt
+val cy = (mev.y/sy).toInt
+val lmveInv = lmve: LCD
+val xf = cx*sx
+val yf = cy*sy
+/*
+    println(s"${scala.util.Random.nextInt(1000)} " +
+      s"mevx: ${mev.x} mevy ${mev.y} w $w h $h" +
+      s"cx: $cx cy $cy sx: $sx sy: $sy xf: $xf yf $yf")
+*/
+//Canvas.ctxR().fillStyle = "yellow"
+//Canvas.ctxR().fillRect(lmve.x*sx, lmve.y*sy, 3, 10)
+/*  // xActive.update(cellX)
+  if (xActive() != cellX) xActive() = cellX
+  if (yActive() != cellY) yActive() = cellY
+  val xO = cellX*spacingX()
+  val yO = cellY*spacingY()*/
+
+
+//cursor.xyi() =
+/*      style {
+        c.fillRect(xy(20D, 20D))
+      }*/
+/*
+   val hoverCoords = Rx {
+     val xO = xActive.map{x => spacingX()*x + 1}()
+     val yO = yActive.map{y => spacingY()*y - 1}()
+     Pos(xO, yO, spacingX.map{s => s - 1}(), 1D)
+   }
+
+ */
+/*
+scala.util.Try {
+  val hoverCursor = new GridRectFlash(xyi(5, 5), xy(), xy(spacingX() - 1, 1D))
+} match {
+  case Success(x) => println("made hover")
+  case Failure(e) => e.printStackTrace(); println("hover failed")
+}*/
+/*
+
+  val hoverCoords = Rx {
+   val cxy = cellXY()
+
+ }*/
+
+/*  val cursor = Try { new GridRect(flashing=false, dxDy = cursorDxDy)
+  }
+  cursor match {
+    case Failure(e) => e.printStackTrace(); case Success(x) => x
+  }
+
+  cellXY.foreach{q =>
+    println("cellXY Obs: " + q.str)
+    cursor.toOption.get.xyi() = q
+  }*/

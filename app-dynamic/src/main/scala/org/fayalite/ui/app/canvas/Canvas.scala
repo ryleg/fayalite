@@ -1,6 +1,7 @@
 package org.fayalite.ui.app.canvas
 
 
+import org.fayalite.ui.app.canvas.elem.PositionHelpers.LatCoordD
 import org.scalajs.dom
 import org.scalajs.dom._
 
@@ -122,12 +123,34 @@ object Canvas {
 
   val widthR = Var(0D)
 
+  val area = Rx { LatCoordD(widthR(), heightR())}
+
+  /*
+          * { padding: 0; margin: 0; }
+        html, body, canvas {
+        min-height: 100% !important;
+        min-width: 100%;
+        height: 100%;
+        width: 100%;
+        background-color:#2B2B2B;
+        }
+   */
   // TODO : Change to reactive.
   @deprecated
   def initCanvas() = {
+    val styling = "" + // position: absolute; " +
+/*      "" + //"left: 0; top: 0;
+      "padding: 0; margin: 0; " +
+    "min-height: 100%; " +
+    "min-width: 100%; " +
+    "height: 100%; " +
+    "width: 100%; " +*/
+    "background-color:#2B2B2B; "
+    document.body.setAttribute("style", styling)
     val elem = document.body.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
       val obj = dom.document.createElement("canvas")
+      val sa = obj.setAttribute("style", styling)
       document.body.appendChild(obj)
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]

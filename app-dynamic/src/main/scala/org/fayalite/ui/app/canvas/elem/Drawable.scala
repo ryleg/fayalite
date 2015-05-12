@@ -1,6 +1,6 @@
 package org.fayalite.ui.app.canvas.elem
 
-import org.fayalite.ui.app.canvas.Canvas
+import org.fayalite.ui.app.canvas.{Input, Canvas}
 import org.fayalite.ui.app.canvas.Canvas._
 import org.fayalite.ui.app.canvas.elem.Drawable.CanvasStyling
 import rx._
@@ -21,17 +21,19 @@ object Drawable {
 import rx.ops._
 
 trait Drawable {
-
-  def clear() : Unit
+  def clear(): Unit
   def draw() : Unit
 //  def drawActual(): Unit = if (visible()) style{draw()}
   def drawActual(): Unit = style{draw()}
 
   def redraw() : Unit = { clear() ; drawActual() }
 
-  val visible : Rx[Boolean] = Rx{true}
+  val visible : Var[Boolean] = Var{true}
 
- // visible.foreach{q => if (q) redraw() else clear()}
+  Obs(visible, skipInitial = true) {
+    val q = visible()
+    if (q) redraw() else clear()
+  }
 
   val pos : Rx[LC2D] = ld20
 

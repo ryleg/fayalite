@@ -7,7 +7,7 @@ import org.fayalite.util.RemoteClient
 import scala.util.Try
 
 object ParseClient {
-    def parseClient() ={
+    def parseClient() = {
         new RemoteClient(defaultPort+51)
     }
 }
