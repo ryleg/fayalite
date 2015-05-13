@@ -1,4 +1,5 @@
-import org.fayalite.ui.app.canvas.elem.PositionHelpers._
+import org.fayalite.ui.app.canvas.{PositionHelpers, Canvas}
+import PositionHelpers._
 import org.fayalite.ui.app.canvas.elem.Text
 import org.scalajs.dom.Text
 import org.scalajs.dom._

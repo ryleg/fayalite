@@ -1,7 +1,7 @@
 package org.fayalite.ui
 
-import org.fayalite.ui.ws.WSServer
-import WSServer.{SprayFrame, WebsocketPipeMessage, SenderMap, RequestClients}
+import org.fayalite.ui.ws.Server
+import Server.{SprayFrame, PipedMessage, SenderMap, RequestClients}
 import org.fayalite.util.RemoteClient
 import org.fayalite.repl.REPL._
 import spray.can.websocket.frame.TextFrame
@@ -17,7 +17,7 @@ class WebsocketPipeClient {
         val sm = s.??[Set[String]](RequestClients())
         sm.toList.map{
           sp =>
-            s ! WebsocketPipeMessage(sp, sprayFrame)
+            s ! PipedMessage(sp, sprayFrame)
         }
     }
 
@@ -26,7 +26,7 @@ class WebsocketPipeClient {
 
 object WebsocketPipeClient {
 
-  import WSServer.pipePort
+  import Server.pipePort
 
   def sendBinary(binary: Int) = {}
 
@@ -39,7 +39,7 @@ object WebsocketPipeClient {
         val sm = s.??[Set[String]](RequestClients())
         sm.toList.map{
             sp =>
-            s ! WebsocketPipeMessage(sp, sprayFrame)
+            s ! PipedMessage(sp, sprayFrame)
         }
     }
 

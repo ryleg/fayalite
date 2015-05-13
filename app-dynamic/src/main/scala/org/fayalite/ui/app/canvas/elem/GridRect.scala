@@ -1,6 +1,6 @@
 package org.fayalite.ui.app.canvas.elem
 
-import org.fayalite.ui.app.canvas.Canvas
+import org.fayalite.ui.app.canvas.{PositionHelpers, Canvas}
 import org.fayalite.ui.app.canvas.elem.Drawable.CanvasStyling
 
 import rx._

@@ -1,6 +1,5 @@
-package org.fayalite.ui.app
+package org.fayalite.ui.app.state.auth
 
-import org.fayalite.ui.app.canvas.Schema.Act
 import org.scalajs.dom._
 
 
@@ -10,7 +9,7 @@ object OAuth {
   val clientId = "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com"
   val redirectURI = "http://localhost:8080/oauth_callback"
 
-  val redirect : Act = () => {
+  val redirect = () => {
     window.location.href = getURL()
   }
 

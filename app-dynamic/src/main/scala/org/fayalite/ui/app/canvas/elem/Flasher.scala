@@ -1,7 +1,8 @@
 package org.fayalite.ui.app.canvas.elem
 
-import org.fayalite.ui.app.canvas.{Input, Canvas}
+import org.fayalite.ui.app.canvas.Canvas
 import org.fayalite.ui.app.canvas.Schema._
+import org.fayalite.ui.app.state.Input
 import rx._
 import rx.ops.{Timer, DomScheduler}
 

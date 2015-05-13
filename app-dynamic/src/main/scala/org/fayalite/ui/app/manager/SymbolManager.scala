@@ -1,34 +1,14 @@
+package org.fayalite.ui.app.manager
 
-package org.fayalite.ui.app
-
-import org.fayalite.ui.app.canvas.elem._
-import org.fayalite.ui.app.canvas.{Input, Canvas, Schema, Graph}
-import org.fayalite.ui.app.canvas.Schema.{Position, GraphData, ParseResponse}
-import org.scalajs.dom.raw.MouseEvent
-import rx._
-import scala.util.{Failure, Success, Try}
-
-object Editor {
-  val editor = Var(null.asInstanceOf[Editor])
-  def apply() = {
-    editor() = new Editor()
-  }
-  val bodyOffset = Var(122)
-  val bodyOffsetY = Var(122)
-  val maxNodeWidth = Var(100D)
-  val rightOffset = Var(300)
-  val numColumns = Rx {
-    ((Canvas.width - bodyOffset() - rightOffset()) / maxNodeWidth()).toInt
-  }
-  val editOffsetY = Var(400)
-}
-
-
-
-//class EditNode(val text: Var[ElementFactory.Text])
-import org.fayalite.ui.app.canvas.elem
-import PositionHelpers._
+import org.fayalite.ui.app.canvas
+import org.fayalite.ui.app.canvas.{PositionHelpers, Canvas}
+import org.fayalite.ui.app.canvas.elem.Grid
+import PositionHelpers.LatCoord
+import org.fayalite.ui.app.state.Input
+import rx.core.Var
 import rx.ops._
+
+import scala.util.Try
 
 /**
  * Handles all assignments to a particular lattice (hopefully
@@ -38,16 +18,12 @@ import rx.ops._
  */
 class SymbolManager(grid: Grid) {
   implicit val grid_ = grid
-  import grid.gridTranslator._
-  //val cxy = grid.cursorXY.map { q => q.offset}
-  //val cxyActual = cxy.map { q => q: LatCoordD}
-  val symbols = Var(Map[Var[LatCoord], Symbol]())
+
+
+  val symbols = Var(Map[Var[LatCoord], canvas.elem.Symbol]())
   Canvas.onKeyDown.foreach{
     q => Try{ if (q.keyCode == 8) q.preventDefault() }
   }
- // Input.Key.downKeyCode.foreach {
-  //  kc =>
-    //  if (kc != 8) {
 
   Input.Key.downKeyCode.foreach {
     q =>
@@ -85,7 +61,7 @@ class SymbolManager(grid: Grid) {
                 sym.shiftRight
             }
             println("new symbol " + ks)
-            val s = new elem.Symbol(Var(k.head), Var(cxy()))
+            val s = new canvas.elem.Symbol(Var(k.head), Var(cxy()))
             grid.cursor.shiftRight
             symbols() = symbols() ++ Map(s.latCoord -> s)
             val gclc = grid.cursor.latCoord
@@ -113,42 +89,3 @@ class SymbolManager(grid: Grid) {
   }
 
 }
-
-class Editor() {
-
-
-  //plusZoom.redraw()
-  val grid = Grid()
-
-  val symbolManager = new SymbolManager(grid)
-
-  implicit val grid_ = grid
-    import rx.ops._
-
-    scala.util.Try {
-      val lc = Var(LatCoord(0,0))
-  //    val lci = lc.map{x => x}
-
-     // s.drawActual()
-      //Canvas.ctx.fillStyle = "red"
-      //s.pos().clearAll()
-    //  lc() = LatCoord(10,10)
-   //   lci.reset(LatCoord(2,2))
-  //    lci.parents.map{q => q.asInstanceOf[Var[LatCoord]]() = LatCoord(1,1)}  lc  aaaaaaaaaaaaaa             i.parents.map{q => q.asInstanceOf[Var[LatCoord]]() = LatCoord(1,1)}
-      //s.drawActual()
-      //s.pos().clearAll()
-     // println(s.pos().x())
-    //  println(s.pos().x())
-      //s.move(xyi(15,15))
-
-
-    } match {
-      case Success(x) => println("made hover")
-      case Failure(e) => e.printStackTrace(); println("hover failed")
-    }
-  Obs(Canvas.pasteEvent, skipInitial = true) {
-    println("cavnas paste event" + Canvas.pasteEvent())
-  }
-
-}
-

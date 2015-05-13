@@ -1,9 +1,6 @@
-package org.fayalite.ui.app.canvas.elem
+package org.fayalite.ui.app.canvas
 
-import org.fayalite.ui.app.canvas.Canvas
 import rx._
-
-import scala.util.Try
 
 
 object PositionHelpers {
@@ -31,8 +28,6 @@ object PositionHelpers {
 
   def xy(x: Double = 0D, y: Double = 0D): LatCoordD = LatCoordD(x,y)
   def xyi(x: Int = 0, y: Int = 0): LatCoord = LatCoord(x,y)
-  
-  case class SpacedPosition(pos: Pos, spacing: LatCoordD)
 
   def lc0 = LatCoord(0, 0)
   def lcd0 = LatCoordD(0D, 0D)

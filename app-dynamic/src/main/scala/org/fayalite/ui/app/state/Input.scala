@@ -1,17 +1,14 @@
-package org.fayalite.ui.app.canvas
+package org.fayalite.ui.app.state
 
-import org.fayalite.ui.app.canvas.Schema._
-import org.fayalite.ui.app.canvas.elem.PositionHelpers
-import org.fayalite.ui.app.canvas.elem.PositionHelpers.LatCoordD
-import org.scalajs.dom._
+import org.fayalite.ui.app.canvas.{PositionHelpers, Canvas}
+import PositionHelpers.LatCoordD
 import org.scalajs.dom
-import scala.util.Try
-import scalajs.js._
-
+import org.scalajs.dom._
 import rx._
-import rx.ops._
-import scala.concurrent.duration._
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+import scala.util.Try
 
 class Input {
 

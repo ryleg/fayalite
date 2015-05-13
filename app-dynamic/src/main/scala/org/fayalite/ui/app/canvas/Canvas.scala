@@ -1,9 +1,12 @@
 package org.fayalite.ui.app.canvas
 
 
-import org.fayalite.ui.app.canvas.elem.PositionHelpers.LatCoordD
+import PositionHelpers.LatCoordD
+import org.fayalite.ui.app.manager.Editor
+import org.fayalite.ui.app.state.Input
 import org.scalajs.dom
 import org.scalajs.dom._
+import rx._
 
 import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
@@ -24,76 +27,24 @@ object Canvas {
   var ctx : dom.CanvasRenderingContext2D = _
   var width = 0
   var height = 0
+  val rect = Var(getRect)
 
-  var activeElem : Option[Elem] = None
-  var elementTriggers : Map[Elem, () => Unit] = Map()
-
-
-  def drawText(s: String, x: Int, y: Int) = {
-    ctx.font = "15pt Calibri"
-    ctx.fillStyle = "white"
-    ctx.fillText(s, x, y)
-  }
-
-
-  def draw(s: String) = {
-    ctx.font = "14pt Calibri"
-    ctx.fillStyle = "white"
-    ctx.fillText(s, cursor, 100)
-  }
-  
-  var cursor = 50
-  val cursorDx = 50
-  var curText = ""
-
-  import rx._
   // change to lift
   val onKeyDown = Var(null.asInstanceOf[KeyboardEvent])
   window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke}
-
   val onKeyUp = Var(null.asInstanceOf[KeyboardEvent])
   window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
-
-  val pasteEvent = Var(null.asInstanceOf[Event])
-  window.addEventListener("paste",
-    (e: Event) => {
-     // def clipboardData(event: dom.Event): dom.DataTransfer = js.native
-      pasteEvent() = e
-/*
-      //  e.cast[ClipboardEvent]
-          val dt = e.asInstanceOf[dom.DataTransfer]
-          println("dt types " + dt.types)
-          println(dt.types.length)
-      //    println(Array.tabulate(dt.types.length){i => dt.types.apply(i)})
-      //      println("dt " + dt.getData("pasteundefined"))
-          println("len " +  dt.getData("text/plain"))*/
-    }
-  )
-
-
-
-/*  Obs(onKeyDown) {
-    println("onkeypress")
-   // TryPrintOpt{println(onKeyDown().keyCode)}
-  }*/
   val ctrlKey = Var(false)
-
   Obs(onKeyDown, skipInitial = true) {
     if (onKeyDown().ctrlKey) ctrlKey() = true
   }
   Obs(onKeyUp, skipInitial = true) {
     if (onKeyUp().ctrlKey) ctrlKey() = false
   }
-
-
-  val xButtonBuffer = 10
-  val yButtonBuffer = 10
-
   import rx._
   val onclick = Var(null.asInstanceOf[MouseEvent])
   val onresize = Var(null.asInstanceOf[UIEvent])
 
-  val rect = Var(getRect)
 
   Obs(onresize, skipInitial = true) {
     widthR() = canvas.width
@@ -102,7 +53,6 @@ object Canvas {
   }
 
   def getRect = document.body.getBoundingClientRect()
-
 
 
   val rightClick = Var(null.asInstanceOf[MouseEvent])
@@ -133,27 +83,8 @@ object Canvas {
 
   val area = Rx { LatCoordD(widthR(), heightR())}
 
-  /*
-          * { padding: 0; margin: 0; }
-        html, body, canvas {
-        min-height: 100% !important;
-        min-width: 100%;
-        height: 100%;
-        width: 100%;
-        background-color:#2B2B2B;
-        }
-   */
-  // TODO : Change to reactive.
-  @deprecated
-  def initCanvas() = {
-    val styling = "" + // position: absolute; " +
-/*      "" + //"left: 0; top: 0;
-      "padding: 0; margin: 0; " +
-    "min-height: 100%; " +
-    "min-width: 100%; " +
-    "height: 100%; " +
-    "width: 100%; " +*/
-    "background-color:#2B2B2B; "
+  def createCanvas() = {
+    val styling = "background-color:#2B2B2B; "
     document.body.setAttribute("style", styling)
     val elem = document.body.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
@@ -164,12 +95,17 @@ object Canvas {
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
 
+  }
 
+  // TODO : Change to reactive.
+  @deprecated
+  def initCanvas() = {
+
+    createCanvas()
     canvas.width = w
     canvas.height = h
     canvasR() = canvas
     ctxR() = ctx
-
     width = canvas.width
     height = canvas.height
     window.onresize = (uie: UIEvent) => {
@@ -177,12 +113,11 @@ object Canvas {
       canvas.height = h
       width = canvas.width
       height = canvas.height
-      DrawManager.onresize(uie)
-      elementTriggers.foreach{_._1.draw()}
       //      println(s"resize canvas width: $width height: $height")
       onresize() = uie
-
     }
+    println(Input.t)
+    println(Editor.editor)
   }
 
 }

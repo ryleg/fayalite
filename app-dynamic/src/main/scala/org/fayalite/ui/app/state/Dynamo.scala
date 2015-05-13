@@ -1,7 +1,7 @@
-package org.fayalite.ui.app
+package org.fayalite.ui.app.state
 
 import scala.scalajs.js
-import js._
+import scala.scalajs.js._
 
 /**
  * Handler for contract between static / dynamic scala.js classloaders.
