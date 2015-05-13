@@ -23,21 +23,30 @@ class GridRect(
                 xyi: VL = l0,
                 offset: VLD = ld0,
                 val dxDy: VLD = ld0,
-                val flashing: Boolean = true
+                val flashing: Boolean = true,
+                val fill: String = "#FFC66D",
+              val alpha: Double = .6D,
+              val extraFill: List[LatCoordD] = List()
                 )
-              (implicit grid: Grid, val cs: CanvasStyling =
-              CanvasStyling(fillStyle= "#FFC66D", globalAlpha = .7))
+              (implicit grid: Grid)
   extends GridElement(xyi, offset=offset, area=Some(dxDy)
-  )(grid,cs)
-  with Flasher // TODO: Fix
-with Drawable with Shiftable
+  )(grid)
+  with Flasher
  {
-  //xyi.foreach{i => println(i.str)}
-  //flash() = flashing
-//  override val area = dxDy
-  override def clear() : Unit = ()
+ // override val styling = CanvasStyling(fillStyle= "#FFC66D", globalAlpha = .7)
+  flash() = flashing
+  override def clear(): Unit = {
+    val p = pos()
+    extraFill.map{f => p.copy(xy2=f).clearAll()}
+    pos().clearAll()
+  }
   def draw() : Unit = {
+    Canvas.ctx.fillStyle = fill
+    Canvas.ctx.globalAlpha = alpha
+    val p = pos()
+    extraFill.map{f => p.copy(xy2=f).fillRect()}
     pos().fillRect()
+
   }
 
 }

@@ -49,7 +49,7 @@ object Canvas {
   import rx._
   // change to lift
   val onKeyDown = Var(null.asInstanceOf[KeyboardEvent])
-  window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke ; ke.stopPropagation()}
+  window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke}
 
   val onKeyUp = Var(null.asInstanceOf[KeyboardEvent])
   window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
@@ -92,10 +92,18 @@ object Canvas {
   import rx._
   val onclick = Var(null.asInstanceOf[MouseEvent])
   val onresize = Var(null.asInstanceOf[UIEvent])
+
+  val rect = Var(getRect)
+
   Obs(onresize, skipInitial = true) {
     widthR() = canvas.width
     heightR() = canvas.height
+    rect() = getRect
   }
+
+  def getRect = document.body.getBoundingClientRect()
+
+
 
   val rightClick = Var(null.asInstanceOf[MouseEvent])
 

@@ -42,6 +42,8 @@ object Input {
 
   object Mouse {
 
+
+
     implicit def mouseEventXY(me: MouseEvent) : LatCoordD =
       Try{adjustOffset(xy(me.clientX, me.clientY))}.toOption.getOrElse(xy(0D, 0D))
 
@@ -77,6 +79,22 @@ object Input {
 
     val to = Canvas.onclick.foreach{ me => click() = me : LatCoordD }
 
+    val dragStart = Var(null.asInstanceOf[DragEvent])
+    dom.window.ondragstart = (de: DragEvent) => {
+      println("dragStart")
+      dragStart() = de
+    }
+    val dragEnd = Var(null.asInstanceOf[DragEvent])
+    dom.window.ondragend = (de: DragEvent) => {dragEnd() = de}
+
+    val down = Var(null.asInstanceOf[LatCoordD])
+    val up = Var(null.asInstanceOf[LatCoordD])
+    dom.window.onmouseup = (me: MouseEvent) => {
+      Try{up() = me}}
+    dom.window.onmousedown = (me: MouseEvent) => {Try{down() = me}}
+
+
+
   }
 
   object Key {
@@ -109,18 +127,30 @@ down arrow	40
       }
       downKeyCode.foreach{d => ;Arrow(d)}
     }
-
     val downKey = Var("")
-
+    val shift = Var(false)
     val keyDownCode = keyDown.map{q =>
+      Try{val s = q.shiftKey; if (s) shift() = true}
       Try{downKeyCode() = q.keyCode}
-      Try{downKey() = q.key}
-      q.keyCode
+      Try{println("keyc" + q.keyCode.toChar)}
+      Try{println(q.keyCode)}
+      Try{println(q.keyCode.toChar.toString.length + "len")}
+      //Try{println(q.shiftKey)}
+      //Try{println("up" +q.keyCode.toChar.toUpper)}
+      //Try{println("lo" + q.keyCode.toChar.toLower)}
+      Try {
+        val k = q.keyCode.toChar.toLower.toString
+        downKey() = {
+          if (q.shiftKey) k.toUpperCase else k
+        }
+      }
+     // println(q.key == undefined)
+     // println(q.key)
+      //Try{if (q.key != null) downKey() = q.key}
+      Try{q.keyCode}
+      shift() = false
     }
-
   }
-
-
 
   implicit val scheduler = new DomScheduler()
 

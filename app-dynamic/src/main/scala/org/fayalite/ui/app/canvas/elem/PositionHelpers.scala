@@ -8,15 +8,26 @@ import scala.util.Try
 
 object PositionHelpers {
 
-
-/*
-// This kills rx.ops._ import carefully. Or make a nested class.
-  implicit class RxOps[T](rxx: Rx[T]) {
-    def reset(f: => T) = {
-      rxx.parents.map{q => Try{q.asInstanceOf[Var[T]]() = f}}
-    }
+  implicit def d2tolc(d2: (Double, Double)) : LatCoordD = {
+    LatCoordD(d2._1, d2._2)
   }
-*/
+
+  implicit def i2tolc(d2: (Int, Int)) : LatCoordD = {
+    LatCoordD(d2._1, d2._2)
+  }
+
+  implicit def i2t2olc(d2: (Int, Int)) : LatCoord = {
+    LatCoord(d2._1, d2._2)
+  }
+
+  /*
+  // This kills rx.ops._ import carefully. Or make a nested class.
+    implicit class RxOps[T](rxx: Rx[T]) {
+      def reset(f: => T) = {
+        rxx.parents.map{q => Try{q.asInstanceOf[Var[T]]() = f}}
+      }
+    }
+  */
 
   def xy(x: Double = 0D, y: Double = 0D): LatCoordD = LatCoordD(x,y)
   def xyi(x: Int = 0, y: Int = 0): LatCoord = LatCoord(x,y)

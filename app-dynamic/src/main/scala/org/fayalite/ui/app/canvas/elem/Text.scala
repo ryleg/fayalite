@@ -16,9 +16,7 @@ import scala.util.Try
 
 
 object Text {
-
-  val textColor = "#A9B7C6"
-
+  val textColor = "#CC7832"  //"#FF9900" //#A9B7C6"
 }
 
 import Text._
@@ -28,15 +26,25 @@ import PositionHelpers._
 
 trait Shiftable {
   implicit val grid: Grid
+  val visible: Var[Boolean]
   val latCoord: Var[LatCoord]
   import grid.gridTranslator._
+  latCoord.foreach{
+    lci => if (distanceLeft < 0 ||
+      distanceRight < 0) visible() = false
+  }
   def lc = latCoord()
-  def shiftRight: Boolean = {
-      val tooFar = lc.right.x >= grid.cols - 1
-      latCoord() = if (tooFar) {
+  def tooFarRight: Boolean = lc.right.x >= grid.cols - 1
+  def distanceRight = grid.cols - lc.x
+  def distanceLeft = lc.x
+  def atRightEdge = distanceRight == 1
+  def shiftLeft = {latCoord() = lc.left}
+  def shiftRight = {latCoord() = lc.right}
+  def shiftRightBounded: Boolean = {
+      latCoord() = if (tooFarRight) {
         lc.left0.down
       } else lc.right
-      tooFar
+      tooFarRight
   }
 }
 
@@ -52,13 +60,13 @@ abstract class GridElement(
                             val extraBuffer: Int = 0,
                             val offset: Var[LatCoordD] = ld0,
                             val area: Option[Var[LatCoordD]] = None
-                            )(implicit val grid: Grid, val canvasStyling: CanvasStyling =
-  CanvasStyling()) extends Drawable
+                            )(implicit val grid: Grid) extends Drawable
   with Shiftable
 {
   import grid._
   import gridTranslator._
-  implicit val canvasStylingProper = canvasStyling
+//  override val styling: CanvasStyling = CanvasStyling()
+  //implicit val canvasStylingProper = canvasStyling
 
   val areaActual = spacing.map{_.-(extraBuffer)}
 
@@ -103,29 +111,20 @@ class Symbol(
             )(override implicit val grid: Grid) extends GridElement(
   latticeCoordinates,
   extraBuffer = 0,
-  offset = Var { LatCoordD(0D, 0D) }
+  offset = Var { LatCoordD(2, 2) },
+area=Some(Var(LatCoordD(grid.spacing().x-2,grid.spacing().y-2)))
 )(grid=grid) {
   import grid._
   import gridTranslator._
 
+  //override val styling = CanvasStyling(fillStyle = Text.textColor)
   char.foreach{_ => redraw()}
-
   def draw() = {
     val c = char()
-    val coords = latCoord() + LatCoord(0,1) : LatCoordD
-   // println("draw coords " + coords.x + " " + coords.y)
+    val coords = latCoord() + LatCoord(0, 1): LatCoordD
+    //println("symbol draw")
+    ctx.fillStyle = Text.textColor //"red"; Text.textColor
     ctx.fillText(c.toString,
-      coords.x, coords.y)//bottomLeftBufferedWithOffset().x,
-      //bottomLeftBufferedWithOffset().y)
-/*    style{
-      pos().fillRect()
-    }(CanvasStyling(globalAlpha = .5, fillStyle="red"))*/
+      coords.x + 2, coords.y - 2)
   }
 }
-/*
-
-
-val srC4 = runSearch(4, 300)
-
-
- */
