@@ -62,7 +62,9 @@ object Server extends App with MySslConfiguration {
       case Some(ps) =>
         println("sending parse request")
         Try{ps.??[TextFrame](msg, timeout=3)}.toOption match {
-          case Some(response) => sender ! response
+          case Some(response) =>
+            println("received parse response " + response)
+            sender ! response
           case None =>
             connectParseServer()
         }

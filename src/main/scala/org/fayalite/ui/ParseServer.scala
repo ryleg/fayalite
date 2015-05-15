@@ -71,13 +71,14 @@ class ParseServer extends Actor{
         val frame = TextFrame(msg)
         sender() ! frame
     case msg: String =>
+
       Try{Future{parseBottleneck(msg, sender())}}
       //sender() ! TextFrame(ret)
       //response.foreach{r => sender() ! TextFrame(r)}
     case TextFrame(msg) =>
       val umsg = msg.utf8String
       println("parse message" + umsg)
-    //  sender() ! TextFrame("parsed")
+      sender() ! TextFrame("parsed")
     case BinaryFrame(dat) =>
       //TODO : Check how to binary serialize dom event input classes here.
       println("binaryframe.")

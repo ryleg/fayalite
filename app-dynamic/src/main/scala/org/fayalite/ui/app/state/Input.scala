@@ -98,7 +98,18 @@ object Input {
 
     val keyDown = Canvas.onKeyDown
 
+    /*def register[T](f: Function1[T, _]) = {
+      val vv = Var(null.asInstanceOf[T])
+    }*/
+    //dom.window.onkeydown = register(dom.window.onkeydown)
+
     val downKeyCode = Var(-1)
+    val press = Var(null.asInstanceOf[KeyboardEvent])
+    window.onkeypress = (ke: KeyboardEvent) => {
+      press() = ke
+      Try{pressCode() = ke.keyCode}
+    }
+    val pressCode = Var(-1)
 
     /**
      * left arrow	37
@@ -127,25 +138,21 @@ down arrow	40
     val downKey = Var("")
     val shift = Var(false)
     val keyDownCode = keyDown.map{q =>
-      Try{val s = q.shiftKey; if (s) shift() = true}
-      Try{downKeyCode() = q.keyCode}
-      Try{println("keyc" + q.keyCode.toChar)}
-      Try{println(q.keyCode)}
-      Try{println(q.keyCode.toChar.toString.length + "len")}
-      //Try{println(q.shiftKey)}
-      //Try{println("up" +q.keyCode.toChar.toUpper)}
-      //Try{println("lo" + q.keyCode.toChar.toLower)}
-      Try {
-        val k = q.keyCode.toChar.toLower.toString
-        downKey() = {
-          if (q.shiftKey) k.toUpperCase else k
+      if (q != null) {
+        Try {
+          val s = q.shiftKey; if (s) shift() = true
         }
+        Try {
+          downKeyCode() = q.keyCode
+        }
+        Try {
+          val k = q.keyCode.toChar.toLower.toString
+          downKey() = {
+            if (q.shiftKey) k.toUpperCase else k
+          }
+        }
+        shift() = false
       }
-     // println(q.key == undefined)
-     // println(q.key)
-      //Try{if (q.key != null) downKey() = q.key}
-      Try{q.keyCode}
-      shift() = false
     }
   }
 
@@ -155,6 +162,7 @@ down arrow	40
 
   val t = Timer(100.milliseconds)
   val flashRate = Timer(650.milliseconds)
+  val heartBeat = Timer(4.seconds)
 
   Obs(t) {
     //println("timer")

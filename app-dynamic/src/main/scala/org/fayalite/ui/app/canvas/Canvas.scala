@@ -31,9 +31,23 @@ object Canvas {
 
   // change to lift
   val onKeyDown = Var(null.asInstanceOf[KeyboardEvent])
-  window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke}
   val onKeyUp = Var(null.asInstanceOf[KeyboardEvent])
+  val onclick = Var(null.asInstanceOf[MouseEvent])
+  val onresize = Var(null.asInstanceOf[UIEvent])
+  val rightClick = Var(null.asInstanceOf[MouseEvent])
+
+
+  window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke}
   window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
+  window.oncontextmenu = (me: MouseEvent) => {
+    me.preventDefault()
+    rightClick() = me
+  }
+  window.onclick = (me: MouseEvent) => {
+    onclick() = me
+  }
+
+  // NO
   val ctrlKey = Var(false)
   Obs(onKeyDown, skipInitial = true) {
     if (onKeyDown().ctrlKey) ctrlKey() = true
@@ -41,11 +55,6 @@ object Canvas {
   Obs(onKeyUp, skipInitial = true) {
     if (onKeyUp().ctrlKey) ctrlKey() = false
   }
-  import rx._
-  val onclick = Var(null.asInstanceOf[MouseEvent])
-  val onresize = Var(null.asInstanceOf[UIEvent])
-
-
   Obs(onresize, skipInitial = true) {
     widthR() = canvas.width
     heightR() = canvas.height
@@ -53,35 +62,22 @@ object Canvas {
   }
 
   def getRect = document.body.getBoundingClientRect()
-
-
-  val rightClick = Var(null.asInstanceOf[MouseEvent])
-
-  window.oncontextmenu = (me: MouseEvent) => {
-    me.preventDefault()
-    rightClick() = me
-  }
-
-  window.onclick = (me: MouseEvent) => {
-    onclick() = me
-  }
-
   def w = document.documentElement.clientWidth - 18 // wtf? it makes a scroll bar without this offset
   def h = document.documentElement.clientHeight - 50
 
   val canvasR = Var(null.asInstanceOf[dom.raw.HTMLCanvasElement])
   val ctxR = Var(null.asInstanceOf[dom.CanvasRenderingContext2D])
+
   val heightR = Var(0D)
+  val widthR = Var(0D)
+  val area = Rx { LatCoordD(widthR(), heightR())}
+
   Obs(canvasR, skipInitial = true) {
     if (canvasR() != null) {
       heightR() = canvasR().height.toDouble
       widthR() = canvasR().width.toDouble
     }
   }
-
-  val widthR = Var(0D)
-
-  val area = Rx { LatCoordD(widthR(), heightR())}
 
   def createCanvas() = {
     val styling = "background-color:#2B2B2B; "
@@ -94,13 +90,11 @@ object Canvas {
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
-
   }
 
   // TODO : Change to reactive.
   @deprecated
   def initCanvas() = {
-
     createCanvas()
     canvas.width = w
     canvas.height = h

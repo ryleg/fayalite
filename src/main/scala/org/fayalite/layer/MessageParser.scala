@@ -6,6 +6,8 @@ import spray.can.websocket.frame.TextFrame
 
 import fa._
 
+import scala.util.Try
+
 object MessageParser {
 
   case class ParseRequest(
@@ -21,10 +23,14 @@ object MessageParser {
 
   //val fileGraphStatic =  FSMan.fileGraph()
   def parseBottleneck(msg: String, ref: ActorRef) = {
-    implicit val formats = JSON.formats
-    val pmsg = JSON.parse4s(msg).extract[ParseRequest]
-   // val refs = fileGraphStatic
-    val res = ParseResponse() //classRefs = Some(refs))
+    println("parse bottlenck " + msg)
+    Try {
+      implicit val formats = JSON.formats
+      val pmsg = JSON.parse4s(msg).extract[ParseRequest]
+      // val refs = fileGraphStatic
+
+    }.toOption
+    val res = ParseResponse() //classRefs = Some(refs)
     ref ! TextFrame(res.json)
   }
 }
