@@ -46,8 +46,10 @@ object DynamicEntryApp extends JSApp {
     }
   }
 
+  @JSExport
   def main(): Unit = {
-
+    Canvas.initCanvas()
+    StateSync.processBridge("asdf")
 //    Canvas.initCanvas()
   //  implicit val wsw = new WSWrapper(WS_URI)
    // val tjson = """{"yo": 1}"""

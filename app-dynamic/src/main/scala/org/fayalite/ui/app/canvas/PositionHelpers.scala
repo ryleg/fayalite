@@ -28,6 +28,12 @@ object PositionHelpers {
 
   def xy(x: Double = 0D, y: Double = 0D): LatCoordD = LatCoordD(x,y)
   def xyi(x: Int = 0, y: Int = 0): LatCoord = LatCoord(x,y)
+  def vl(x: Int = 0, y: Int = 0) = Var(xyi(x,y))
+
+  implicit class RxOpsExt[T](t: T) {
+    def v = Var(t)
+    def rx = Rx{t}
+  }
 
   def lc0 = LatCoord(0, 0)
   def lcd0 = LatCoordD(0D, 0D)
@@ -53,6 +59,7 @@ object PositionHelpers {
     def up0 = this.copy(y=0)
     def left0 = this.copy(x=0)
     def right = this.copy(x=x+1)
+    def right(n: Int) = this.copy(x=x+n)
     def left = this.copy(x=x-1)
     def up = this.copy(y=y-1)
     def down = this.copy(y=y+1)

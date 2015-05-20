@@ -1,4 +1,8 @@
+import com.lihaoyi.workbench.Plugin._
+
 enablePlugins(ScalaJSPlugin)
+
+workbenchSettings
 
 name := "fayalite-app-dynamic"
 
@@ -28,3 +32,7 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %%% "scalarx" % "0.2.8" withSources() withJavadoc(),
   "com.lihaoyi" %%% "upickle" % "0.2.8" withSources() withJavadoc()
 )
+
+bootSnippet := "org.fayalite.ui.app.DynamicEntryApp().main();"
+
+updateBrowsers <<= updateBrowsers.triggeredBy(fastOptJS in Compile)

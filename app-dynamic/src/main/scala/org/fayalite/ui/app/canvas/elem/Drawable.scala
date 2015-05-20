@@ -11,7 +11,7 @@ import scala.util.Try
 object Drawable {
 
   case class CanvasStyling(
-                          font: String = "11pt monospace",
+                          font: String = "14pt monospace",
                           fillStyle: String =  "#A9B7C6",
                           globalAlpha: Double = 1D
                             )
@@ -25,6 +25,8 @@ trait Drawable {
   def draw() : Unit
   def drawActual(): Unit = style{draw()}
   def redraw() : Unit = { clear() ; drawActual() }
+  def off = visible() = false
+  def on = visible() = true
 
   val visible : Var[Boolean] = Var{true}
 

@@ -109,6 +109,7 @@ object Canvas {
       height = canvas.height
       //      println(s"resize canvas width: $width height: $height")
       onresize() = uie
+      rect() = getRect
     }
     println(Input.t)
     println(Editor.editor)

@@ -15,7 +15,7 @@ object PersistentWebSocket {
   // val cookies = document.cookie
   // case class Register(cookies: String)
 
-  var pws = new PersistentWebSocket()
+  //var pws = new PersistentWebSocket()
 
 }
   // TODO : Switch to upickle once errors are resolved.
@@ -67,22 +67,26 @@ class PersistentWebSocket(
   val socket = Var(new WebSocket(wsUri))
 
   def send(s: String) = Try{socket().send(s)}
+/*
 
   val heartBeat = Input.heartBeat.foreach{
     hb =>
       Schema.TryPrintOpt{
-        println("heartbeat sent" + open())
+      //  println("heartbeat sent" + open())
         if (open()) send("heartbeat") //Window.metaData)
       }
   }
 
   val msgPrinter = Obs(messageStr, skipInitial = true) {
-    println("ws msg " + messageStr())
+    println("ws msg " + messageStr().slice(0, 100))
   }
+*/
 
   val socketWatch = Obs(socket) {
     val ws = socket()
-    ws.onopen = (e: Event) => {onOpen() = e; open() = true; println("open") ;send("debug")}
+    ws.onopen = (e: Event) => {onOpen() = e; open() = true; println("open") ;
+    //  send("debug")
+    }
     ws.onclose = (e: Event) => {onClose() = e; open() = false; println("closed")}
     ws.onerror = (e: Event) => {onError() = e; open() = false ; println("wserr" + e.toString)}
     ws.onmessage = (me: MessageEvent) => {

@@ -98,6 +98,9 @@ abstract class GridElement(
 
 }
 
+class FillStyle (val value: String = Text.textColor ) {
+
+}
 /*
 Should be able to draw a secondary grid
 over the primary and build N levels of
@@ -106,7 +109,8 @@ over the primary and build N levels of
 
 class Symbol(
             val char: Var[Char], // change to styled text to absorb styling monad ops
-            val latticeCoordinates : Var[LatCoord]
+            val latticeCoordinates : Var[LatCoord],
+            val underLine : Var[FillStyle] = Var(new FillStyle(null))
             )(override implicit val grid: Grid) extends GridElement(
   latticeCoordinates,
   extraBuffer = 0,
@@ -116,14 +120,26 @@ area=Some(Var(LatCoordD(grid.spacing().x-2,grid.spacing().y-2)))
   import grid._
   import gridTranslator._
 
+  def underline() = {
+    pos.map{
+      lc =>
+        lc.copy(xy2=lc.xy2.copy(y=2D))
+    }
+  }
+  // @ forceRedraw
+  //underLine.foreach{_ => redraw()}
+  //def over(fill: String = Text.textColor) = underLine() = new FillStyle(fill)
+  //def overOff = underLine() = new FillStyle(null)
+
   //override val styling = CanvasStyling(fillStyle = Text.textColor)
   char.foreach{_ => redraw()}
   def draw() = {
     val c = char()
     val coords = latCoord() + LatCoord(0, 1): LatCoordD
     //println("symbol draw")
-    ctx.fillStyle = Text.textColor //"red"; Text.textColor
+    ctx.fillStyle =  Text.textColor
     ctx.fillText(c.toString,
-      coords.x + 2, coords.y - 2)
+      coords.x + 7, coords.y - 7)
+    if (underLine().value != null) underline()().fillRect()
   }
 }

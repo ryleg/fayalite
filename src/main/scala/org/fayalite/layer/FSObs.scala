@@ -7,7 +7,7 @@ object FSObs {
   def main(args: Array[String]): Unit = {
 
     val c = new WebsocketPipeClient()
-
+    c.sendFrame(ParseServer.evalUIFrame)
     var lt = System.currentTimeMillis()
     observeDirectory(
       "/Users/ryle/Documents/repo/fayalite/app-dynamic/target/scala-2.11",

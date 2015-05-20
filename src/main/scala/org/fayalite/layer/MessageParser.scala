@@ -17,11 +17,16 @@ object MessageParser {
                            fileRequest: Option[Array[String]]
                            )
   case class ParseResponse(
-                            classRefs: Option[Array[String]] = None,
-                            classContents: Option[Map[String, String]] = None
+                            classRefs: Option[Array[String]] =
+                            Some(fileGraphStatic),
+                            classContents: Option[Map[String, String]] = None,
+                            heartBeatActive: Boolean = true
                             )
 
-  //val fileGraphStatic =  FSMan.fileGraph()
+  val fileGraphStatic =  FSMan.fileGraph()
+  /*
+  G1 G2
+   */
   def parseBottleneck(msg: String, ref: ActorRef) = {
     println("parse bottlenck " + msg)
     Try {
@@ -31,6 +36,7 @@ object MessageParser {
 
     }.toOption
     val res = ParseResponse() //classRefs = Some(refs)
+    println("sending response" + res.json)
     ref ! TextFrame(res.json)
   }
 }

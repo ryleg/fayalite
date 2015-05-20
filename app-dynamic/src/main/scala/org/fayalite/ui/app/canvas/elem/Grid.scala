@@ -39,19 +39,19 @@ import Canvas.{widthR=>width,heightR=>height}
 
 class Grid(
             val spacing: Var[PositionHelpers.LatCoordD] =
-  Var(PositionHelpers.LatCoordD(22D, 22D)),
+  Var(PositionHelpers.LatCoordD(28D, 28D)),
             val elementBuffer: Var[Int] = Var(1)
        //     val maxRows: Int = 100,
       //    val maxColumns: Int = 100
             )
   extends Drawable
+//  with ElementRegistry
 {
 
- val bodyArea = Canvas.rect.map{
-    cr =>
+ val bodyArea = Rx {
       val wa = ((Canvas.widthR()/spacing().x).toInt)*spacing().x
       val ha = ((Canvas.heightR()/spacing().y).toInt)*spacing().y
-      println("cr width" + cr.width + " cr botom" + cr.bottom)
+     // println("cr width" + cr.width + " cr botom" + cr.bottom)
      LatCoord2D(LatCoordD(0D, 0D),
        (wa,ha) : LCD
      )}
@@ -67,6 +67,22 @@ class Grid(
    val gridTranslator = new GridTranslator(this)
   import gridTranslator._
   implicit val grid_ = this
+
+  numColumns.foreach{
+    c =>
+      println("col " + c + " " + Canvas.widthR())
+  }
+
+  numRows.foreach{
+    c =>
+      println("rows " + c + " " + Canvas.heightR())
+  }
+
+  Canvas.rect.foreach{
+    r =>
+      println(s"${r.bottom} bot ${r.height} hei ${r.left} left" +
+      s"${r.right} right ${r.top} top ${r.width} width")
+  }
 
   override val styling = CanvasStyling(
 fillStyle="#6897BB",
@@ -93,9 +109,11 @@ globalAlpha = .3
     offset = Var(LatCoordD(1D, 1D))
   )
   Obs(cursor.latCoord){
-    if (cursor.latCoord().x > numRows()+1
+    println("cursor LC" + cursor.latCoord())
+
+    if (cursor.latCoord().x > numColumns()
     ) cursor.latCoord() = cursor.latCoord().left.left
-    if (cursor.latCoord().y > numColumns()-2
+    if (cursor.latCoord().y > numRows()
     ) cursor.latCoord() = cursor.latCoord().up
     if (cursor.latCoord().x < 0
     ) cursor.latCoord() = cursor.latCoord().copy(x=0)

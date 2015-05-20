@@ -72,8 +72,8 @@ class ParseServer extends Actor{
         sender() ! frame
     case msg: String =>
 
-      Try{Future{parseBottleneck(msg, sender())}}
-      //sender() ! TextFrame(ret)
+     val ret =  Try{parseBottleneck(msg, sender())}.toOption.getOrElse("bottleneck failed")
+      sender() ! TextFrame(ret)
       //response.foreach{r => sender() ! TextFrame(r)}
     case TextFrame(msg) =>
       val umsg = msg.utf8String

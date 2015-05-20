@@ -19,5 +19,7 @@ class Editor() {
 
   implicit val grid_ = grid
 
+  val tree = new FileTree(this)
+
 }
 
