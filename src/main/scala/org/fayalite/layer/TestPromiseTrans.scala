@@ -7,7 +7,6 @@ import scala.concurrent.{Promise, Future}
 import scala.reflect.ClassTag
 import language.experimental.macros
 import Fayalite._
-import experimental.macros.info.DebugMacros
 
 
 class ASDF(

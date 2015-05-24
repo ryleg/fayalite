@@ -29,7 +29,7 @@ object StateSync {
     import rx.ops._
     resp.foreach{q =>
       //println("yo response: " + q)
-      Schema.TryPrintOpt{
+      Try{
         import upickle._
         meta() = read[Response](q)
       }

@@ -45,5 +45,8 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
   "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc(),
   "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
-   "com.googlecode.lanterna" % "lanterna" % "2.1.9"
+   "com.googlecode.lanterna" % "lanterna" % "2.1.9",
+  "com.jcraft" % "jzlib" % "1.1.3",
+  "com.decodified" %% "scala-ssh" % "0.7.0",
+  "ch.qos.logback" % "logback-classic" % "1.1.2"
 )
