@@ -1,23 +1,22 @@
-sbt run & 'cd app-dynamic; sbt ~fastOptJS'
-
+```
+export FAY=~/Documents/repo/fayalite
+alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
+alias ws="cd $FAY; sbt run org.fayalite.MainServer"
+```
 
 Run org.fayalite.ui.ParseServer to handle state management / synchronization
-Run org.fayalite.ui.WSServer to handle websocket management / serving page
+Run org.fayalite.ui.ws.Server to handle websocket management / serving page ( in theory )
+In practice right now Workbench (Haoyi Li) serves page.
 
-Open http://localhost:8080 in browser
+Copy app-dynamic/index-fastopt.html to path below. Idk why workbench requires
+this path, but it won't show up if it's not there.
 
-to compile static-js page
-
-cd fayalite/app
-
-It's bundled in resources since it never really needs to change that much.
+http://localhost:12345/target/scala-2.11/classes/index-fastopt.html
 
 to start additional servers to test other components.
 Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
+Not fully hooked up to UI yet.
 
-
-This all should switch to play but there are dependency conflicts that must be
+This all should switch to play (maybe?) but there are dependency conflicts that must be
 resolved the way that spark-notebook resolved them. Did not want to modify
 build.sbt yet so I'm using spray.
-
-// Data lead tags - data agg classes - data source.
