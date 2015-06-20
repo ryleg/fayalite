@@ -32,9 +32,6 @@ object Grid {
 }
 import Grid._
 import PositionHelpers._
-
-
-
 import Canvas.{widthR=>width,heightR=>height}
 
 class Grid(
@@ -134,7 +131,35 @@ globalAlpha = .3
    * Find what cell mouse is currently on.
    */
   val cellXY = Rx {
-    Mouse.move() : LC
+    if (Mouse.move != null) Mouse.move() : LC
+    else xyi(0,0)
+  }
+
+  val dragOrigin = vl()
+
+  val dragging = Var(false)
+
+  val cellXYDown = Rx {
+    if (Mouse.down != null) {
+      val md = Mouse.down() : LC
+      dragOrigin() = md
+      dragging() = true
+      md
+    }
+    else xyi(0,0)
+  }
+
+
+  val dragEnd = vl()
+
+  val cellXYUp = Rx {
+    if (Mouse.up != null) {
+      val md = Mouse.up() : LC
+      dragEnd() = md
+      dragging() = false
+      md
+    }
+    else xyi(0,0)
   }
 
   cellXY.foreach{ cxy => hover.latCoord() = cxy.copy(x=cxy.x) }

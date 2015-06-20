@@ -29,6 +29,7 @@ object PositionHelpers {
   def xy(x: Double = 0D, y: Double = 0D): LatCoordD = LatCoordD(x,y)
   def xyi(x: Int = 0, y: Int = 0): LatCoord = LatCoord(x,y)
   def vl(x: Int = 0, y: Int = 0) = Var(xyi(x,y))
+  //def vl(x: Int = 0) = Var(xyi(x,x))
 
   implicit class RxOpsExt[T](t: T) {
     def v = Var(t)

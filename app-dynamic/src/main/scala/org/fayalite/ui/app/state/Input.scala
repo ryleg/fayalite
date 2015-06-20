@@ -90,7 +90,7 @@ object Input {
       Try{up() = me}}
     dom.window.onmousedown = (me: MouseEvent) => {Try{down() = me}}
 
-
+    Obs(down, skipInitial = true) { println("msdown") }
 
   }
 

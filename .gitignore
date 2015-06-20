@@ -3,7 +3,6 @@
 # Ignore all dotfiles...
 .*
 
-# except for .gitignore
 !.gitignore
 
 /db
@@ -23,12 +22,7 @@
 /*.iml
 /*.eml
 
-/out
-/RUNNING_PID
-/docs/out
 
-# Mac Stuff
-.DS_Store
 .AppleDouble
 .LSOverride
 Icon
@@ -36,38 +30,17 @@ Icon
 .Spotlight-V100
 .Trashes
 
-
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*.pyc
 *.class
 *.jar
 
-
-# C extensions
-*.so
-
 *.DS_Store
 
-#Serialization
-*.pickle
-*.p
-*.data
-
-
-#Data
 data
-graph_input
 *.tar.gz
 
 *.idea
 *.iml
 
-#Dev
-dev.cfg
-secret_info
-docker_binaries
 binaries/
 
 #Scala / sbt

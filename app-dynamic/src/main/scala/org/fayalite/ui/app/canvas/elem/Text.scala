@@ -77,6 +77,10 @@ abstract class GridElement(
     q => q : LatCoordD
   } // map {_ - extraBuffer}
 
+  val bottomRight = topLeftB map {
+    q => q + grid.spacing()
+  }
+
   override val pos = topLeftB.map{
     o => LatCoord2D(o+offset(), usedArea())
   }
@@ -110,7 +114,7 @@ over the primary and build N levels of
 class Symbol(
             val char: Var[Char], // change to styled text to absorb styling monad ops
             val latticeCoordinates : Var[LatCoord],
-            val underLine : Var[FillStyle] = Var(new FillStyle(null))
+            val overLine : Var[FillStyle] = Var(new FillStyle(null))
             )(override implicit val grid: Grid) extends GridElement(
   latticeCoordinates,
   extraBuffer = 0,
@@ -123,7 +127,7 @@ area=Some(Var(LatCoordD(grid.spacing().x-2,grid.spacing().y-2)))
   def underline() = {
     pos.map{
       lc =>
-        lc.copy(xy2=lc.xy2.copy(y=2D))
+        lc.copy(xy=lc.xy.copy(y=lc.xy.y + 2), xy2=lc.xy2.copy(y=2D))
     }
   }
   // @ forceRedraw
@@ -140,6 +144,6 @@ area=Some(Var(LatCoordD(grid.spacing().x-2,grid.spacing().y-2)))
     ctx.fillStyle =  Text.textColor
     ctx.fillText(c.toString,
       coords.x + 7, coords.y - 7)
-    if (underLine().value != null) underline()().fillRect()
+    if (overLine().value != null) underline()().fillRect()
   }
 }

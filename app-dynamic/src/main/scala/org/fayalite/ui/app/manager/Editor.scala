@@ -19,7 +19,8 @@ class Editor() {
 
   implicit val grid_ = grid
 
-  val tree = new FileTree(this)
+  val tree = new FileGraph(this)
+
 
 }
 

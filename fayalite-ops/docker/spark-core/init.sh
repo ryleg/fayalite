@@ -1,1 +1,0 @@
-/bin/bash -c "source /etc/extra_environment; /etc/init.d/ssh start;" ; /bin/bash ;
