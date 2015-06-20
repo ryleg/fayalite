@@ -9,6 +9,11 @@ import org.fayalite.ui.ImageUtils._
 import org.fayalite.ui.{ImageUtils, WebsocketPipeClient}
 import spray.can.websocket.frame.BinaryFrame
 
+/**
+ * In theory this could be used for piping image data between
+ * client and JVMs.
+ * In practice I don't even remember if it works. Honest docs whoa.
+ */
 object ImagePipe {
 
   val default = createTestImage()

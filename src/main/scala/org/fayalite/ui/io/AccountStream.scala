@@ -9,6 +9,10 @@ import org.apache.spark.util.IntParam
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.storage.StorageLevel
 
+/**
+ * I don't know what's going on here. We may never know.
+ */
+
 object AccountStream {
 /*
     val sc = SparkReference.getSC

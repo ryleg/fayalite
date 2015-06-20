@@ -15,7 +15,9 @@ import JSON._
 
 import scala.reflect.ClassTag
 
-
+/**
+ * Why does Akka not have these?
+ */
 trait AkkaExt {
 
   implicit val akkaTimeout = Timeout(5 seconds)

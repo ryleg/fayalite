@@ -2,6 +2,9 @@ package org.fayalite.layer
 
 import org.fayalite.ui.{ParseServer, WebsocketPipeClient}
 
+/**
+ * Not really sure I like this. Needs more RX
+ */
 object FSObs {
 
   def main(args: Array[String]): Unit = {

@@ -1,8 +1,6 @@
 package org.fayalite.ui.oauth
 
-/**
- * Created by ryle on 11/8/2014.
- */
+
 
 import dispatch._
 import org.json4s.DefaultFormats
@@ -11,6 +9,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.Try
 
+/**
+ * This is supposed to be used for testing OAuth but I don't
+ * even remember what's going on here.
+ */
 object TestGet {
  /* implicit val formats = DefaultFormats
 

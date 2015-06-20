@@ -29,6 +29,14 @@ import org.apache.spark.executor.Executor
 import scala.reflect.runtime._
 import scala.reflect.runtime.{currentMirror => m, universe => ru}
 
+/**
+ * This started off as a way to test whether Spark SQL is friendly
+ * to modifications of SchemaRDDs
+ * It isn't.
+ * @param tableS
+ * @param evt
+ * @tparam T
+ */
 class SparkDBManager[T <: Product](tableS: String)(implicit evt: ru.TypeTag[T]) {
 
   val sqlc = SparkRef.sqlContext

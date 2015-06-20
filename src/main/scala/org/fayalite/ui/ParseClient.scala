@@ -6,6 +6,7 @@ import org.fayalite.util.RemoteClient
 
 import scala.util.Try
 
+@deprecated
 object ParseClient {
     def parseClient() = {
         new RemoteClient(defaultPort+51)

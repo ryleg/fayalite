@@ -13,6 +13,8 @@ import ops._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
+// TODO : Oh god what's going on in here.
+
 class TerminalEmulator(host: String = "localhost") {
   //  return new UnixTerminal(terminalInput, terminalOutput, terminalCharset)
   val run = Var(0 -> "ls -a")

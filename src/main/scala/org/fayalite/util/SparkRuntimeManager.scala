@@ -1,10 +1,8 @@
 package org.fayalite.util
 
-/**
- * Created by ryle on 1/25/15.
- */
-
 import scala.sys.process._
+
+// TODO: Switch to ammonite-ops. Merge with remote server management code ala EMR/EC2
 
 /**
  * In order to avoid patching spark, we must hijack the bootstrap launcher

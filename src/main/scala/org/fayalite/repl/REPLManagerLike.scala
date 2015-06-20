@@ -5,7 +5,12 @@ import java.io.{InputStreamReader, BufferedReader, PipedOutputStream, PipedInput
 
 import scala.tools.nsc.interpreter.JPrintWriter
 
-
+/**
+ * In theory this is for a really low level wrapper around the REPL
+ * IOStream for elegant patching of the spark REPL.
+ * In practice I'm not even sure I still need this? It was mostly for
+ * stupid tests.
+ */
 class REPLManagerLike extends java.io.Serializable {
 
   val replInputSource = new PipedInputStream()

@@ -11,6 +11,9 @@ import Defaults._
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
+// TODO : Remember what this was being used for
+// For real
+
 // we don't implement our route structure directly in the service actor because
 // we want to be able to test it independently, without having to spin up an actor
 class MyServiceActor extends Actor with MyService {

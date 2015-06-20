@@ -6,6 +6,10 @@ import spray.can.websocket.frame.TextFrame
 import scala.concurrent.Future
 import scala.util.Try
 
+/**
+ * Websockets seem to require a heartbeat for some goddamn
+ * reason.
+ */
 object Heartbeat {
 
   var started: Boolean = false

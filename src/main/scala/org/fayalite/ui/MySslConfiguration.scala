@@ -6,6 +6,10 @@ import javax.net.ssl.{KeyManagerFactory, SSLContext, TrustManagerFactory}
 import spray.io._
 
 // for SSL support (if enabled in application.conf)
+/**
+ * This came from some other example, I don't really know whats
+ * going on in here. Don't touch it.
+ */
 trait MySslConfiguration {
 
   // if there is no SSLContext in scope implicitly the HttpServer uses the default SSLContext,

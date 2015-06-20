@@ -9,7 +9,9 @@ import scala.concurrent._
 import scala.reflect.ClassTag
 import scala.util.{Success, Failure, Try}
 
-
+/**
+ * For when you're shocked that futures aren't gettable.
+ */
 trait CommonMonadExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global

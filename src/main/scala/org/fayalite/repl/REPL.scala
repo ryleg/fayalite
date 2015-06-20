@@ -5,6 +5,10 @@ package org.fayalite.repl
 import org.fayalite.util.dsl._
 import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
 
+/**
+ * Try and guess which of these is being used.
+ * Honestly don't know. Sorry, not gonna lie.
+ */
 object REPL extends AkkaExt with CommonMonadExt with ScaryExt {
 
   trait Instruction

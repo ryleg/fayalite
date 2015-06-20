@@ -8,7 +8,10 @@ import org.fayalite.Fayalite._
 
 import scala.util.Try
 
-
+/**
+ * The hope of this object is that you never need to look at json4s docs again
+ * We'll see how far it gets.
+ */
 object JSON {
 
   implicit val formats = DefaultFormats

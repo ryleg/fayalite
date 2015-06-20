@@ -19,6 +19,10 @@ import com.amazonaws.auth._
 import scala.io.Source
 import scala.util.Try
 
+
+/**
+ * This doesn't really live up to it's name.
+ */
 object ServerManager {
 
   case class ServerStatus()

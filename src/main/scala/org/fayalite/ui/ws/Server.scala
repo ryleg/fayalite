@@ -21,6 +21,9 @@ import ExecutionContext.Implicits.global
 /**
  * Don't touch this it's just a stub from some example
  * extend the logic elsewhere and replace this later.
+ * All this does in principle is host a websocket bridge that mediates
+ * client browsers with other JVMs for handling the interpretation
+ * of their requests.
  */
 object Server extends App with MySslConfiguration {
 

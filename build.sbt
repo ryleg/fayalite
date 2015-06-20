@@ -50,3 +50,5 @@ libraryDependencies ++= Seq(
   "com.decodified" %% "scala-ssh" % "0.7.0",
   "ch.qos.logback" % "logback-classic" % "1.1.2"
 )
+
+mainClass in (Compile, run) := Some("org.fayalite.MainServer")

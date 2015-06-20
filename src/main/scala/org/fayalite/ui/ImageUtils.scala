@@ -14,6 +14,11 @@ import java.awt.image.BufferedImage
 
 import java.awt.Color
 
+/**
+ * A set of demonstrative functions that show how to convert
+ * canvas data from HTML5 ByteStrings received through a
+ * websocket into java compatible images and back!
+ */
 object ImageUtils {
 
   def byteStringToUInt8ToRGBInt(bs : ByteString) = {

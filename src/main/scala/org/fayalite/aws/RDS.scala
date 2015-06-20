@@ -6,6 +6,9 @@ import com.amazonaws.services.rds.model.{Tag, CreateDBInstanceRequest}
 import scala.collection.JavaConversions
 import JavaConversions._
 
+/**
+ * Not even closed to being ready.
+ */
 object RDS {
 
   def getDB() = {

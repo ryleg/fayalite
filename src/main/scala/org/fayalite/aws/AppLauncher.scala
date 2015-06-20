@@ -10,6 +10,10 @@ import JavaConversions._
 /*
 Remember when creating the VPC you must create a gateway and setup the routes.
  */
+
+/**
+ * In theory, something that could help you launch machines on AWS.
+ */
 object AppLauncher {
 
   val ubuntu1404HVM = "ami-d05e75b8"

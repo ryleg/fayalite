@@ -7,6 +7,12 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime._
 import scala.reflect.runtime.{currentMirror => m, universe => ru}
 
+/**
+ * DANGEROUS!
+ * Enter with caution.
+ * These things can break a lot of stuff. I'll consider removing
+ * it from some of the package level implicit imports if it gets too scary.
+ */
 trait ScaryExt {
 
   val sqlc = SparkRef.sqlContext

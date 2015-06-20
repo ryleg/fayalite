@@ -7,6 +7,9 @@ import akka.pattern.ask
 import akka.util.Timeout
 import scala.concurrent.duration._
 
+/**
+ * Pretty sure this was just like a way to see if spray-can works
+ */
 object Boot extends App {
 
   // we need an ActorSystem to host our application in

@@ -15,7 +15,10 @@ import org.apache.spark.SparkConf
 import org.apache.spark.executor.{ExecutorURLClassLoader, ChildExecutorURLClassLoader, MutableURLClassLoader}
 import org.apache.spark.util.Utils
 
-
+/**
+ * Lotta weird stuff goin on here. Pretty much just demonstrating
+ * multi-user classloading examples with shared RDD/Context
+ */
 object SparkREPLManager {
 
   def apply(userId: Int, singleJarSimplePath: String) = {

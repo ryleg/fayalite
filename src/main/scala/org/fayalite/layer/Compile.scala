@@ -6,7 +6,10 @@ import org.fayalite.util.RemoteClient
 
 import scala.sys.process.Process
 
-
+/**
+ * This doesn't really work as promised, I mean, it sort of does
+ * but looking at this makes me nervous.
+ */
 object Compile {
 
   def main(args: Array[String]) {

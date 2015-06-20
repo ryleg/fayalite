@@ -17,6 +17,15 @@ import org.fayalite.repl.REPL._
 
 import org.apache.spark.executor.Executor
 
+/**
+ * This guy is supposed to make Spark run in a single JVM
+ * so you can get around bullshit SparkContext non-serializability
+ * errors. It's a terrible workaround to just like making SparkContext
+ * not suck completely, but hey, you could probably fit a few thousand
+ * REPLs inside the same JVM without serious issue. Unless all your
+ * users are dumb enough to crash the driver (which they will unless
+ * we introduce guards somewhere else.) Consider yourself warned.
+ */
 object SparkSupervisor{
   //Debug
   val supervisorPort = 31415
@@ -46,6 +55,8 @@ object SparkSupervisor{
  */
 class SparkSupervisor()(implicit masterIntp: Option[SparkIMain] = None) extends Actor with Logging {
   import SparkSupervisor._
+  // TODO : There should be like a lot more sophistication to these messages
+  // You know like errors and stuff.
   def receive = {
     case Start(id, classPath) =>
       sender ! (

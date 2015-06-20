@@ -5,7 +5,8 @@ import org.apache.spark.Logging
 
 
 /**
- * Actor deployment shortcuts
+ * Actor deployment shortcuts. Not very sophisticated but great if you
+ * just want to play around.
  */
 object Deploy {
 

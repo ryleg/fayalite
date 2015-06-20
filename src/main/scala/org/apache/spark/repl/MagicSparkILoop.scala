@@ -6,6 +6,8 @@ import scala.tools.nsc.interpreter.{JPrintWriter, _}
 import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.nsc.{Settings, io}
 
+// TODO : I can't really remember whats going on here, that would be the first step.
+
 class MagicSparkILoop(inbr: Option[java.io.BufferedReader], out:JPrintWriter) extends SparkILoop(None, out, None) {
   override def getMaster(): String = {
     val master = this.master match {

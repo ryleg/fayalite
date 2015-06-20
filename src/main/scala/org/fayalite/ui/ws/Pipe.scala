@@ -3,6 +3,10 @@ package org.fayalite.ui.ws
 import akka.actor.{ActorRef, Actor}
 import org.fayalite.ui.ws.Server.{RequestClients, PipedMessage, SenderMap}
 
+/**
+ * Client to Websocket to Akka / Other JVMs tunnel
+ * @param allSenders
+ */
 class Pipe(allSenders: SenderMap) extends Actor {
   def receive = {
     case PipedMessage(senderPath, message) =>

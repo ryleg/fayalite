@@ -6,9 +6,21 @@ import org.fayalite.util.RemoteAkkaUtils._
 
 import scala.util.{Failure, Try}
 
+/**
+ * Quick and dirty Spark-Akka compatible actor system / actor wrapper
+ * for case class cross-jvm communication. Needs substantial fixes.
+ * @param port
+ */
 class RemoteClient(port: Int=scala.util.Random.nextInt(20000) + 10000) {
   val actorSystem = createActorSystem(clientActorSystemName, defaultHost, port)
 
+  /**
+   * Find another JVM on the same machine on a supplied port.
+   * This is just for cross-jvm test talk. Doesn't actually work with a custom
+   * host because as you'll notice, that's hardcoded.
+   * @param remotePort
+   * @return
+   */
   def getServerRef(remotePort: Int) = {
     val at = Try {
       val actorPath = s"akka.tcp://$serverActorSystemName" +
@@ -22,13 +34,4 @@ class RemoteClient(port: Int=scala.util.Random.nextInt(20000) + 10000) {
     at match { case Failure(e) => e.printStackTrace(); case _ => }
     at.toOption
   }
-/*
-Map[Long SK, int Group]
-OR just Array[Long, skip NaN]
-Take the Bools first
-take all combinations(2) of them that appear on places.
-zipwithlongindex
-countminsketch, preserve good ones.
-continue.
- */
 }

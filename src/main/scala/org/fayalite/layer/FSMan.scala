@@ -10,6 +10,7 @@ import rx._
 
 /**
  * Returns raw code files primarily for serving in the UI
+ * Actually like legitimately useful although painfully incomplete.
  */
 object FSMan {
 

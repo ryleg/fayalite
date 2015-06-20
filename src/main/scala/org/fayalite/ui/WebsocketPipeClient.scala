@@ -6,6 +6,10 @@ import org.fayalite.util.RemoteClient
 import org.fayalite.repl.REPL._
 import spray.can.websocket.frame.TextFrame
 
+/**
+ * Used for sending messages through a websocket pipe intermediary
+ * bridge that feed to client browser js engine.
+ */
 class WebsocketPipeClient {
 
   val rc = new RemoteClient(scala.util.Random.nextInt(30000) + 10000)
@@ -24,6 +28,9 @@ class WebsocketPipeClient {
   }
 }
 
+/**
+ * I can't remember if this is being used or not, probably don't use it?
+ */
 object WebsocketPipeClient {
 
   import Server.pipePort

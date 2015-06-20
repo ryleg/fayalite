@@ -23,7 +23,9 @@ import com.amazonaws.auth._
 import scala.io.Source
 import scala.util.Try
 
-
+/**
+ * Main interaction gateway for AWS. Sort of works? Maybe?
+ */
 object AWS {
 
   def getKeys = {

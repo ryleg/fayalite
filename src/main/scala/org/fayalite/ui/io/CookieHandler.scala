@@ -1,5 +1,9 @@
 package org.fayalite.ui.io
 
+/**
+ * I'm pretty sure there's a standard library function that does this
+ * somewhere else.
+ */
 object CookieHandler {
 
  def splitCookies(cookies: String) = {
