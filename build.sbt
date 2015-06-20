@@ -6,7 +6,7 @@ version := "0.0.3"
 
 lazy val sparkVersion = "1.2.1"
 
-licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+licenses := Seq("MIT License" -> url("https://github.com/ryleg/fayalite/LICENSE")),
 
 scalaVersion := "2.10.4"
 

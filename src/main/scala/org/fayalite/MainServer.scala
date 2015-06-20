@@ -1,9 +1,9 @@
 package org.fayalite
 
-import fa._
 import org.fayalite.ui.{ParseServer, ws}
-
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.sys.process._
+import ExecutionContext.Implicits.global
 
 /**
  * Entry point to single machine synthetic cluster run. Inside same JVM for now.
@@ -15,8 +15,9 @@ object MainServer {
    * @param args: Unused
    */
   def main(args: Array[String]) {
-    Future{ParseServer.main(args)}
-    ws.Server.main(args)
+    val sbr: Seq[String] = Seq("sbt", "run")
+    Future{(sbr ++ Seq(ParseServer.getClass.getCanonicalName)).!!}
+    (sbr ++ Seq(ws.Server.getClass.getCanonicalName)).!!
   }
 
 }

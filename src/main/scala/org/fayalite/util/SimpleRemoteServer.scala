@@ -2,13 +2,15 @@ package org.fayalite.util
 
 import akka.actor.{Actor, Props}
 
+import fa._
+
 /**
  * The dumbest possible spark compatible actor deployment possible.
  * For an even dumber way to get an actorDeploy, see Deploy object.
  * @param actorDeploy : Something that gives us an actor by construction.
  * @param port: A port, like for TCP you know.
  */
-class SimpleRemoteServer(actorDeploy: => Actor, port: Int) {
+class SimpleRemoteServer(actorDeploy: => Actor, port: Int = rport) {
 
   import RemoteAkkaUtils._
   val actorSystem = createActorSystem(serverActorSystemName, defaultHost, port)

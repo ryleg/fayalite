@@ -1,17 +1,17 @@
 package org.fayalite.util
 
 import org.fayalite.util.RemoteAkkaUtils._
-import org.fayalite.repl.REPL._
-import org.fayalite.util.RemoteAkkaUtils._
 
 import scala.util.{Failure, Try}
+import fa._
+
 
 /**
  * Quick and dirty Spark-Akka compatible actor system / actor wrapper
  * for case class cross-jvm communication. Needs substantial fixes.
  * @param port
  */
-class RemoteClient(port: Int=scala.util.Random.nextInt(20000) + 10000) {
+class RemoteClient(port: Int=rport) {
   val actorSystem = createActorSystem(clientActorSystemName, defaultHost, port)
 
   /**

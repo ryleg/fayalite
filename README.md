@@ -1,6 +1,5 @@
-cd app-dynamic; sbt ~fastOptJS
+sbt run & 'cd app-dynamic; sbt ~fastOptJS'
 
-sbt run
 
 Run org.fayalite.ui.ParseServer to handle state management / synchronization
 Run org.fayalite.ui.WSServer to handle websocket management / serving page

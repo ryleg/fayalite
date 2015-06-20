@@ -16,12 +16,8 @@ import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
 object ParseServer {
-/*
-The high decibels.
-color me black
-djohnson2009@yahoo
 
- */
+
   def main(args: Array[String]) {
     val sr = new SimpleRemoteServer({new ParseServer()} ,20000)
     Thread.sleep(Long.MaxValue)
