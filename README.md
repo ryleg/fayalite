@@ -16,6 +16,7 @@ EOF
 ```
 
 Open in browser:
+
 http://localhost:12345/target/scala-2.11/classes/index-fastopt.html
 
 
