@@ -1,3 +1,15 @@
+Fayalite is a mineral form of iron silicate used in processed form for
+high voltage high frequency transformers. Goal of this library is to
+make large data transforms in Spark quick and easy to modify / test and to 
+provide extensions to the REPL that make multi-user clusters better. 
+Eventual goal is multiplayer like development with real-time class sharing
+across independent user ClassLoaders for dynamic RDD modifications / 
+sharing / collaboration. Additionally, eventually to layout notebook cells in a graph
+format and simplify some of the inconveniences of REPL coding with macro based
+DSL mods to language. (I.e. macros to autoimport case class members in anonymous 
+functions)
+
+#Run
 Run install.sh which will grab a dynamic version of Spark
 with multi-user/multi-classloader cluster patches from 
 https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
