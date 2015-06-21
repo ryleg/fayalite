@@ -5,7 +5,7 @@ and put it in your /lib folder. It will also copy app-dynamic/index-fastopt.html
 to /target/scala-2.11/classes/index-fastopt.html. Idk why workbench requires 
 this path, but it won't load up if it's not there.
 
-Use ./run.sh to start or add aliases as below to run components separately.
+Add aliases as below to run components separately.
 
 ```
 cat << EOF >> ~/.bash_profile
@@ -14,6 +14,8 @@ alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
 alias ws="cd $FAY; sbt run org.fayalite.MainServer"
 EOF
 ```
+
+Or use ./run.sh (aliases are better so you can see split outputs)
 
 Open in browser:
 

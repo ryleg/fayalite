@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-sbt run org.fayalite.MainServer & 'cd app-dynamic; sbt ~fastOptJS;'
+sbt run & cd app-dynamic ; sbt ~fastOptJS
