@@ -41,8 +41,8 @@ object SparkRef {
       sparkConf.set("spark.driver.memory", "1G")
       sc = new SparkContext(sparkConf)
       sqlContext = new SQLContext(sc)
-      rsc() = sc
-      rsqc() = sqlContext
+//      rsc() = sc
+   //   rsqc() = sqlContext
     }
     sc
   }

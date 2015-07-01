@@ -47,3 +47,5 @@ binaries/
 target/
 reference.conf
 secret_keys
+
+secret/

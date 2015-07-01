@@ -6,7 +6,9 @@ version := "0.0.3"
 
 lazy val sparkVersion = "1.2.1"
 
-licenses := Seq("MIT License" -> url("https://github.com/ryleg/fayalite/blob/master/LICENSE"))
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
+
+//licenses := Seq("MIT License" -> url("https://github.com/ryleg/fayalite/blob/master/LICENSE"))
 
 scalaVersion := "2.10.4"
 
@@ -28,7 +30,12 @@ resolvers += Resolver.url("scala-js-releases",
   url("http://dl.bintray.com/content/scala-js/scala-js-releases"))(
     Resolver.ivyStylePatterns)
 
+resolvers += "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven"
+
+resolvers += Resolver.jcenterRepo
+
 libraryDependencies ++= Seq(
+  "amplab" % "spark-indexedrdd" % "0.1",
   "org.scalatest" %% "scalatest" % "2.2.1" % "test" withSources() withJavadoc(),
   "org.scalacheck" %% "scalacheck" % "1.11.4" % "test" withSources() withJavadoc(),
   "org.json4s" %% "json4s-core" % "3.2.10" % "provided" withSources() withJavadoc(),

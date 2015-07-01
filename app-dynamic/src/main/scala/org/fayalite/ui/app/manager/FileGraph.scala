@@ -92,5 +92,12 @@ class FileGraph(editor: Editor) {
       }
   }
   */
+  /*
+
+  Ex:
+ latcoord dx dy map (a_i * a_j ex : wealth distr map ** elevation weighted
+ by linear func according to domain of draggable ui event.
+  DXDY : Optimal path * domain * range * weight.
+   */
 
 }
