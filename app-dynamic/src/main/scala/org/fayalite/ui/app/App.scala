@@ -4,6 +4,8 @@ import scala.collection.GenTraversableOnce
 import scala.collection.generic.CanBuildFrom
 import scala.collection.immutable.List
 
+
+// EXPERIMENTAL DSL MODS DANGEROUS
 object App {
 
   //  List(1,3,3).map

@@ -27,11 +27,11 @@ resolvers ++= Seq("Rhinofly Internal Repository" at "http://maven-repository.rhi
 resolvers += Resolver.sonatypeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "com.github.japgolly.scalacss" %%% "ext-scalatags" % "0.3.0" withSources() withJavadoc(),
   "org.scala-js" %%% "scalajs-dom" % "0.8.0" withSources() withJavadoc(),
   "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
   "com.lihaoyi" %%% "scalarx" % "0.2.8" withSources() withJavadoc(),
-  "com.lihaoyi" %%% "upickle" % "0.2.8" withSources() withJavadoc()
+  "com.lihaoyi" %%% "upickle" % "0.2.8" withSources() withJavadoc(),
+  "com.lihaoyi" %%% "scalatags" % "0.5.2" withSources() withJavadoc()
 )
 
 bootSnippet := "org.fayalite.ui.app.DynamicEntryApp().main();"

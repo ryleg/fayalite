@@ -10,6 +10,8 @@ import rx.ops._
 
 import scala.util.Try
 
+
+//EXPERIMENTAL.
 /**
  * Handles all assignments to a particular lattice (hopefully
  * eventually independent of that lattice's specification

@@ -1,7 +1,3 @@
-
-/**
- * Created by ryle on 1/29/15.
- */
 package org.fayalite.ui.app
 
 import org.fayalite.ui.app.canvas.Canvas
@@ -19,44 +15,16 @@ import scala.util.{Failure, Success, Try}
 
 object DynamicEntryApp extends JSApp {
 
+  // Used??
   val fp = "file:///Users/ryle/Documents/fayalite/app-dynamic/target/scala-2.10/fayalite-app-dynamic-fastopt.js"
   val WS_URI = "ws://localhost:8080/"
-  def oAuthCatch() = {
-    val isCatch = window.location.href.contains("access")
-    if (isCatch) {
-      println("reloading due to oauth catch url")
-      window.location.href = "http://localhost:8080"
-    }
-    isCatch
-  }
-
-  @JSExport
-  def fromBridge(bridge: String): String = {
-    val attempt = Try {
-      if (oAuthCatch()) bridge
-       else {
-        Canvas.initCanvas()
-        StateSync.processBridge(bridge)
-      }
-    }
-    attempt match {
-      case Success(x) => //println("bridge success");
-       x
-      case Failure(e) => e.printStackTrace(); "Failure"
-    }
-  }
 
   @JSExport
   def main(): Unit = {
-    Canvas.initCanvas()
+    //Canvas.initCanvas()
     StateSync.processBridge("asdf")
-//    Canvas.initCanvas()
-  //  implicit val wsw = new WSWrapper(WS_URI)
-   // val tjson = """{"yo": 1}"""
-    //println(JSON.parse(tjson).yo)
-    println("Main")
-
-
   }
 }
 
+//    if (oAuthCatch()) bridge // return bridge without initializing
+// anything, allow the callback page to handle this.

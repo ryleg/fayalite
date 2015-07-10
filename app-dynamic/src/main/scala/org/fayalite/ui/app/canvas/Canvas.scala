@@ -114,8 +114,7 @@ object Canvas {
       onresize() = uie
       rect() = getRect
     }
-    println(Input.t)
-    println(Editor.editor)
+
   }
 
 }

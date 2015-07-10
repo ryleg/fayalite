@@ -5,6 +5,18 @@ import org.scalajs.dom._
 
 object OAuth {
 
+  // UPDATE TO REFLECT URL PROPERLY
+  // requires integration between workbench / standard
+  // spray serving.
+  def oAuthCatch() = {
+    val isCatch = window.location.href.contains("access")
+    if (isCatch) {
+      println("reloading due to oauth catch url")
+      window.location.href = "http://localhost:8080"
+    }
+    isCatch
+  }
+
   // TODO: Pickup from configs or DB
   val clientId = "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com"
   val redirectURI = "http://localhost:8080/oauth_callback"

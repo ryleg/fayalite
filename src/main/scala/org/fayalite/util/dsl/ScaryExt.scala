@@ -84,6 +84,7 @@ trait ScaryExt {
 
   implicit class SerExt(jsonSerializable: Any) {
     def json = JSON.caseClassToJson(jsonSerializable)
+    def j = json
   }
 
 }
