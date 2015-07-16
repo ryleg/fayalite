@@ -155,18 +155,32 @@ object Server extends App with MySslConfiguration {
                     access_token,
                     expires=Some(DateTime(2020,1,1,1,1,1))
                   )) {
-                  authResponse.map(ar => oauth.OAuth.handleAuthResponse(ar, access_token)).flatten.foreach {
+                  authResponse.map(
+                    ar => oauth.OAuth.handleAuthResponse(ar, access_token)).flatten.foreach {
                     r => parseServer.foreach{p => p ! r }
                   }
                   getFromFile(Common.currentDir + "index-fastopt.html")
                 }
               }
             }
-          } ~   pathPrefix("app/target/scala-2.10/fayalite-app-") {
+          } ~   pathPrefix("fayalite-app-dynamic") {
           get {
-            getFromDirectory(Common.currentDir + "app/target/scala-2.10/")
+            println("pathPrefix(\"fayalite-app-dynamic\") {" +
+              " " + Common.currentDir + "app-dynamic/target/scala-2.11/")
+           val r1 = unmatchedPath {
+              path =>
+                println(path.toString() + " unmatched path")
+                val fp = Common.currentDir +
+                  "app-dynamic/target/scala-2.11/fayalite-app-dynamic" +
+                  path.toString()
+                  println(fp)
+                getFromFile(fp)
+            }
+            r1
+            /*getFromDirectory(Common.currentDir +
+              "app-dynamic/target/scala-2.11/fayalite-app-dynamic")*/
           }
-        } ~ {
+        }  ~ {
           println("file: ==" + Common.currentDir + "index-fastopt.html")
           getFromFile(Common.currentDir + "index-fastopt.html")
         }

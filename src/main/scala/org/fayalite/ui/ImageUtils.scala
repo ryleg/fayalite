@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui
 
 import java.awt.image.{DataBufferByte, DataBufferInt, RenderedImage}
@@ -89,3 +90,4 @@ object ImageUtils {
   }
 
 }
+*/

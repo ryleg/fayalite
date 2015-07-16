@@ -13,6 +13,8 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 }
 }
 
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutput = false)
+
 test in assembly := {}
 
 excludedJars in assembly := {

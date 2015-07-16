@@ -52,6 +52,7 @@ object PositionHelpers {
   type VL2 = Var[LatCoord2]
   type VL2D = Var[LatCoord2D]
 
+
   case class LatCoord(x: Int, y: Int) {
     def *(o: Int) = {
       this.copy(x*o, y*o)
@@ -106,13 +107,14 @@ object PositionHelpers {
     }
     // Change to import something._ ; clearRect(pos)
     def clearAll() = {
-      Canvas.ctxR().clearRect(//rekt
+      if (Canvas.ctxR() != null) {
+      Canvas.ctxR.toTry.foreach{_.clearRect( //rekt
         x,
         y,
         dx,
         dy
       )
-    }
+    }}}
 
     def fillRect() = {
       Canvas.ctxR().fillRect(

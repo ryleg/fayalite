@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui
 
 import java.awt.Color
@@ -42,3 +43,4 @@ class TestImagePipeToBrowser extends FunSuite {
 }
 
 
+*/

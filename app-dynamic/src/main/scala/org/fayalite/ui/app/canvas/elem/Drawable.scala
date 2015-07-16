@@ -21,7 +21,9 @@ object Drawable {
 import rx.ops._
 
 trait Drawable {
+
   def clear(): Unit
+
   def draw() : Unit
   def drawActual(): Unit = style{draw()}
   def redraw() : Unit = { clear() ; drawActual() }
@@ -55,7 +57,8 @@ trait Drawable {
     val prevFont = ctx.font
     val prevFillStyle = ctx.fillStyle
     val prevAlpha = ctx.globalAlpha
-    val stylingEvidence = styling // if (styling == CanvasStyling()) stylingEv else styling
+    val stylingEvidence = styling
+    // if (styling == CanvasStyling()) stylingEv else styling
     ctx.font = stylingEvidence.font
     ctx.fillStyle = stylingEvidence.fillStyle
     ctx.globalAlpha = stylingEvidence.globalAlpha

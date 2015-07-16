@@ -78,7 +78,7 @@ object Input {
 
     val dragStart = Var(null.asInstanceOf[DragEvent])
     dom.window.ondragstart = (de: DragEvent) => {
-      println("dragStart")
+ //     println("dragStart")
       dragStart() = de
     }
     val dragEnd = Var(null.asInstanceOf[DragEvent])
@@ -90,7 +90,9 @@ object Input {
       Try{up() = me}}
     dom.window.onmousedown = (me: MouseEvent) => {Try{down() = me}}
 
-    Obs(down, skipInitial = true) { println("msdown") }
+    Obs(down, skipInitial = true) {
+      //println("msdown") }
+    }
 
   }
 

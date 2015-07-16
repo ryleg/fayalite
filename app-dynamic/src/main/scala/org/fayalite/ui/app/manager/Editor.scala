@@ -5,7 +5,7 @@ import org.fayalite.ui.app.canvas.elem._
 
 object Editor {
 
-  //val editor = new Editor()
+  val editor = new Editor()
 
 }
 

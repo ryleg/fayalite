@@ -94,4 +94,4 @@ high voltage high frequency transformers. The analogy with large-scale data
   takes inspiration from https://github.com/ucb-bar/chisel/ and hopes to extend
   it further to make an efficient representation of DAG data transformations
   follow a pattern usually reserved for more rigorous approaches that 
-  require high degrees of analysis, as in circuit diagramming software.
+  require a high degree of analysis, as in circuit diagramming software.

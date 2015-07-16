@@ -65,26 +65,11 @@ class Grid(
   import gridTranslator._
   implicit val grid_ = this
 
-  numColumns.foreach{
-    c =>
-      println("col " + c + " " + Canvas.widthR())
-  }
-
-  numRows.foreach{
-    c =>
-      println("rows " + c + " " + Canvas.heightR())
-  }
-
-  Canvas.rect.foreach{
-    r =>
-      println(s"${r.bottom} bot ${r.height} hei ${r.left} left" +
-      s"${r.right} right ${r.top} top ${r.width} width")
-  }
-
   override val styling = CanvasStyling(
 fillStyle="#6897BB",
 globalAlpha = .3
 )
+
   def cols = gridTranslator.numColumns()
   def rows = gridTranslator.numRows()
 
@@ -106,7 +91,7 @@ globalAlpha = .3
     offset = Var(LatCoordD(1D, 1D))
   )
   Obs(cursor.latCoord){
-    println("cursor LC" + cursor.latCoord())
+    //println("cursor LC" + cursor.latCoord())
 
     if (cursor.latCoord().x > numColumns()
     ) cursor.latCoord() = cursor.latCoord().left.left

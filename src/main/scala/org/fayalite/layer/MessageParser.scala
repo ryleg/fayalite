@@ -16,12 +16,22 @@ object MessageParser {
                            cookies: Option[String],
                            fileRequest: Option[Array[String]]
                            )
+
   case class ParseResponse(
                             classRefs: Option[Array[String]] =
                             Some(fileGraphStatic),
                             classContents: Option[Map[String, String]] = None,
                             heartBeatActive: Boolean = true
                             )
+
+  case class FileIO(name: String, contents: String)
+  case class IdIO(id: Int, io: String)
+  case class RIO(asyncOutputs: Array[String], asyncInputs: Array[IdIO])
+  case class Response(
+                       classRefs: Option[Array[String]] = None,
+                       files: Option[Array[FileIO]] = None,
+                       replIO: Option[RIO] = None
+                       )
 
   val fileGraphStatic =  FSMan.fileGraph()
   /*
@@ -35,7 +45,7 @@ object MessageParser {
       // val refs = fileGraphStatic
 
     }.toOption
-    val res = ParseResponse() //classRefs = Some(refs)
+    val res = Response() //classRefs = Some(refs)
     println("sending response" + res.json)
     ref ! TextFrame(res.json)
   }

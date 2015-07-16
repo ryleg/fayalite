@@ -17,9 +17,10 @@ import scala.util.{Failure, Try}
 import org.fayalite.ui.app.canvas.Schema._
 
 /**
- * We're only using a single canvas / context to start with for simplicity, this will eventually become
- * the 'background' canvas when we move to multiple contexts. For now this is the sole
- * bottleneck to all canvas interactions.
+ * We're only using a single canvas / context
+ * to start with for simplicity, this will eventually become
+ * the 'background' canvas when we move to multiple contexts.
+ * For now this is the sole bottleneck to all canvas interactions.
  */
 object Canvas {
 
@@ -83,17 +84,40 @@ object Canvas {
   }
 
   def createCanvas() = {
-    val styling = "background-color:#2B2B2B; "
-    document.body.setAttribute("style", styling)
+    val stylingb = "background-color:#2B2B2B"
+    val styling = "position:absolute;left:" +
+      "0;top:0:z-index:2;"
+    document.body.setAttribute("style", stylingb)
     val elem = document.body.getElementsByTagName("canvas")
     canvas = {if (elem.length != 0) elem(0) else {
       val obj = dom.document.createElement("canvas")
-      val sa = obj.setAttribute("style", styling)
+      val sa = obj.setAttribute("style", stylingb)
       document.body.appendChild(obj)
       obj
     }}.asInstanceOf[dom.raw.HTMLCanvasElement]
     ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
   }
+
+  var cnvbg : dom.raw.HTMLCanvasElement = _
+  var ctxbg : dom.CanvasRenderingContext2D = _
+
+  def createCanvasBG() = {
+    val styling = "position:absolute;left:" +
+      "0;top:0;z-index:1;" // background-color:#2B2B2B; "
+  //  document.body.setAttribute("style", styling)
+    cnvbg = {
+      val obj = dom.document.createElement("canvas")
+      val sa = obj.setAttribute("style", styling)
+      document.body.appendChild(obj)
+      obj
+    }.asInstanceOf[dom.raw.HTMLCanvasElement]
+
+    ctxbg = cnvbg.getContext("2d").asInstanceOf[
+      dom.CanvasRenderingContext2D]
+  }
+
+
+
 
   // TODO : Change to reactive.
   @deprecated
@@ -101,6 +125,9 @@ object Canvas {
     createCanvas()
     canvas.width = w
     canvas.height = h
+/*    createCanvasBG()
+    cnvbg.width = w
+    cnvbg.height = h*/
     canvasR() = canvas
     ctxR() = ctx
     width = canvas.width
@@ -108,13 +135,16 @@ object Canvas {
     window.onresize = (uie: UIEvent) => {
       canvas.width = w
       canvas.height = h
+/*      cnvbg.width = w
+      cnvbg.height = h*/
+      ctxR() = ctx
       width = canvas.width
       height = canvas.height
+
       //      println(s"resize canvas width: $width height: $height")
       onresize() = uie
-      rect() = getRect
+      rect() = getRect // lol
     }
-
   }
 
 }

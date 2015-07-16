@@ -1,8 +1,6 @@
 package org.fayalite.aws
 
-/**
- * Created by ryle on 11/29/2014.
- */
+import fa._
 
 import java.util
 

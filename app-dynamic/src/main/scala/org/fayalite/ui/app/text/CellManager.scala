@@ -3,6 +3,7 @@ package org.fayalite.ui.app.text
 object CellManager {
 
   import org.scalajs.dom
+/*
 
   class Cell[Builder, Output <: FragT, FragT]
   (
@@ -17,6 +18,7 @@ object CellManager {
       )
     }
   }
+*/
 
   def onLoad() = {
 

@@ -22,7 +22,7 @@ class SymbolManager(grid: Grid) {
   implicit val grid_ = grid
 
 
-  val symbols = Var(Map[Var[LatCoord], canvas.elem.Symbol]())
+  val symbols = Var(Map[Var[LatCoord], canvas.elem.Symbol1]())
   Canvas.onKeyDown.foreach{
     q => Try{ if (q.keyCode == 8) q.preventDefault() }
   }
@@ -37,8 +37,8 @@ class SymbolManager(grid: Grid) {
           case (latc, sym) if latc().x >= cxy().x && cxy().y == latc().y =>
             sym.shiftRight
         }
-        println("new symbol " + ks)
-        val s = new canvas.elem.Symbol(Var(k.head), Var(cxy()))
+     //   println("new symbol " + ks)
+        val s = new canvas.elem.Symbol1(Var(k.head), Var(cxy()))
         grid.cursor.shiftRight
         symbols() = symbols() ++ Map(s.latCoord -> s)
         val gclc = grid.cursor.latCoord

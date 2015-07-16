@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui.io
 
 import java.awt.Color
@@ -50,3 +51,4 @@ object ImagePipe {
   }
 
 }
+*/

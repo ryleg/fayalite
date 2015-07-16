@@ -94,8 +94,8 @@ abstract class GridElement(
       posB
   }
 
-  def clear() : Unit = {
-    pos().clearAll()
+  def clear() : Unit =
+    if (pos != null) {import fa._ ; tpl{pos.toTry.foreach{_.clearAll()}}
   }
 
   redraw()
@@ -111,7 +111,11 @@ over the primary and build N levels of
 2Chirals or MChirals.
  */
 
-class Symbol(
+object Symbol1 {
+  val all = Var(List[Symbol1]())
+}
+
+class Symbol1(
             val char: Var[Char], // change to styled text to absorb styling monad ops
             val latticeCoordinates : Var[LatCoord],
             val overLine : Var[FillStyle] = Var(new FillStyle(null))
@@ -121,6 +125,8 @@ class Symbol(
   offset = Var { LatCoordD(2, 2) },
 area=Some(Var(LatCoordD(grid.spacing().x-2,grid.spacing().y-2)))
 )(grid=grid) {
+  import Symbol1._
+  all() = all() ++ List(this)
   import grid._
   import gridTranslator._
 
