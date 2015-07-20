@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui
 
 import java.awt.Color
@@ -45,3 +46,4 @@ class TestRemoteEval extends FunSuite {
 }
 
 
+*/

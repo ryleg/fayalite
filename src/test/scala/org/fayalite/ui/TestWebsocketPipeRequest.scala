@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui
 
 import org.scalatest.FunSuite
@@ -16,3 +17,4 @@ class TestWebsocketPipeRequest extends FunSuite {
 }
 
 
+*/

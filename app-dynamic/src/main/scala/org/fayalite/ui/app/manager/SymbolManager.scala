@@ -21,7 +21,7 @@ import scala.util.Try
 class SymbolManager(grid: Grid) {
   implicit val grid_ = grid
 
-
+// TODO : Use scala.js.dom KeyValue / KeyCode enums.
   val symbols = Var(Map[Var[LatCoord], canvas.elem.Symbol1]())
   Canvas.onKeyDown.foreach{
     q => Try{ if (q.keyCode == 8) q.preventDefault() }

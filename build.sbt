@@ -35,8 +35,10 @@ resolvers += "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/mave
 resolvers += Resolver.jcenterRepo
 
 libraryDependencies ++= Seq(
+  "org.jsoup" % "jsoup" % "1.7.2"  withSources() withJavadoc(),
+  "org.scalatest" % "scalatest_2.10" % "2.0.M5b" % "test",
+  "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" % "test",
   "amplab" % "spark-indexedrdd" % "0.1",
-  "org.scalatest" %% "scalatest" % "2.2.1" % "test" withSources() withJavadoc(),
   "org.scalacheck" %% "scalacheck" % "1.11.4" % "test" withSources() withJavadoc(),
   "org.json4s" %% "json4s-core" % "3.2.10" % "provided" withSources() withJavadoc(),
   "org.json4s" %% "json4s-jackson" % "3.2.10" % "provided" withSources() withJavadoc(),
@@ -48,7 +50,7 @@ libraryDependencies ++= Seq(
   "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources(),
   "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
   "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
-  "net.databinder.dispatch" %% "dispatch-core" % "0.11.1",
+  "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
   "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
   "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc(),
   "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),

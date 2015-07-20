@@ -1,14 +1,6 @@
 package org.fayalite.ui.oauth
 
 
-
-import dispatch._
-import org.json4s.DefaultFormats
-import org.json4s.jackson.JsonMethods._
-import scala.concurrent.Await
-import scala.concurrent.duration._
-import scala.util.Try
-
 /**
  * This is supposed to be used for testing OAuth but I don't
  * even remember what's going on here.
@@ -28,4 +20,24 @@ val rl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.uADRq
     println(resp)
     println(userId)*/
   }*/
+
+
+  def main(args: Array[String]) {
+
+
+/*    import dispatch._
+    import org.json4s.DefaultFormats
+    import org.json4s.jackson.JsonMethods._
+    import scala.concurrent.Await
+    import scala.concurrent.duration._
+    import scala.util.Try*/
+    import dispatch._, Defaults._
+    val svc = url("http://api.hostip.info/country.php")
+    val country = Http(svc OK as.String)
+
+    country.foreach{
+      q => println("response: " + q)
+    }
+
+  }
 }

@@ -15,7 +15,7 @@ no obvious conflicts and conflicts should ideally be resolved using RDD
 operation isolation in conjunction with SBT-as-an-api-per-transform philosophy.
 
 Another natural use case would be to make transitions between successive
- code versions allow in-JVM RDD translations across conflicting ClassLoaders.
+code versions allow in-JVM RDD translations across conflicting ClassLoaders.
 Additionally, these RDDs should be able to be shared instantaneously 
 irrespective of library version across large user bases for rapid development. 
 
@@ -46,32 +46,26 @@ that README revisions should be sufficiently adequate.
 Run install.sh which will grab a dynamic version of Spark
 with multi-user/multi-classloader cluster patches from 
 https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
-and put it in your /lib folder. It will also copy app-dynamic/index-fastopt.html
-to /target/scala-2.11/classes/index-fastopt.html. I don't know why workbench 
-requires this path, but it won't load up if it's not there.
+and put it in your /lib folder.
 
 Add aliases as below to run components separately.
 
 ```
-cat << EOF >> ~/.bash_profile
 export FAY=~/Documents/repo/fayalite
 alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
 alias ws="cd $FAY; sbt run org.fayalite.MainServer"
-EOF
 ```
 
 Or use ./run.sh (aliases are better so you can see split outputs)
 
 Open in browser:
 
-http://127.0.0.1:12345/target/scala-2.11/classes/index-fastopt.html
-
+http://localhost:8080
 
 MainServer will run org.fayalite.ui.ParseServer to handle state 
 management / synchronization and org.fayalite.ui.ws.Server 
-to handle websocket management / {serving page ( in theory ) ; 
-In practice right now Workbench (Haoyi Li) serves page. }
-
+to handle websocket management / serving page
+ 
 To start additional servers to test other components.
 Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
 Not fully hooked up to UI yet.
@@ -79,10 +73,12 @@ Not fully hooked up to UI yet.
 If you want to test Spark components that rely upon spark-dynamic, make an
 assembly binary of spark-dynamic with your changes and copy it to lib/
 
-It is intended to update spark-dynamic to Spark 1.4.0 as soon as possible, 
-but the current blocking development factor is the standardi
-
 #Notes
+
+It is intended to update spark-dynamic to Spark 1.4.0 as soon as possible, 
+but the current blocking development factor is the standardization of the UI
+
+Intended integration with ibm spark-kernel comms api eventually.
 
 This all should switch to play (maybe?) but there are dependency conflicts that must be
 resolved the way that spark-notebook resolved them. Did not want to modify
@@ -90,8 +86,8 @@ build.sbt yet so I'm using spray.
 
 Etymology - Fayalite is a mineral form of iron silicate used in processed form for
 high voltage high frequency transformers. The analogy with large-scale data
- transformations should be completely natural. The pipeline / DAG approach
-  takes inspiration from https://github.com/ucb-bar/chisel/ and hopes to extend
-  it further to make an efficient representation of DAG data transformations
-  follow a pattern usually reserved for more rigorous approaches that 
-  require a high degree of analysis, as in circuit diagramming software.
+transformations should be completely natural. The pipeline / DAG approach
+takes inspiration from https://github.com/ucb-bar/chisel/ and hopes to extend
+it further to make an efficient representation of DAG data transformations
+follow a pattern usually reserved for more rigorous approaches that 
+require a high degree of analysis, as in circuit diagramming software.

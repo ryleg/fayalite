@@ -98,6 +98,8 @@ object Input {
 
   object Key {
 
+    // Use KeyCode and KeyValue
+    val keyUp = Canvas.onKeyUp
     val keyDown = Canvas.onKeyDown
 
     /*def register[T](f: Function1[T, _]) = {
@@ -105,8 +107,11 @@ object Input {
     }*/
     //dom.window.onkeydown = register(dom.window.onkeydown)
 
+
     val downKeyCode = Var(-1)
+
     val press = Var(null.asInstanceOf[KeyboardEvent])
+
     window.onkeypress = (ke: KeyboardEvent) => {
       press() = ke
       Try{pressCode() = ke.keyCode}
@@ -139,10 +144,23 @@ down arrow	40
     }
     val downKey = Var("")
     val shift = Var(false)
+    val ctrl = Var(false)
+
+    val keyUpCode = keyUp.map{
+      q => if (q != null) {
+        ctrl() = false // Reset key states.
+        shift() = false
+        q.keyCode
+      } else null.asInstanceOf[Int]
+    }
+
     val keyDownCode = keyDown.map{q =>
       if (q != null) {
         Try {
           val s = q.shiftKey; if (s) shift() = true
+        }
+        Try {
+          val c = q.ctrlKey; if (c) ctrl() = true
         }
         Try {
           downKeyCode() = q.keyCode

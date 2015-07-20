@@ -126,10 +126,10 @@ class FileGraph(editor: Editor) {
 
  // val numBlocks = grid.gridTranslator.numColumns.map{_ / maxLen}
  // new D1Symbols()
-  Array.tabulate(1){i =>
+/*  Array.tabulate(1){i =>
     val lci = LatCoord(i*maxLen ,0)
     new D1Symbols(loc=Var(lci))
-  }
+  }*/
 /*
   StateSync.meta.foreach{
     q =>

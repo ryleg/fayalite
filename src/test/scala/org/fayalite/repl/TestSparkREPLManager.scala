@@ -1,3 +1,4 @@
+/*
 package org.fayalite.repl
 
 import org.fayalite.util.SparkRef
@@ -21,3 +22,4 @@ class TestSparkREPLManager extends FunSuite {
 }
 
 
+*/
