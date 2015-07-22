@@ -6,6 +6,7 @@ import org.fayalite.util.{JSON, SparkRef}
 import scala.reflect.ClassTag
 import scala.reflect.runtime._
 import scala.reflect.runtime.{currentMirror => m, universe => ru}
+import scala.util.Try
 
 
 /**
@@ -85,6 +86,7 @@ trait ScaryExt {
 
   implicit class SerExt(jsonSerializable: Any) {
     def json = JSON.caseClassToJson(jsonSerializable)
+    def tryJson = Try{JSON.caseClassToJson(jsonSerializable)}
     def j = json
   }
 

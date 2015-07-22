@@ -6,11 +6,16 @@ import scala.sys.process.ProcessIO
 
 import rx._
 
-class PRx {
+object PRx {
+  def main(args: Array[String]) {
 
+  }
+}
 /*
+
+class PRx {
   new ProcessIO((o: OutputStream) =>
   )
-*/
 
 }
+*/

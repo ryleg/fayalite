@@ -1,3 +1,39 @@
+@EXPERIMENTAL - unfinished, partially documented. Primary tests /
+demonstrations include deployment of a multi-ClassLoader Spark cluster
+implemented by modifying all serializers to accept a threadLocalProperty
+defining which ClassLoader to use (see http://github.com/ryleg/spark-dynamic 
+for the fork of Spark that allows for this
+Eventually this will be implemented for all Spark versions using 
+macros/reflection to inject Executor.scala changes into the 
+cluster on a live JVM). An incremental step would be package overrides in this
+repo re-implementing the Spark Executor / SparkContext / JVM Deployment 
+with modified serializers, but that may as well be a fork of Spark due to 
+versioning / MergeStrategy / packaging issues.
+
+Additional tests include ActorSystem wrappers to make connecting to a remote
+Spark ActorSystem easy (Spark does not package the standard Akka
+lib but rather a modified version of it, to which your code must conform
+to play on the same system,) a websocket / REST server using Spray for
+communicating to clients (and replacing the inability of the current Jupyter
+ipython/scala setup/API to handle multiple users editing a single kernel in 
+real-time). OAuth tests are completed as preliminary for multi-user organizations to 
+manage a cluster. A trivial SparkREPLManager is demonstrated for example
+on how to manage mutliple REPL's within the same JVM, and multiple conflicting
+ClassLoader tests are finished (to be documented more.)
+
+Trivial tests / examples for the UI are partially complete in app-dynamic. 
+app-template is intended for a hacked pseudo-implementation of a Scala.js REPL.
+Jupyter ipython's DOM-based code mirror was taken as inspiration, and for
+performance / simplicity Canvas was chosen (for later integrations with
+data visualizations in a consistent pattern to match a REPL integrated with
+a DAG viewer for Spark pipelines. Some image conversion utilities are also
+tested for handling handoff between Canvas image data types and java Image types
+(compressed unimplemented currently.) Live code injection into a Javascript
+client engine tested (inspired by Haoyi Li's workbench)
+
+
+#Motivation
+
 The goal of this library is to make large data transforms in Spark quick 
 and easy to modify / test and to provide extensions to the REPL that 
 make multi-user clusters better. 

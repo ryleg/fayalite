@@ -27,7 +27,12 @@ object StateSync {
                        replIO: Option[RIO]
                        )
 
+  case class ParseRequest (
+                          code: Option[String]
+                            )
+
   def initializeApp() = {
+
     CellManager.onLoad()
     Canvas.initCanvas()
     println(Input.t)
@@ -47,7 +52,15 @@ object StateSync {
 
 
   def processBridge(bridge: String) = {
-    initializeApp()
+   // initializeApp()
+    val kvs = ParseRequest(Some(
+      "println(150) ; }}"
+    ))
+    import upickle._
+    val ser = write(kvs)
+    import Disposable.send
+    println("sent : " + ser)
+    send(ser)
     bridge
   }
 }

@@ -57,7 +57,9 @@ libraryDependencies ++= Seq(
    "com.googlecode.lanterna" % "lanterna" % "2.1.9",
   "com.jcraft" % "jzlib" % "1.1.3",
   "com.decodified" %% "scala-ssh" % "0.7.0",
-  "ch.qos.logback" % "logback-classic" % "1.1.2"
+  "ch.qos.logback" % "logback-classic" % "1.1.2",
+  "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
+ // "oncue.quiver" %% "core" % "x.x.x" withSources() withJavadoc()
 )
 
 mainClass in (Compile, run) := Some("org.fayalite.MainServer")

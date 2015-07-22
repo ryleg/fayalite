@@ -180,6 +180,26 @@ object Server extends App with MySslConfiguration {
             /*getFromDirectory(Common.currentDir +
               "app-dynamic/target/scala-2.11/fayalite-app-dynamic")*/
           }
+        } ~   pathPrefix("template") {
+          get {
+            val r1 = unmatchedPath {
+              path =>
+                println(path.toString() + " unmatched path")
+                val actualPath = path.toString()
+                val pfx = actualPath.split("/").head
+                println("pfx " + pfx)
+                getFromFile(Common.currentDir + "index-fastopt.html")
+/* // TODO : Template by id.
+                val fp = Common.currentDir +
+                  s"tmp/$pfx/target/scala-2.11/fayalite-app-template" +
+                  path.toString()
+                println(fp)
+                getFromFile(fp)*/
+            }
+            r1
+            /*getFromDirectory(Common.currentDir +
+              "app-dynamic/target/scala-2.11/fayalite-app-dynamic")*/
+          }
         }  ~ {
           println("file: ==" + Common.currentDir + "index-fastopt.html")
           getFromFile(Common.currentDir + "index-fastopt.html")

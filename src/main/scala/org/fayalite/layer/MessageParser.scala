@@ -14,12 +14,13 @@ object MessageParser {
                            tab: Option[String],
                            requestId: Option[String],
                            cookies: Option[String],
-                           fileRequest: Option[Array[String]]
+                           fileRequest: Option[Array[String]],
+                          code: Option[String]
                            )
 
   case class ParseResponse(
                             classRefs: Option[Array[String]] =
-                            Some(fileGraphStatic),
+                            None, //Some(fileGraphStatic),
                             classContents: Option[Map[String, String]] = None,
                             heartBeatActive: Boolean = true
                             )
@@ -30,21 +31,23 @@ object MessageParser {
   case class Response(
                        classRefs: Option[Array[String]] = None,
                        files: Option[Array[FileIO]] = None,
-                       replIO: Option[RIO] = None
+                       replIO: Option[RIO] = None,
+                       out: Option[String] = None
                        )
 
-  val fileGraphStatic =  FSMan.fileGraph()
+  //val fileGraphStatic =  FSMan.fileGraph()
   /*
   G1 G2
    */
   def parseBottleneck(msg: String, ref: ActorRef) = {
     println("parse bottlenck " + msg)
-    Try {
-      implicit val formats = JSON.formats
-      val pmsg = JSON.parse4s(msg).extract[ParseRequest]
+    val pr = Try{msg.json[ParseRequest]}.toOption
+    pr.foreach{
+      _.code.foreach{
+        q => org.fayalite.repl.JsREPL.writeCompile(q)
+      }
+    }
       // val refs = fileGraphStatic
-
-    }.toOption
     val res = Response() //classRefs = Some(refs)
     println("sending response" + res.json)
     ref ! TextFrame(res.json)
