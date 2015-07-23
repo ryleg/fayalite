@@ -1,3 +1,5 @@
+
+#Status
 @EXPERIMENTAL - unfinished, partially documented. Primary tests /
 demonstrations include deployment of a multi-ClassLoader Spark cluster
 implemented by modifying all serializers to accept a threadLocalProperty
@@ -28,8 +30,43 @@ performance / simplicity Canvas was chosen (for later integrations with
 data visualizations in a consistent pattern to match a REPL integrated with
 a DAG viewer for Spark pipelines. Some image conversion utilities are also
 tested for handling handoff between Canvas image data types and java Image types
-(compressed unimplemented currently.) Live code injection into a Javascript
-client engine tested (inspired by Haoyi Li's workbench)
+for passing binary image data through websocket and back (compression 
+unimplemented currently.) Live code injection into a Javascript
+client engine tested (inspired by Haoyi Li's workbench) from remote ActorSystem
+
+
+
+#Run
+
+Run install.sh which will grab a dynamic version of Spark
+with multi-user/multi-classloader cluster patches from 
+https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
+and put it in your /lib folder.
+
+Add aliases as below to run components separately.
+
+```
+export FAY=~/Documents/repo/fayalite
+alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
+alias ws="cd $FAY; sbt run org.fayalite.MainServer"
+```
+
+Or use ./run.sh (aliases are better so you can see split outputs)
+
+Open in browser:
+
+http://localhost:8080
+
+MainServer will run org.fayalite.ui.ParseServer to handle state 
+management / synchronization and org.fayalite.ui.ws.Server 
+to handle websocket management / serving page
+ 
+To start additional servers to test other components.
+Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
+Not fully hooked up to UI yet.
+
+If you want to test Spark components that rely upon spark-dynamic, make an
+assembly binary of spark-dynamic with your changes and copy it to lib/
 
 
 #Motivation
@@ -73,41 +110,38 @@ REPL coding with macro based DSL mods to language.
 functions, to set RDD names automatically, to add automatic constructor
 methods for turning REPL statements into class hierarchies. 
 
+What is lacking is proper notebook execution stream management and 
+easy orchestration of displaying concurrently modifiable cells in a format
+with configurable compactness (DAG zooming).
+
+As I write a method, a new case class is needed, I should be able to open
+a second stream, different in scope than the originating stream, and redirect
+client text input into that second stream/scope such that I can instantaneously 
+declare the case class as required by my first stream's declaration. 
+Intellij aims to do this to some degree, but is vastly restrained by it's linear
+file reading (2D box, one document, nothing like cells arranged in a graph),
+and inability to reproduce non-linear relationships of many
+related code blocks in UI. These streams could be understood as mixing 
+in notebook cells with scopes, imports, and DSL mods to make refactoring
+easier / editing complex class hierarchies by careful selection and layout
+of required sections.
+
+The context switching between these,
+including scope referencing (imports, members ..,) should be automatic. 
+Bundles of streams could be considered to be 'common scopes' and used for development
+of 5-10 or more classes concurrently in ui-parallel by orchestrating their
+development through the use of a DAG/REPL
+
+Primary intended use case of this project is for symbolic math
+diagrams of data pipeline operations for large scale real time 
+machine learning debugging and development. It's use as a conventional
+REPL is not primarily intended, but due to the lack of existing alternatives
+is encouraged.
+
 Some of these README commentaries will eventually be pulled into
 the git wiki for simplification, for now the project is experimental enough
 that README revisions should be sufficiently adequate.
 
-#Run
-
-Run install.sh which will grab a dynamic version of Spark
-with multi-user/multi-classloader cluster patches from 
-https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
-and put it in your /lib folder.
-
-Add aliases as below to run components separately.
-
-```
-export FAY=~/Documents/repo/fayalite
-alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
-alias ws="cd $FAY; sbt run org.fayalite.MainServer"
-```
-
-Or use ./run.sh (aliases are better so you can see split outputs)
-
-Open in browser:
-
-http://localhost:8080
-
-MainServer will run org.fayalite.ui.ParseServer to handle state 
-management / synchronization and org.fayalite.ui.ws.Server 
-to handle websocket management / serving page
- 
-To start additional servers to test other components.
-Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
-Not fully hooked up to UI yet.
-
-If you want to test Spark components that rely upon spark-dynamic, make an
-assembly binary of spark-dynamic with your changes and copy it to lib/
 
 #Notes
 

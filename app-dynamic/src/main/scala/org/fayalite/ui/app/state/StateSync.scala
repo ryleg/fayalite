@@ -28,7 +28,7 @@ object StateSync {
                        )
 
   case class ParseRequest (
-                          code: Option[String]
+                          code: String
                             )
 
   def initializeApp() = {
@@ -53,9 +53,9 @@ object StateSync {
 
   def processBridge(bridge: String) = {
    // initializeApp()
-    val kvs = ParseRequest(Some(
-      "println(150) ; }}"
-    ))
+    val kvs = ParseRequest(
+      "println(150)"
+    )
     import upickle._
     val ser = write(kvs)
     import Disposable.send

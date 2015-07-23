@@ -18,6 +18,8 @@ import scala.util.Random
 class TerminalEmulator(host: String = "localhost") {
   //  return new UnixTerminal(terminalInput, terminalOutput, terminalCharset)
   val run = Var(0 -> "ls -a")
+
+  def runNL(sui: (Int, String)) = run() = sui._1 -> {sui._2 + "\n"}
   val out = Var(0 -> ("", ""))
 
   val client = SshClient(host)
@@ -39,6 +41,10 @@ class TerminalEmulator(host: String = "localhost") {
             out() = ridx -> (rr.stdOutAsString() -> rr.stdErrAsString())
         }
     }
+      client.left.foreach{
+        q =>
+          println(q)
+      }
   }
  // out.foreach{println}
 }
