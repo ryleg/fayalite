@@ -9,6 +9,8 @@ import rx._
 object PRx {
   def main(args: Array[String]) {
 
+    import ammonite.ops._
+
   }
 }
 /*

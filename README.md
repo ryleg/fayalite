@@ -20,7 +20,7 @@ communicating to clients (and replacing the inability of the current Jupyter
 ipython/scala setup/API to handle multiple users editing a single kernel in 
 real-time). OAuth tests are completed as preliminary for multi-user organizations to 
 manage a cluster. A trivial SparkREPLManager is demonstrated for example
-on how to manage mutliple REPL's within the same JVM, and multiple conflicting
+on how to manage multiple REPL's within the same JVM, and multiple conflicting
 ClassLoader tests are finished (to be documented more.)
 
 Trivial tests / examples for the UI are partially complete in app-dynamic. 

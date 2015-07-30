@@ -13,18 +13,50 @@ import org.json4s.Extraction
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 
-import scala.collection.JavaConversions
+import scala.collection.{TraversableLike, JavaConversions}
 import scala.reflect.ClassTag
 import scala.util.Random
 
 
-
+/**
+ * This is for quick declarations of implicits that
+ * you might need to shuffle down into a trait later
+ *
+ * Use this to declare common lib-wide extensions
+ * that are probably useful but you don't really know where to
+ * put. When they hit a critical mass organize them or port
+ * them over to some other trait to prevent clutter in here.
+ */
 package object fa  extends AkkaExt
 with CommonMonadExt
 with ScaryExt
 with VeryCommon
 with MethodShorteners
 {
+
+
+
+  implicit class Cleanliness(s: String) {
+
+
+  }
+/*
+  implicit class TLEXT[A, B, +Repr](t: TraversableLike[(A,B), Repr]) {
+
+    def gbk = t.groupBy{_._1}.map{
+      case (x,y) => x -> y.
+    }
+
+  }
+
+  implicit class TLEXT2[+A, +B, +Repr](
+                                        t: TraversableLike[(A,B), Repr]) {
+
+    def gbk = t.groupBy{case (x,y) => x}.map{
+      case (x,y) => x -> y.map
+    }
+
+  }*/
 
   def rport = Random.nextInt(50000) + 1500
   def ct = {

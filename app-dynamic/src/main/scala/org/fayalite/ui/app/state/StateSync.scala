@@ -28,7 +28,8 @@ object StateSync {
                        )
 
   case class ParseRequest (
-                          code: String
+                          code: Option[String]
+                      //    pollOutput: Boolean = true
                             )
 
   def initializeApp() = {
@@ -50,17 +51,51 @@ object StateSync {
     }
   }
 
-
-  def processBridge(bridge: String) = {
-   // initializeApp()
+  def code(s: String) = {
     val kvs = ParseRequest(
-      "println(150)"
+      Some(s)
     )
     import upickle._
     val ser = write(kvs)
     import Disposable.send
     println("sent : " + ser)
     send(ser)
+  }
+
+  /*
+  Wow, theres an un-compilable state here, not sure which
+  variation it is, but I tried pulling above into sendCase(a: Any)
+  and it never compiled. That or flashRate heartbeats caused it
+  to lock forever on fastOptJS
+   */
+
+  Input.flashRate.foreach{
+    e =>
+     import upickle._
+      PersistentWebSocket
+        .send(write(ParseRequest(code=None)))
+
+  }
+
+  import rx.ops._
+
+
+  case class ParseResponse(sbtOut: String)
+
+/*  val response = Var(ParseResponse(""))
+
+  val listener = Obs(PersistentWebSocket.pws.messageStr, skipInitial = true) {
+    val m = PersistentWebSocket.pws.messageStr()
+    import upickle._
+    response() = read[ParseResponse](m)
+  }*/
+
+
+  val ms = PersistentWebSocket.pws.messageStr
+  ms.foreach{println}
+  def processBridge(bridge: String) = {
+   // initializeApp()
+    code("println(150)")
     bridge
   }
 }

@@ -59,14 +59,14 @@ object Server extends App with MySslConfiguration {
   def attemptParse(msg: String, sender: ActorRef) = {
     import org.fayalite.repl.REPL._
 
-    println("attempting parse " + msg)
+    //println("attempting parse " + msg)
     parseServer match {
       case None => connectParseServer()
       case Some(ps) =>
-        println("sending parse request")
+        //    println("sending parse request")
         Try{ps.??[TextFrame](msg, timeout=3)}.toOption match {
           case Some(response) =>
-            println("received parse response " + response)
+            //   println("received parse response " + response)
             sender ! response
           case None =>
             connectParseServer()
@@ -100,14 +100,18 @@ object Server extends App with MySslConfiguration {
         x match {
           case TextFrame(msg) =>
             val utfm = msg.utf8String
-            println("botlnck start")
+            //      println("botlnck start")
             Future{Try{Bottleneck.rx(utfm, sender())}}
-            println("botlnck end")
+          //      println("botlnck end")
           case _ =>
             println("binary frame")
         }
-        //      allSenders(sender().path.toString) = sender()
+
+        // Websockets will auto-terminate without this
+        // hack. TODO : Cleanup / remove dead-letters / empty
+        // senders
         allSenders(sender().path.toString) = sender()
+      //  allSenders(sender().path.toString) = sender()
         org.fayalite.ui.ws.Heartbeat.startHeartbeats()(allSenders)
       case Push(msg) => {
         println("Pushmsg: " + msg + " " + TextFrame(msg))
@@ -165,15 +169,15 @@ object Server extends App with MySslConfiguration {
             }
           } ~   pathPrefix("fayalite-app-dynamic") {
           get {
-            println("pathPrefix(\"fayalite-app-dynamic\") {" +
-              " " + Common.currentDir + "app-dynamic/target/scala-2.11/")
-           val r1 = unmatchedPath {
+            //          println("pathPrefix(\"fayalite-app-dynamic\") {" +
+            //            " " + Common.currentDir + "app-dynamic/target/scala-2.11/")
+            val r1 = unmatchedPath {
               path =>
-                println(path.toString() + " unmatched path")
+                //  println(path.toString() + " unmatched path")
                 val fp = Common.currentDir +
                   "app-dynamic/target/scala-2.11/fayalite-app-dynamic" +
                   path.toString()
-                  println(fp)
+                //     println(fp)
                 getFromFile(fp)
             }
             r1
@@ -184,24 +188,24 @@ object Server extends App with MySslConfiguration {
           get {
             val r1 = unmatchedPath {
               path =>
-                println(path.toString() + " unmatched path")
+                //  println(path.toString() + " unmatched path")
                 val actualPath = path.toString()
                 val pfx = actualPath.split("/").head
-                println("pfx " + pfx)
+                //     println("pfx " + pfx)
                 getFromFile(Common.currentDir + "index-fastopt.html")
-/* // TODO : Template by id.
-                val fp = Common.currentDir +
-                  s"tmp/$pfx/target/scala-2.11/fayalite-app-template" +
-                  path.toString()
-                println(fp)
-                getFromFile(fp)*/
+              /* // TODO : Template by id.
+                              val fp = Common.currentDir +
+                                s"tmp/$pfx/target/scala-2.11/fayalite-app-template" +
+                                path.toString()
+                              println(fp)
+                              getFromFile(fp)*/
             }
             r1
             /*getFromDirectory(Common.currentDir +
               "app-dynamic/target/scala-2.11/fayalite-app-dynamic")*/
           }
         }  ~ {
-          println("file: ==" + Common.currentDir + "index-fastopt.html")
+          //    println("file: ==" + Common.currentDir + "index-fastopt.html")
           getFromFile(Common.currentDir + "index-fastopt.html")
         }
       }

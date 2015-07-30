@@ -55,7 +55,7 @@ object RemoteAkkaUtils extends Logging {
     val xKB = 500
     val akkaFrameSize = xKB * 1024 * 1024
     val akkaLogLifecycleEvents = false
-    val lifecycleEvents = "on"
+    val lifecycleEvents = "off"
     val logAkkaConfig = "on"
     val akkaHeartBeatPauses = 600
     val akkaFailureDetector = 300.0
@@ -84,9 +84,9 @@ object RemoteAkkaUtils extends Logging {
       |akka.remote.netty.tcp.execution-pool-size = $akkaThreads
       |akka.actor.default-dispatcher.throughput = $akkaBatchSize
       |akka.log-config-on-start = $logAkkaConfig
-      |akka.remote.log-remote-lifecycle-events = $lifecycleEvents
-      |akka.log-dead-letters = $lifecycleEvents
-      |akka.log-dead-letters-during-shutdown = $lifecycleEvents
+      |akka.remote.log-remote-lifecycle-events = error
+      |akka.log-dead-letters = off
+      |akka.log-dead-letters-during-shutdown = off
       """.stripMargin)
 
     logInfo(s"Create actor system on port $port")

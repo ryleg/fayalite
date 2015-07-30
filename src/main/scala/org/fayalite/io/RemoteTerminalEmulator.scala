@@ -15,41 +15,47 @@ import scala.util.Random
 
 // TODO : Oh god what's going on in here.
 
-class TerminalEmulator(host: String = "localhost") {
+class RemoteTerminalEmulator(host: String = "localhost") {
   //  return new UnixTerminal(terminalInput, terminalOutput, terminalCharset)
-  val run = Var(0 -> "ls -a")
+  val run = Var(0 -> "")
 
-  def runNL(sui: (Int, String)) = run() = sui._1 -> {sui._2 + "\n"}
-  val out = Var(0 -> ("", ""))
+  def runNL(sui: (Int, String)) = run() = sui._1 -> {
+    sui._2 + "\n"
+  }
+
+  val out = Var(0 ->("", ""))
 
   val client = SshClient(host)
 
-  run.foreach { case (ridx, r) =>
-    val body = (c: SshClient) => c.exec(r)
-    client.right.foreach {
-      client =>
-        val result = {
-          try {
-            body(client)
-          }
-          catch {
-            case e: Exception ⇒ Left(e.toString)
-          }
+  Obs(run, skipInitial = true) {
+    run() match {
+      case (ridx, r) =>
+        val body = (c: SshClient) => c.exec(r)
+        client.right.foreach {
+          client =>
+            val result = {
+              try {
+                body(client)
+              }
+              catch {
+                case e: Exception ⇒ Left(e.toString)
+              }
+            }
+            result.right.foreach {
+              rr =>
+                out() = ridx -> (rr.stdOutAsString() -> rr.stdErrAsString())
+            }
         }
-        result.right.foreach {
-          rr =>
-            out() = ridx -> (rr.stdOutAsString() -> rr.stdErrAsString())
+        client.left.foreach {
+          q =>
+            println(q)
         }
     }
-      client.left.foreach{
-        q =>
-          println(q)
-      }
+    // out.foreach{println}
   }
- // out.foreach{println}
 }
 
-  object TerminalEmulator {
+  object RemoteTerminalEmulator {
 
     val wb = Var(0)
     val wba = Var(Array[Byte]())
@@ -67,6 +73,8 @@ class TerminalEmulator(host: String = "localhost") {
     }
 
     def main(args: Array[String]) {
+
+
 /*
 tmux send-keys -t <session:win.pane> '<command>' Enter
 tmux capture-pane -t <session:win.pane>
@@ -74,7 +82,7 @@ tmux show-buffer
  */
       // msgs.foreach{println}
       //  return new UnixTerminal(terminalInput, terminalOutput, terminalCharset)
-      val t = new TerminalEmulator()
+      val t = new RemoteTerminalEmulator()
       t.out.foreach{println}
       t.run() = 1 -> {
         "ssh -i keypair " +

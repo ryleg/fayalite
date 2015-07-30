@@ -10,7 +10,7 @@ import scala.util.Try
 
 object Disposable {
 
-    def send(s: String) = {
+    def send(s: String): Var[String] = {
       val socket = new WebSocket(
         "ws://localhost:8080")
       val message: Var[MessageEvent] = Var(null.asInstanceOf[MessageEvent])
