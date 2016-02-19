@@ -12,7 +12,7 @@ object Disposable {
 
     def send(s: String): Var[String] = {
       val socket = new WebSocket(
-        "ws://localhost:8080")
+        "ws://" + window.location.host)
       val message: Var[MessageEvent] = Var(null.asInstanceOf[MessageEvent])
       val parsedMessage = Var(null.asInstanceOf[Dynamic])
       val messageStr: Var[String] = Var(null.asInstanceOf[String])

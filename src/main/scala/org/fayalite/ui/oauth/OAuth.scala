@@ -3,7 +3,7 @@ package org.fayalite.ui.oauth
 import dispatch.{Http, url}
 import org.fayalite.util.JSON
 
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 
 import org.fayalite.repl.REPL._
 
@@ -11,51 +11,35 @@ import scala.util.Try
 
 object OAuth {
 
-
-
-  /*
-  {
- "issued_to": "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com",
- "audience": "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com",
- "user_id": "106775157482038906164",
- "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile",
- "expires_in": 3599,
- "email": "ryledup@gmail.com",
- "verified_email": true,
- "access_type": "online"
-}
-   */
-
   case class OAuthResponse(
-                          issued_to: String,
-                          audience: String,
+                       //   issued_to: String,
+                     //     audience: String,
                           user_id: String,
-                          scope: String,
-                          expires_in: Int,
-                          email: String,
-                          verified_email: Boolean,
-                          access_type: String
+                   //       scope: String,
+                  //        expires_in: Int,
+                          email: String
+                 //         verified_email: Boolean,
+                 //         access_type: String
                             )
 
   //def initializeOAuthDB
 
   case class OAuthInfo(accessToken: String, authResponse: OAuthResponse)
 
+  import fa._
+
   def handleAuthResponse(authResponse : String, accessToken: String) = {
     println("handleAuthResponse \n" + authResponse)
-    implicit val formats = JSON.formats
-    val response = Try{JSON.parse4s(authResponse).extract[OAuthResponse]}.printOpt
-    response.map{r => OAuthInfo(accessToken, r)}
+    OAuthInfo(accessToken, authResponse.json[OAuthResponse])
   }
 
 
-  def performGoogleOAuthRequest(access_token: String) = {
+  def performGoogleOAuthRequest(access_token: String): Future[String] = {
     println("performing oauth request with at : " + access_token )
     val myRequest = url(s"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=$access_token")
-    val request = Http(myRequest.GET);
-
+    val request = Http(myRequest.GET)
     val ret = request.map{_.getResponseBody}
-    ret.foreach{q => println("oauth response" + q)}
+    ret.onComplete{q => println("oauth response" + q)}
     ret
   }
 

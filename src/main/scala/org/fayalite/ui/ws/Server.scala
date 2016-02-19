@@ -10,6 +10,7 @@ import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{BinaryFrame, TextFrame}
 import spray.can.{Http, websocket}
 import spray.http.{DateTime, HttpCookie, HttpRequest}
+import spray.routing
 import spray.routing.HttpServiceActor
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -92,6 +93,10 @@ object Server extends App with MySslConfiguration {
   object WebSocketWorker {
     def props(serverConnection: ActorRef) = Props(classOf[WebSocketWorker], serverConnection)
   }
+  import spray.routing.directives._
+  //{ oauth.OAuth.handleAuthResponse(q, access_token)
+
+  var oauthCatch = (at: String, a: String) => ()
 
   class WebSocketWorker(val serverConnection: ActorRef) extends HttpServiceActor with websocket.WebSocketServerWorker {
     override def receive = handshaking orElse businessLogicNoUpgrade orElse closeLogic
@@ -112,7 +117,7 @@ object Server extends App with MySslConfiguration {
         // senders
         allSenders(sender().path.toString) = sender()
       //  allSenders(sender().path.toString) = sender()
-        org.fayalite.ui.ws.Heartbeat.startHeartbeats()(allSenders)
+    //    org.fayalite.ui.ws.Heartbeat.startHeartbeats()(allSenders)
       case Push(msg) => {
         println("Pushmsg: " + msg + " " + TextFrame(msg))
         send(TextFrame(msg))
@@ -147,24 +152,20 @@ object Server extends App with MySslConfiguration {
           } ~
           path("oauth_catch") {
             get {
-              //            parameters('state, 'access_token.as[String], 'token_type, 'expires_in) {
-              //              (state : String, access_token: String, token_type: String, expires_in : String) =>
-              parameters('access_token) { access_token =>
+                parameters('access_token) { access_token =>
                 import org.fayalite.Fayalite._
-                // Put these in OAuth session from parseServer, return access token set as cookie
-                val authResponse = oauth.OAuth.performGoogleOAuthRequest(access_token).getAsTry(10).printOpt
-                setCookie(
-                  HttpCookie(
-                    "access_token",
-                    access_token,
-                    expires=Some(DateTime(2020,1,1,1,1,1))
-                  )) {
-                  authResponse.map(
-                    ar => oauth.OAuth.handleAuthResponse(ar, access_token)).flatten.foreach {
-                    r => parseServer.foreach{p => p ! r }
-                  }
-                  getFromFile(Common.currentDir + "index-fastopt.html")
-                }
+          oauth.OAuth.performGoogleOAuthRequest(access_token)
+                  .onComplete{_.foreach{
+                    q =>
+                      //.getAsTry(10).printOpt
+
+
+            parseServer.foreach { p => p !
+                          oauth.OAuth.handleAuthResponse(q, access_token)
+                        }
+
+                  }}(ec)
+                  getIndex
               }
             }
           } ~   pathPrefix("fayalite-app-dynamic") {
@@ -192,7 +193,7 @@ object Server extends App with MySslConfiguration {
                 val actualPath = path.toString()
                 val pfx = actualPath.split("/").head
                 //     println("pfx " + pfx)
-                getFromFile(Common.currentDir + "index-fastopt.html")
+                getIndex
               /* // TODO : Template by id.
                               val fp = Common.currentDir +
                                 s"tmp/$pfx/target/scala-2.11/fayalite-app-template" +
@@ -206,9 +207,13 @@ object Server extends App with MySslConfiguration {
           }
         }  ~ {
           //    println("file: ==" + Common.currentDir + "index-fastopt.html")
-          getFromFile(Common.currentDir + "index-fastopt.html")
+          getIndex
         }
       }
+    }
+
+    def getIndex: routing.Route = {
+      getFromFile(Common.currentDir + "index-fastopt.html")
     }
   }
 
@@ -217,7 +222,7 @@ object Server extends App with MySslConfiguration {
 
     val server = system.actorOf(WebSocketServer.props(), "websocket")
 
-    IO(UHttp) ! Http.Bind(server, "localhost", 8080)
+    IO(UHttp) ! Http.Bind(server, "0.0.0.0", 80)
 
     readLine("Hit ENTER to exit ...\n")
     system.shutdown()

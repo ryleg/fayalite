@@ -7,8 +7,8 @@ package org.fayalite.util
 object Common {
 
   // TODO: NOT THIS. Anything but this. Should be from a UI based config in browser
-  val home = System.getProperty("user.home")
-  val SPARK_HOME = s"$home/Documents/repo/spark-dynamic/dist/"
+  val home = "/home/ubuntu/fayalite" //System.getProperty("user.home")
+  val SPARK_HOME = s"$home/fayalite/"
   val currentDir = new java.io.File(".").getCanonicalPath + "/"
 
 }

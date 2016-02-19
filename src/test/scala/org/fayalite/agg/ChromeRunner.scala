@@ -1,5 +1,6 @@
 package org.fayalite.agg
 
+import ammonite.ops.Path
 import ammonite.ops.write.append
 import org.fayalite.agg.JobFormatting._
 import org.scalatest.FlatSpec
@@ -7,13 +8,22 @@ import org.scalatest.selenium.Chrome
 import org.scalatest.selenium.WebBrowser.go
 import fa._
 
+
+class SimpleChrome(
+                    override val dir: Path,
+                    jobPages: List[String],
+                    val srcC: String
+                    ) extends ChromeRunner(srcC, 2) {
+  override def getPages = jobPages.toIterator
+}
+
+
 class ChromeRunner(
                          sourceContains: String = "job-title",
                          forcedSleep: Int = 5
                          ) extends FlatSpec with Chrome {
 
   import scalaz.Scalaz._
-  import JobBoardRunner._
 
   /**
    * Does this page contain extractable info as loaded
@@ -23,9 +33,10 @@ class ChromeRunner(
     sourceContains)
     .option {pageSource}
 
-  val dir = fullDir
+  import ammonite.ops._
+  val dir = cwd / 'secret / 'tmp
 
-  private def wd = dir / ct
+  private def wd = dir / currentTime
 
   private val pages = 1 -> 202
 

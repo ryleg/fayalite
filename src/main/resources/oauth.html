@@ -10,7 +10,7 @@
             }
 
 
-
+            document.cookie= "queryString=" + queryString
             // redirecting user to catch oauth Url which gets all the information
             window.location = 'http://' + window.location.host + '/oauth_catch?' + queryString;
             /*

@@ -1,6 +1,7 @@
 package org.fayalite.ui.app.comm
 
 import org.fayalite.ui.app.canvas.Schema
+import org.fayalite.ui.app.state.StateSync.ParseRequest
 import org.fayalite.ui.app.state.{Window, Input}
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 import rx._
@@ -14,10 +15,26 @@ object PersistentWebSocket {
 
   // val cookies = document.cookie
   // case class Register(cookies: String)
-
+ val host = org.scalajs.dom.document.location.host
   var pws = new PersistentWebSocket()
 
+  case class PRTemp(
+
+                   )
+
   def send(s: String) = pws.send(s)
+/*
+  def sendPR(pr: ParseRequest) = {
+    import upickle._
+    send(write(pr))
+  }
+*/
+
+  def getWSURI = {
+    val uri = "ws://" +
+      org.scalajs.dom.document.location.host
+    if (uri.endsWith("/")) uri.dropRight(1) else uri
+  }
 
 }
   // TODO : Switch to upickle once errors are resolved.
@@ -54,8 +71,9 @@ object PersistentWebSocket {
     id*/
 
 
+
 class PersistentWebSocket(
-                          wsUri: String = "ws://localhost:8080" //DisposableWebSocket.WS_URI
+                          wsUri: String = PersistentWebSocket.getWSURI
                            ) {
   val onOpen: Var[Event] = Var(null.asInstanceOf[Event])
   val onClose: Var[Event] = Var(null.asInstanceOf[Event])
@@ -80,13 +98,13 @@ class PersistentWebSocket(
     } else toSend = toSend :+ s
   }
 
-  val heartBeat = Input.heartBeat.foreach{
+/*  val heartBeat = Input.heartBeat.foreach{
     hb =>
       Schema.TryPrintOpt{
       //  println("heartbeat sent" + open())
         if (open()) send("heartbeat") //Window.metaData)
       }
-  }
+  }*/
 /*
   val msgPrinter = Obs(messageStr, skipInitial = true) {
     println("ws msg " + messageStr().slice(0, 100))

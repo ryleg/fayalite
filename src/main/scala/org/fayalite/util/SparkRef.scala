@@ -20,6 +20,8 @@ object SparkRef {
   var rsconf: Var[SparkConf] = _
   var rsc: Var[SparkContext] = _
 
+  var run : (String, Boolean) => String = _
+
 
   implicit val master = Var("local[*]") //"spark://ubuntu:7077" //
 
@@ -39,11 +41,13 @@ object SparkRef {
       sparkConf.setAppName("SuperMaster")
       sparkConf.set("spark.executor.memory", "512M")
       sparkConf.set("spark.driver.memory", "1G")
+      println("starting sparkcontext")
       sc = new SparkContext(sparkConf)
+      println("started sparkcontext")
       sqlContext = new SQLContext(sc)
 //      rsc() = sc
    //   rsqc() = sqlContext
-    }
+    } // bring up screen repl server single cmd run main inspect actors.
     sc
   }
 

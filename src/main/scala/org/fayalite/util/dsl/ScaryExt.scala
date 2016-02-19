@@ -1,3 +1,4 @@
+/*
 package org.fayalite.util.dsl
 
 import org.apache.spark.sql.SchemaRDD
@@ -18,8 +19,6 @@ import scala.util.Try
 trait ScaryExt {
 
   val sqlc = SparkRef.sqlContext
-
-  implicit def AnyJSON(any: Any) : String = any.json
 
   implicit class BatchSQL[T <: Product](t: Seq[T]) (implicit evct: ClassTag[T],
                                                 evtt: ru.TypeTag[T]){
@@ -84,10 +83,5 @@ trait ScaryExt {
     }
   }
 
-  implicit class SerExt(jsonSerializable: Any) {
-    def json = JSON.caseClassToJson(jsonSerializable)
-    def tryJson = Try{JSON.caseClassToJson(jsonSerializable)}
-    def j = json
-  }
-
 }
+*/

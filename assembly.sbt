@@ -17,9 +17,4 @@ assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutpu
 
 test in assembly := {}
 
-excludedJars in assembly := {
-  val cp = (fullClasspath in assembly).value
-  cp filter {_.data.getName == "spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar"}
-}
-
 run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))

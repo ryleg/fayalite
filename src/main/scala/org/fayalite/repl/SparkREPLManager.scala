@@ -1,3 +1,4 @@
+/*
 package org.fayalite.repl
 
 
@@ -21,7 +22,7 @@ import org.apache.spark.util.Utils
  */
 object SparkREPLManager {
 
-  def apply(userId: Int, singleJarSimplePath: String) = {
+  def apply(userId: Int = 0, singleJarSimplePath: String = "/home/ubuntu/zinc-0.3.7/lib/nailgun-server.jar") = {
     new BootstrapREPLManager(userId, "file://" + singleJarSimplePath)
   }
 
@@ -131,7 +132,8 @@ object SparkREPLManager {
   }
 }
 
-class SparkREPLManager(replId: Int, classPath: Option[String] = None) extends REPLManagerLike with Logging {
+class SparkREPLManager(replId: Int, classPath: Option[String] = None
+                        ) extends REPLManagerLike with Logging {
 
   val iloop = new MagicSparkILoop(Some(br), pw)
 
@@ -176,3 +178,4 @@ class SparkREPLManager(replId: Int, classPath: Option[String] = None) extends RE
   }
 
 }
+*/

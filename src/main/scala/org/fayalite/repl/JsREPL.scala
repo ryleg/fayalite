@@ -1,11 +1,12 @@
 package org.fayalite.repl
 
 import java.io.{File, OutputStream}
+import java.net.URL
 
+import ammonite.ops.ls
 import org.fayalite.io.RemoteTerminalEmulator
 import rx.ops._
 import scala.concurrent.Future
-import scala.sys.process._
 import scala.sys.process.ProcessIO
 import rx._
 
@@ -66,8 +67,9 @@ object JsREPL {
   val rs = """screen -r sbbt -p0 -X hardcopy $(tty)"""
   def readScreen() = {
     //t.run() = 0 -> rs
-    Seq("screen", "-r", "sbbt", "-p0", "-X", "hardcopy", "scrout").!!
-    Seq("tail", "-n", "500", "scrout").!!
+    //Seq("screen", "-r", "sbbt", "-p0", "-X", "hardcopy", "scrout").!!
+   // Seq("tail", "-n", "500", "scrout").!!
+    ""
   }
 
   val SBT_START = scrw(scrnNm) + """usr/local/bin/sbt'$'\012'"""
@@ -84,10 +86,12 @@ object JsREPL {
 
   val line = Var("")
 
+/*
   line.foreach{
     q =>
       println("line out from screenlog: " + q)
   }
+*/
 
   val lastClientLines = Var("")
 /*
@@ -114,16 +118,50 @@ object JsREPL {
 
     }
   }
-  initTailWatchScreenLog
+  //initTailWatchScreenLog
+
+  def inject(code: String) = {
+    scala.tools.nsc.io.File("tmpl/src/main/scala" +
+      "/Inject.scala").writeAll(
+     code // MAIN + code + MAIN_TERMINATION
+    )
+    import scala.sys.process._
+
+    val p = sys.process.Process(
+      Seq(
+        //"cd", "templ", "&",
+     //   "C:/Program Files (x86)/sbt/bin/sbt.bat",
+      "sbt",
+        "fastOptJS"),
+    new File("tmpl")
+    )
+    p.!!
+  }
+
+
   def main(args: Array[String]): Unit = {
 
+    // import ammonite.ops._
+    inject("println(\"yo\")")
+   /*
+    val pb = new ProcessBuilder(
+      "C:/Program Files (x86)/sbt/bin/sbt",
+      "x",
+      "myjar.jar",
+      "*.*",
+      "new");
+    pb.directory(new File("H:/"));
+    pb. redirectErrorStream(true);
+
+    val p = pb.start();*/
+    //  ls.!!(Path("/Users")) foreach println
     /*
     */
  //   println(SBT_INIT.!!)
 //    Thread.sleep(Long.MaxValue)
  //   writeCompile("println(1)")
 
-    println(readScreen())
+   // println(readScreen())
     //Thread.sleep(Long.MaxValue)
 /*    println(
      readScreen()

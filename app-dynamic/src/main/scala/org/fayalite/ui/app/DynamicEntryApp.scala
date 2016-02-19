@@ -1,7 +1,7 @@
 package org.fayalite.ui.app
 
 import org.fayalite.ui.app.canvas.Canvas
-import org.fayalite.ui.app.state.StateSync
+import org.fayalite.ui.app.state.{StateSync2, StateSync}
 import org.scalajs.dom
 import org.scalajs.dom._
 
@@ -21,7 +21,7 @@ object DynamicEntryApp extends JSApp {
 
   @JSExport
   def main(): Unit = {
-    StateSync.processBridge("asdf")
+    StateSync2.processBridge("asdf")
   }
 }
 

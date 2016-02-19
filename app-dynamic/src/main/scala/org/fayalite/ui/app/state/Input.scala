@@ -182,7 +182,7 @@ down arrow	40
 
   val t = Timer(100.milliseconds)
   val flashRate = Timer(650.milliseconds)
-  val heartBeat = Timer(4.seconds)
+  val heartBeat = Timer(15.seconds)
 
   Obs(t) {
     //println("timer")

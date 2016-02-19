@@ -1,9 +1,9 @@
 package org.fayalite.ui
 
 import akka.actor.{ActorRef, Actor, Props}
+import fa.SCPR.CodeUpdate
 import org.fayalite.Fayalite
 import org.fayalite.aws.ServerManager
-import org.fayalite.db.SparkDBManager
 import org.fayalite.layer.{MessageParser, FSMan}
 import org.fayalite.ui.oauth.OAuth.OAuthInfo
 import org.fayalite.ui.ws.Server.TestEval
@@ -21,13 +21,6 @@ object ParseServer {
   def main(args: Array[String]) {
     val sr = new SimpleRemoteServer({new ParseServer()} ,20000)
     Thread.sleep(Long.MaxValue)
-  }
-
-
-  def getField(msg: String, field: String) = {
-    implicit val formats = JSON.formats
-    val pj = JSON.parse4s(msg)
-    Try{(pj \\ field).extract[String]}.toOption
   }
 
   case class AWSCredentials(
@@ -50,26 +43,51 @@ object ParseServer {
     frame
   }
 
+ // import ammonite.ops._
+ // val oauthLog = cwd / 'secret / 'oauth
 
 }
+
+import fa._
 
 class ParseServer extends Actor{
   import ParseServer._
   import MessageParser._
 
+  println("PARSE ACTOR PATH : " + this.self.path)
+  val authed = List()
+  @volatile var authedTokens = Array[String]("")
+
   def receive = {
     // TODO : Remove all this, switch to case class from shared submodule
+    case o : OAuthInfo =>
+      println(o)
+      if (
+        authed.contains(o.authResponse.email) ||
+        o.authResponse.email.endsWith("")
+      ) {
+        println("authed")
+        authedTokens :+= o.accessToken
+      }
+    case cu : Array[CodeUpdate] =>
+      println("codeupdate ")
+      cu.foreach{
+        q => import ammonite.ops._ ;
+          write.over(cwd / RelPath(q.path), q.contents)
+      }
+
     case xs if xs == "reload" || xs == "init" =>
         println("load")
-        val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
+       /* val sampleJS = Source.fromFile("./app-dynamic/target/scala-2.11/fayalite-app-dynamic-fastopt.js")
           .mkString
         val msg = JSON.caseClassToJson(TestEval("eval", sampleJS))
         val frame = TextFrame(msg)
-        sender() ! frame
+        sender() ! frame*/
+/*    case o @ OAuthInfo(at, ar) =>
+      oauthLog jsa o*/
     case msg: String =>
-
-     val ret =  Try{parseBottleneck(msg, sender())}.toOption.getOrElse("bottleneck failed")
-      sender() ! TextFrame(ret)
+     val ret: Unit =  Try{parseBottleneck(msg, sender(), this)}.toOption.getOrElse("bottleneck failed")
+    //  sender() ! TextFrame(ret)
       //response.foreach{r => sender() ! TextFrame(r)}
     case TextFrame(msg) =>
       val umsg = msg.utf8String

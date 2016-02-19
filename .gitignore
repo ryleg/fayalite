@@ -5,10 +5,8 @@
 
 !.gitignore
 
-/db
 /dist
 /tmp
-/eclipse
 /lib
 /*.log
 /logs
@@ -18,35 +16,19 @@
 /project/target
 /target
 /tmp
-/test-result
-/server.pid
 /*.iml
 /*.eml
-
-
-.AppleDouble
-.LSOverride
-Icon
+*.idea
 ._*
-.Spotlight-V100
 .Trashes
+*.DS_Store
 
 *.class
 *.jar
 
-*.DS_Store
 
 data
+/data
 *.tar.gz
-
-*.idea
-*.iml
-
 binaries/
-
-#Scala / sbt
-target/
-reference.conf
-secret_keys
-
 secret/

@@ -9,7 +9,7 @@ import org.fayalite.util.RemoteAkkaUtils.RemoteActorPath
  * Try and guess which of these is being used.
  * Honestly don't know. Sorry, not gonna lie.
  */
-object REPL extends AkkaExt with CommonMonadExt with ScaryExt {
+object REPL extends AkkaExt with CommonMonadExt {
 
   trait Instruction
 

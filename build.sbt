@@ -4,23 +4,15 @@ organization := "fayalite"
 
 version := "0.0.3"
 
-lazy val sparkVersion = "1.2.1"
-
 licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
-//licenses := Seq("MIT License" -> url("https://github.com/ryleg/fayalite/blob/master/LICENSE"))
-
 scalaVersion := "2.10.4"
-
-net.virtualvoid.sbt.graph.Plugin.graphSettings
 
 resolvers ++= Seq("mvnrepository" at "http://mvnrepository.com/artifact/")
 
 resolvers ++= Seq("Rhinofly Internal Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-release-local")
 
 resolvers += Resolver.sonatypeRepo("snapshots")
-
-resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/mavenrepo"
 
 resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
@@ -58,8 +50,7 @@ libraryDependencies ++= Seq(
   "com.jcraft" % "jzlib" % "1.1.3",
   "com.decodified" %% "scala-ssh" % "0.7.0",
   "ch.qos.logback" % "logback-classic" % "1.1.2",
-  "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
- // "oncue.quiver" %% "core" % "x.x.x" withSources() withJavadoc()
+  "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc(),
+  //"com.healthmarketscience.jackcess" % "jackcess" % "2.1.2",
+  "com.github.sarxos" % "webcam-capture" % "0.3.10" withSources() withJavadoc()
 )
-
-mainClass in (Compile, run) := Some("org.fayalite.MainServer")

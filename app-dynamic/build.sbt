@@ -31,8 +31,19 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %%% "utest" % "0.3.0" % "test",
   "com.lihaoyi" %%% "scalarx" % "0.2.8" withSources() withJavadoc(),
   "com.lihaoyi" %%% "upickle" % "0.2.8" withSources() withJavadoc(),
-  "com.lihaoyi" %%% "scalatags" % "0.5.2" withSources() withJavadoc()
+  "com.lihaoyi" %%% "scalatags" % "0.5.2" withSources() withJavadoc() //,
+ // "be.doeraene" %%% "scalajs-jquery" % "0.8.0"
 )
+
+/*
+jsDependencies += "org.webjars.bower" % "moment" % "2.10.6" / "moment.js"
+
+jsDependencies += "org.webjars.bower" % "zeroclipboard" % "2.2.0" / "zeroclipboard.js"
+
+jsDependencies += "org.webjars.bower" % "handsontable" % "0.17.0" / "handsontable.js"
+*/
+
+
 
 //bootSnippet := "org.fayalite.ui.app.DynamicEntryApp().main();"
 

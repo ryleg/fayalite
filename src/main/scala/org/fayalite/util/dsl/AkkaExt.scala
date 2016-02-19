@@ -14,11 +14,15 @@ import org.fayalite.repl.REPL._
 import JSON._
 
 import scala.reflect.ClassTag
+import scala.util.Random
+
 
 /**
  * Why does Akka not have these?
  */
 trait AkkaExt {
+
+  def rport = Random.nextInt(50000) + 1500
 
   implicit val akkaTimeout = Timeout(5 seconds)
 
@@ -32,17 +36,6 @@ trait AkkaExt {
     def ??[T](msg: Any, timeout: Int=3) = {
       (actor ? msg).getAs[T](timeout)
     }
-
-    /**
-     * Listener actor receives actual data.
-     */
-      def read() : Unit = {
-      //  actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "read")))
-      }
-
-      def write(text: String) = {
-       // actor ! ByteString(JSON.caseClassToJson(REPLMessage(instruction = "write", text = text)))
-      }
 
   }
 

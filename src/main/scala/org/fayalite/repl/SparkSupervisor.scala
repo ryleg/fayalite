@@ -1,3 +1,4 @@
+/*
 package org.fayalite.repl
 
 import akka.actor.{ActorSystem, Actor, ActorRef}
@@ -84,3 +85,4 @@ class SparkSupervisor()(implicit masterIntp: Option[SparkIMain] = None) extends 
       sender ! success
     }
 }
+*/

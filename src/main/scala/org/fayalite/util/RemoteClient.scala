@@ -26,7 +26,7 @@ class RemoteClient(port: Int=rport) {
       val actorPath = s"akka.tcp://$serverActorSystemName" +
         s"@$defaultHost:$remotePort/user/" +
         s"$serverActorName"
-
+     // import akkaTimeout
       val actor = actorSystem.actorSelection(actorPath).resolveOne()
       val actorRef = actor.get
       actorRef

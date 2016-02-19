@@ -1,3 +1,4 @@
+/*
 package org.fayalite.db
 
 
@@ -41,7 +42,7 @@ class SparkDBManager[T <: Product](tableS: String)(implicit evt: ru.TypeTag[T]) 
 
   val sqlc = SparkRef.sqlContext
   import sqlc._
-  createParquetFile[T](s"$tableS.parquet").registerTempTable(tableS)
+  //createParquetFile[T](s"$tableS.parquet").registerTempTable(tableS)
   val schemaRDD = table(tableS)
   def insert(selectStatement: Seq[String]) =
     sql(s"INSERT INTO $tableS SELECT ${selectStatement.mkString(",")}")
@@ -177,13 +178,11 @@ object SparkDBManager{
 
 
     //  testTableInsert()
-/*    val rawJs = """{"accessToken":"ya29.OwG-n69XyAEPL7y2F87roQjV853ISpx4QltnyQeF_O1vKi49N9RECqzCC_5hPoHWQYLkd66OKdeTWg", "authResponse": { "issued_to": "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com", "audience": "978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com", "user_id": "106775157482038906164", "scope": "https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile", "expires_in": 3599, "email": "ryledup@gmail.com", "verified_email": true, "access_type": "online"}}{"accessToken":"ya29.PgEQFz6Ushjp5erScIQIM4VH2PhUy2X8TkqV_S7HbhB_oXGQIkRCzJ19kRLdfd6W0UgAI9TWKAa7Aw","authResponse":{"issued_to":"978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com","audience":"978142080736-jp2h3frujj891vnjh4il2ac0j59dbm11.apps.googleusercontent.com","user_id":"106775157482038906164","scope":"https://www.googleapis.com/auth/userinfo.email https://www.googleapis.com/auth/userinfo.profile","expires_in":3600,"email":"ryledup@gmail.com","verified_email":true,"access_type":"online"}}"""
     implicit val formats = JSON.formats
     val sampOAI = JSON.parse4s(rawJs).extract[OAuthInfo]
     oauthInsert(sampOAI)
     //println(sampOAI.sql.collect().toList)
  //   createParquetSchema()
-    val atk = "ya29.OwG-n69XyAEPL7y2F87roQjV853ISpx4QltnyQeF_O1vKi49N9RECqzCC_5hPoHWQYLkd66OKdeTWg"
    // println(oauthDB.collect().toList)
  //   sampOAI.insert("oauth")
  //   def getT = SparkReference.sqlContext.table("oauth")
@@ -229,4 +228,4 @@ object SparkDBManager{
       case
     }, 16190)
   }*/
-}
+}*/

@@ -1,0 +1,4 @@
+Create a separate project mimicking the normal Spark test project (mcc)
+Use this as the demonstration project for the Spark gateway project.
+
+Start by modifying spark 1.6 to update / reflect new changes.

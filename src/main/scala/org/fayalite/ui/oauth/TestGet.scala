@@ -9,8 +9,7 @@ object TestGet {
  /* implicit val formats = DefaultFormats
 
   def main(args: Array[String]) {
-val rl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ya29.uADRqOB0Ny6J1QeaRlcWrSVRMEMAWc5-3mG-Yvp_dtelyBKgWAPLAVg2B9sV7eEGLamDW3aMpiNbIQ"
-
+val rl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=
     val page = url(rl)
     val request = Http(page.GET);
     val response = Await.result(request, 10 seconds);

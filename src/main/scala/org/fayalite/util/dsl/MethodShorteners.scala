@@ -3,6 +3,8 @@ package org.fayalite.util.dsl
 import scala.collection.TraversableLike
 import scala.collection.generic.FilterMonadic
 
+// EXPERIMENTAL USE WITH CAUTION
+// YOU'VE BEEN WARNED
 trait MethodShorteners {
 
   /*
@@ -10,6 +12,51 @@ trait MethodShorteners {
     def m[Q](f: T => Q) = s map f
   }
 */
+
+  implicit class TravExt[K](kv: Traversable[K]) {
+    def gb[B](f: K => B) = kv.groupBy{f}.map{
+      case (a, bs) => bs
+    }
+    def spk(f: K => Boolean) = {
+      kv.withFilter{q => f(q)} ->
+        kv.withFilter{q => !f(q)}
+    }
+    def zig [B](f: K => B) = zi.groupBy{case (k, i) => f(k)}.map{
+      case (q,w) => q -> w.sortBy{_._2}.map{_._1}
+    }
+    def zi = kv.toSeq.zipWithIndex
+  }
+
+  implicit class ShortTravOp[K,V](kv: Traversable[(K,V)]) {
+
+    def fk[B](f: (K => Boolean)) = kv.filter{q => f(q._1)}
+    def mk[B](f: (K => B)) = kv.map{
+      case (x,y) => f(x) -> y
+    }
+    def mv[B](f: (V => B)) = kv.map{
+      case (x,y) => x -> f(y)
+    }
+    def gbk[B] = {
+      kv.groupBy(_._1).map{case (x,y) => x -> y.map{_._2}}
+    }
+    def spk(f: K => Boolean) = {
+      kv.withFilter{q => f(q._1)} ->
+        kv.withFilter{q => !f(q._1)}
+    }
+    def m1 = kv m{_._1}
+    def m2 = kv m {_._2}
+  }
+
+  implicit class MapShortTuple[K,V](kv: (K,V)) {
+    def m1 = kv._1
+    def m2 = kv._2
+    def mk[B](f: (K => B)) = kv match {
+      case (x,y) => f(x) -> y
+    }
+    def mv[B](f: (V => B)) = kv match {
+      case (x,y) => x -> f(y)
+    }
+  }
 
   implicit class TLAbbrv[+A, +Repr](t: TraversableLike[A, Repr]) {
     def fe[U](f: scala.Function1[A, U]): scala.Unit = t.foreach(f)
@@ -73,7 +120,6 @@ trait MethodShorteners {
     def tas: scala.collection.Iterator[Repr] = t tails
 
     def is: scala.collection.Iterator[Repr] = t inits
-
 
     type ite[q] = scala.collection.Iterator[q]
 
