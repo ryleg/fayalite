@@ -1,10 +1,3 @@
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 36A1D7869245C8950F966E92D8576A8BA88D21E9
-sudo sh -c "echo deb https://get.docker.com/ubuntu docker main > /etc/apt/sources.list.d/docker.list"
-sudo apt-get update && sudo apt-get install -y lxc-docker
-sudo apt-get update && sudo apt-get install -y build-essential
-
-
-
 wget http://developer.download.nvidia.com/compute/cuda/6_5/rel/installers/cuda_6.5.14_linux_64.run
 chmod +x cuda_6.5.14_linux_64.run
 mkdir nvidia_installers
@@ -74,7 +67,4 @@ sudo docker run -ti --device /dev/nvidia0:/dev/nvidia0 --device /dev/nvidiactl:/
 
  export LD_LIBRARY_PATH="/hostlib32:/hostlib:/usr/local/cuda/lib:/usr/local/cuda/lib64:/home/ubuntu/jclnx/JCuda-All-0.6.5-bin-linux-x86_64"
 
-
 java -cp /home/ubuntu/torch.jar JCublasSample
-
-java.lang.UnsatisfiedLinkError: /home/ubuntu/jclnx/JCuda-All-0.6.5-bin-linux-x86_64/libJCublas-linux-x86_64.so: libcuda.so.1: cannot open shared object file: No such file or directory

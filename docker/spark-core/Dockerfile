@@ -1,20 +1,8 @@
-FROM    ubuntu
-
-#Standard
-RUN apt-get update; ls;
-RUN apt-get install -y --fix-missing python-software-properties python-dev \
-software-properties-common \
-vim sudo git gcc g++ build-essential \
-postfix wget unzip redis-server nano tmux \
-psmisc curl net-tools vim-tiny sudo openssh-server ;
-
-RUN apt-get install -y openjdk-7-jre
+FROM    fayalite:base
 
 
-RUN apt-get install -y python-setuptools ssh; easy_install pip
-
-
-RUN mkdir -p /root/spark-provision; mkdir -p /root/spark  mkdir -p /root/persistent-hdfs
+RUN mkdir -p /root/spark-provision; \
+ mkdir -p /root/spark  mkdir -p /root/persistent-hdfs
 WORKDIR /root/spark-provision
 
 RUN wget http://s3.amazonaws.com/spark-related-packages/hadoop-1.0.4.tar.gz
@@ -63,18 +51,7 @@ RUN export NAMENODE_DIR="/mnt/ephemeral-hdfs/dfs/name" ; \
 export JAVA_HOME="/usr/lib/jvm/java-7-openjdk-amd64" ; \
 /root/ephemeral-hdfs/bin/hadoop namenode -format
 
-#ADD secret_info/worker /root/.ssh/id_rsa
-ADD secret_keys/worker.pub /root/.ssh/worker.pub
-#ADD secret_info/worker.pub /root/.ssh/authorized_keys
-
-#chmod 400 /root/.ssh/worker; \
-#
-
-
-RUN cat /root/.ssh/worker.pub >> /root/.ssh/authorized_keys
-
 ADD extra_environment /etc/extra_environment
-#RUN cat /etc/extra_environment >> /etc/environment
 
 RUN cat /etc/extra_environment >> /root/.bashrc
 
@@ -84,17 +61,11 @@ ADD init.sh /root/init.sh
 RUN chmod +x /root/init.sh
 
 
-
-ADD wrap_sparkshell.py /root/wrap_sparkshell.py
-
 RUN echo 'source /root/init.sh; source /root/.bashrc' >> /etc/init.d/rc.local
-
 
 RUN ls; \
 mkdir -p /mnt/ephemeral-hdfs/logs ; \
-mkdir -p /mnt/hadoop-logs
-
-RUN git clone https://github.com/ooyala/spark-jobserver.git ; \
+mkdir -p /mnt/hadoop-logs ; \
 mkdir -p /root/mapreduce
 
 ADD mapreduce/conf /root/mapreduce/conf
@@ -107,37 +78,4 @@ echo '127.0.0.1' > /root/spark-ec2/cluster-url
 
 WORKDIR /root/
 
-#NEED HADOOP USER FOR CDH4 hadoop:x:500:501::/home/hadoop:/bin/bash
-
-
-
 EXPOSE 8080 4040 22 80 8081 10999 22221 9000
-#docker run -P -i --net="host" -t spark /bin/bash
-#boot2docker ssh -L 10999:localhost:10999 -L 22:localhost:22221 -L 8080:localhost:8080 -L 4040:localhost:4040 'cd fayalite/spocker; docker kill $(docker ps -a -q); docker rm $(docker ps -a -q); docker run -P -i --net="host" -t spark /bin/bash'
-# docker run --net="host" -p 22:22 10999:10999 -t spark
-# docker kill $(docker ps -a -q); docker rm $(docker ps -a -q); docker build -t spark .
-# NOTE: Remove all rrds which might be around from an earlier run
-#rm -rf /var/lib/ganglia/rrds/*
-#rm -rf /mnt/ganglia/rrds/*
-
-# Symlink /var/lib/ganglia/rrds to /mnt/ganglia/rrds
-#RUN rmdir /var/lib/ganglia/rrds; \
-#ln -s /mnt/ganglia/rrds /var/lib/ganglia/rrds
-# Make sure rrd storage directory has right permissions
-#mkdir -p /mnt/ganglia/rrds
-#chown -R nobody:nobody /mnt/ganglia/rrds
-
-# Install ganglia
-# TODO: Remove this once the AMI has ganglia by default
-
-#RUN apt-get install ganglia ganglia-web ganglia-gmond ganglia-gmetad
-#echo "export HDFS_URL=$HDFS_URL" >> ~/.bash_profile
-#$EPHEMERAL_HDFS/sbin/start-dfs.sh
-#$EPHEMERAL_HDFS/bin/start-dfs.sh
-#C:\\Users\\ryle\\Downloads\\pscp.exe -r -agent root@ec2-50-17-120-247.compute-1.amazonaws.com:/root/hadoop-native .
-
-#SWAP!
-#  dd if=/dev/zero of=/mnt/swap bs=1M count=$SWAP_MB
-#   mkswap /mnt/swap
-#   swapon /mnt/swap
-#   echo "Added $SWAP_M MBB swap file /mnt/swap"
