@@ -222,10 +222,9 @@ object SparkDBManager{
 */
   //  println(sqlc.table("oauth"))
 
-  }
+  
     /*
     Deploy({
       case
     }, 16190)
   }*/
-}*/

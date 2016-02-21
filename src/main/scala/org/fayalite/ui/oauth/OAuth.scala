@@ -30,7 +30,7 @@ object OAuth {
 
   def handleAuthResponse(authResponse : String, accessToken: String) = {
     println("handleAuthResponse \n" + authResponse)
-    OAuthInfo(accessToken, authResponse.json[OAuthResponse])
+    OAuthInfo(accessToken, OAuthResponse("", ""))// authResponse.json[OAuthResponse])
   }
 
 

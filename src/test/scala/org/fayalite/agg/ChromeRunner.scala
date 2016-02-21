@@ -2,7 +2,7 @@ package org.fayalite.agg
 
 import ammonite.ops.Path
 import ammonite.ops.write.append
-import org.fayalite.agg.JobFormatting._
+import org.fayalite.agg.ChromeRunner.Extr
 import org.scalatest.FlatSpec
 import org.scalatest.selenium.Chrome
 import org.scalatest.selenium.WebBrowser.go
@@ -18,6 +18,10 @@ class SimpleChrome(
 }
 
 
+object ChromeRunner {
+  case class Extr(page: String, extr: Option[String])
+}
+
 class ChromeRunner(
                          sourceContains: String = "job-title",
                          forcedSleep: Int = 5
@@ -27,6 +31,7 @@ class ChromeRunner(
 
   /**
    * Does this page contain extractable info as loaded
+ *
    * @return : Option[PageHTMLSource]
    */
   private def extractCondition: Option[String] = pageSource.contains(
@@ -66,12 +71,13 @@ class ChromeRunner(
 
   /**
    * Operation specific page load
+ *
    * @param i: Offset into scroll on index
    * @return : Page extraction to convenient serializable
    *         representation
    */
   protected def run(i: Int) : String = {
-    val p = byPage(i)
+    val p = "" //byPage(i)
     go to p
     //implicitlyWait(Span(15, Seconds)) // Weaker guarantee of waiting
     Thread.sleep(5000) // Stronger guarantee of waiting, safer

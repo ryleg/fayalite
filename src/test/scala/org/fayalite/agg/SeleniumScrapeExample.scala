@@ -1,5 +1,8 @@
 package org.fayalite.agg
 
+import org.fayalite.agg.ChromeRunner.Extr
+import org.jsoup.nodes.Document
+
 import scala.collection.JavaConversions
 import scala.util.{Success, Failure, Try}
 
@@ -14,9 +17,9 @@ import fa._
  *
  */
 
-import JobFormatting._
 
 object SeleniumScrapeExample {
+  case class ParsedExtr(url: String, soup: Document)
 
   import fa._
   def readExtrParse[T](path: Path, parser: ParsedExtr => Traversable[T]

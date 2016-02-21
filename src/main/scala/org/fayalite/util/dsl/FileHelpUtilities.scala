@@ -1,8 +1,8 @@
-package fa
+package org.fayalite.util.dsl
 
 import java.io.File
 
-import ammonite.ops.{write, Path, read}
+import ammonite.ops.{Path, read, write}
 import com.github.tototoshi.csv.CSVWriter
 import org.fayalite.layer.MessageParser
 import org.fayalite.util.JSON
@@ -28,7 +28,19 @@ trait FileHelpUtilities {
 
   type KVC = Map[String, Array[String]]
 
+  implicit class ap(f: String)  {
+    def app(cnt: String) = scala.tools.nsc.io.File(
+      f)
+      .appendAll(cnt + "\n")
+  }
 
+  def loadCSV(cv: String) = {
+    import com.github.tototoshi.csv.CSVReader
+    val c = CSVReader.open(new File(cv))
+    val a = c.all
+    c.close()
+    a
+  }
 
   implicit class DirtyCSVOps[T](
                                  asmap: List[Map[String, String]]
@@ -55,7 +67,6 @@ trait FileHelpUtilities {
   }
 
   implicit class LocalIOHelp(p: Path) {
-    import org.json4s.Extraction
 
     def lsr = {
       import ammonite.ops._
@@ -66,7 +77,7 @@ trait FileHelpUtilities {
     }.toIterable
 
     def jsa(j: Any) = {
-      write.append(p, j.json + "\n")
+     // write.append(p, j.json + "\n")
     }
 
 
@@ -82,13 +93,12 @@ trait FileHelpUtilities {
     def jsonRec[T]()(implicit m: Manifest[T]) = {
       textRec.map { q =>
         import JSON._
-        import org.json4s.jackson.JsonMethods._
-        import org.json4s.{DefaultFormats, Extraction, _}
+        import org.json4s._
         JSON.parse4s(q).extract[T]
       }
     }
     def jser(a: List[Any]) = {
-      write(p, a.map{_.json}.mkString("\n"))
+   //   write(p, a.map{_.json}.mkString("\n"))
     }
   }
 

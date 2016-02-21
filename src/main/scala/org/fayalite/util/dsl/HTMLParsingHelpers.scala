@@ -1,4 +1,4 @@
-package fa
+package org.fayalite.util.dsl
 
 import org.fayalite.util.JSON
 import org.jsoup.Jsoup

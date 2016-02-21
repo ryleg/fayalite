@@ -1,4 +1,4 @@
-package fa
+package org.fayalite.util.dsl
 
 import org.fayalite.util.JSON
 import org.json4s.Extraction
@@ -42,7 +42,7 @@ trait JSONLikeHelpers {
 
   implicit class CaseJsonCSVCol(jl: List[Any]) {
     def csv(path: String) = {
-      jl.map{_.toKV}.save(path)
+     // jl.map{_.toKV}.save(path)
     }
   }
 

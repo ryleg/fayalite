@@ -13,8 +13,22 @@ import rx._
 
 import scala.util.{Try, Failure, Success}
 
+
+/**
+  * Our basic mathematical symbol support grid, this
+  * is intended for drawing any unicode symbol to
+  * and providing a basis for zooming in and out
+  *
+  * Attached to this grid are characters and words
+  * with associated programmatic objects (ideally)
+  */
 object Grid {
 
+  /**
+    * You really shouldn't need more than a single grid instantiation,
+    * but in case you do here you go.
+    * @return : A new grid class
+    */
   def apply() = new Grid()
 
   // doesnt seem to work?

@@ -54,6 +54,7 @@ object Yahoo {
 
   case class Price(ask: Double, bid: Double)
 
+
   def getPolls: Iterator[Poll] = {
     asLines(yahooFinanceExamplePull)
       .withFilter(q => q != "null" && q.stripLineEnd.nonEmpty) // junk from aggregation

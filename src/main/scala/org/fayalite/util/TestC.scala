@@ -6,34 +6,35 @@ import javax.swing.JFrame
 
 import com.github.sarxos.webcam.Webcam
 
+import scala.concurrent.Future
+
 
 /**
-  * Creates a fullscreen window with a workaround
-  * to not minimize to the background, flickers a
-  * little on context change but whatever, beats alternative
-  * @param windowId: String of 0,1,2 etc. corresponding to monitor id
+  * Same as regular frame but with irritating
+  * init methods wrapped up and a fix for being
+  * able to draw directly to the buffer and
+  * interface with it directly through a functional
+  * process loop
+ *
+  * @param name : Your tag for the window
   */
-class FullScreenFrame(windowId: String) extends JFrame("") {
-  override def processWindowEvent (we: WindowEvent): Unit = {
-    setExtendedState (getExtendedState | Frame.MAXIMIZED_BOTH)
-  }
-  var graphicsDevice: GraphicsDevice = null
+class FFrame(name: String = "fayalite") extends JFrame(name) {
 
+  /**
+    * Does the gross stuff to get you a frame
+    */
   def init() = {
-    setExtendedState(getExtendedState)
     setBackground(Color.BLACK)
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    setAlwaysOnTop(true)
-    setUndecorated(true)
     setEnabled(true)
     pack()
     setVisible(true)
-    GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices.foreach {
-      case q if q.getIDstring.contains(windowId) => q.setFullScreenWindow(this)
-        graphicsDevice = q
-      case _ =>
-    }
   }
+
+  /**
+    * Required for direct draws to buffer in func loop below
+    * @return : Guaranteed buffer strategy
+    */
   override def getBufferStrategy = {
     val bs = super.getBufferStrategy
     if (bs == null) {
@@ -44,15 +45,69 @@ class FullScreenFrame(windowId: String) extends JFrame("") {
 
   def graphics = getBufferStrategy.getDrawGraphics
 
+  import fa._
+
+  /**
+    * Event process loop for drawing
+    * @param proc : Single graphics object available for
+    *             drawing onto
+    * @return : Future of draw loop for exception handling
+    */
+  def start(proc: (Graphics => Unit)) = F {
+    while(true) {
+      val bs = getBufferStrategy
+      val g = bs.getDrawGraphics
+      proc(g)
+      g.dispose(); bs.show()
+    }
+  }
+
+}
+
+/**
+  * Creates a fullscreen window with a workaround
+  * to not minimize to the background, flickers a
+  * little on context change but whatever, beats alternative
+  *
+  * @param windowId: String of 0,1,2 etc. corresponding to monitor id
+  */
+class FullScreenFrame(windowId: String) extends FFrame(
+  name = windowId
+) {
+  override def processWindowEvent (we: WindowEvent): Unit = {
+    setExtendedState (getExtendedState | Frame.MAXIMIZED_BOTH)
+  }
+
+  var graphicsDevice: GraphicsDevice = null
+
+  override def init() = {
+    setExtendedState(getExtendedState)
+    setAlwaysOnTop(true)
+    setUndecorated(true)
+    super.init()
+    GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices.foreach {
+      case q if q.getIDstring.contains(windowId) => q.setFullScreenWindow(this)
+        graphicsDevice = q
+      case _ =>
+    }
+  }
+
 }
 
 
+
 object TestC {
+/*
 
   val webcam = Webcam.getDefault()
   webcam.open()
+*/
 
   def main(args: Array[String]) {
+
+    val f = new FFrame()
+
+    f.init()
 
     }/*
 

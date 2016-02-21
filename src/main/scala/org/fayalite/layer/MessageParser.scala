@@ -126,7 +126,7 @@ object MessageParser {
   def parseBottleneck(msg: String, ref: ActorRef, ps: ParseServer) = {
 
   //  println("parse bottlenck " + msg)
-    val pr = Try{msg.json[ParseRequest]}.toOption
+    val pr: Option[ParseRequest] = None //Try{msg.json[ParseRequest]}.toOption
 
     var metadataret = ""
 
@@ -247,6 +247,6 @@ object MessageParser {
 
   )) else ParseResponseDebug(Array())
     //if (isAuthed)    println("sending response" + res.json)
-    ref ! TextFrame(res.json)
+   // ref ! TextFrame(res.json)
   }
 }

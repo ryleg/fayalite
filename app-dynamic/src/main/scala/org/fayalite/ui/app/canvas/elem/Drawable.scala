@@ -8,8 +8,24 @@ import PositionHelpers._
 
 import scala.util.Try
 
+/**
+  * Contains static references for any
+  * usable metadata related to drawing anywhere
+  * Either Canvas or otherwise
+  */
 object Drawable {
 
+  /**
+    * This is used because the canvas
+    * engine requires setting flags in advance of draw
+    * calls, these are the typical modified GUI
+    * declarations required most commonly, feel
+    * free to add on additional specifications
+    * @param font: A string as expected in CSS
+    * @param fillStyle : Hex prefixed color code
+    * @param globalAlpha : Zero to one float value
+    *                    as in png for draw call
+    */
   case class CanvasStyling(
                           font: String = "14pt monospace",
                           fillStyle: String =  "#A9B7C6",
@@ -20,16 +36,41 @@ object Drawable {
 
 import rx.ops._
 
+/**
+  * Something that is gonna get drawn to
+  * a screen somewhere and has some universal
+  * values on how that occurs
+  */
 trait Drawable {
 
+  /**
+    * Completely remove this object
+    * from wherever it is being seen
+    */
   def clear(): Unit
 
+  /**
+    * Draw this object where it belongs
+    * according to some other definition
+    */
   def draw() : Unit
+
+  /**
+    * The behind the scenes draw that ensures
+    * style has been applied, kind of a hack
+    * and not performant.
+    */
   def drawActual(): Unit = style{draw()}
+
+  /**
+    * Basically an alias for not having to clear
+    * every call.
+    */
   def redraw() : Unit = { clear() ; drawActual() }
+
+  // UNTESTED
   def off = visible() = false
   def on = visible() = true
-
   val visible : Var[Boolean] = Var{true}
 
   Obs(visible, skipInitial = true) {

@@ -1,4 +1,4 @@
-package fa
+package org.fayalite.util.dsl
 
 import org.fayalite.layer.Schema.FixedName
 
@@ -39,7 +39,7 @@ trait StringFormatHelpers {
     * Java/Unicode normalizer so we have to replace them ourselves.
     */
 
-  import java.text.Normalizer.{ normalize ⇒ jnormalize, _ }
+  import java.text.Normalizer.{normalize => jnormalize, _}
 
   //object NormalizeSupport extends NormalizeSupport
 
@@ -78,7 +78,7 @@ trait StringFormatHelpers {
 
   def fix(q: String) = {
     val normalized = {
-      import java.text.Normalizer.{ normalize ⇒ jnormalize, _ }
+      import java.text.Normalizer.{normalize => jnormalize, _}
       jnormalize(q, Form.NFD).replaceAll(
         "[\\p{InCombiningDiacriticalMarks}\\p{IsM}\\p{IsLm}\\p{IsSk}]+", "")
     }

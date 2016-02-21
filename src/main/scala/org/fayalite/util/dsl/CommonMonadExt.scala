@@ -16,7 +16,9 @@ import scala.util.{Success, Failure, Try}
 trait CommonMonadExt {
 
 
-    implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
+
+  def F[T](f: => T) = Future(f)
 
   def getFuture[T](fut: Future[T], timeout: Int = 10) = Await.result(fut, timeout.seconds)
 

@@ -1,3 +1,4 @@
+/*
 package org.fayalite.util.windows
 
 import scala.sys.process._
@@ -16,4 +17,4 @@ object PuttyExec {
   def main(args: Array[String]) {
     new PuttyExec().run("ls")
   }
-}
+}*/
