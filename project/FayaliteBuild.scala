@@ -83,4 +83,12 @@ object FayaliteBuild extends sbt.Build {
           "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
         )
   )
+
+  lazy val sjs = Project(
+    id = "sjs",
+    base = file("./sjs")
+  )
+
+  mainClass in (Compile, run) := Some("org.fayalite.sjs.App")
+
 }

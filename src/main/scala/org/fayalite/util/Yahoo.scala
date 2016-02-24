@@ -103,10 +103,10 @@ object Yahoo {
     val t: Req = r.GET
     val svc = r
     val country = Http(svc OK as.String)
-    println("doing request " + u)
+  //  println("doing request " + u)
     country.map{
       c =>
-        println("processing response ")
+       // println("processing response ")
         val pp = c.json[Response].query.results.quote.toList.map{
           case ba @ BA(b, a) =>
             val res = formatNumber(a).flatMap{aa =>

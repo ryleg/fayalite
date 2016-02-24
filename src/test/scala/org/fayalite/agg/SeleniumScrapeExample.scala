@@ -30,10 +30,17 @@ object SeleniumScrapeExample {
   }.toList.flatten
 
 
+  def indeedRemoteJobsUrl(page: Int) = {
+    "http://www.indeed.com/jobs?q=&l=Remote&start=" + page*10
+  }
+
+
   def main(args: Array[String]) {
 
     println("main")
   }
+
+
     def tes = {
    new SimpleChrome(
           cwd / 'secret / 'thelocal / 'run,

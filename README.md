@@ -1,16 +1,18 @@
+Some tests and scripts related to spark and REPL interactions.
 
-#Status
-@EXPERIMENTAL - unfinished, partially documented. Primary tests /
-demonstrations include deployment of a multi-ClassLoader Spark cluster
+There's an example of a multi-ClassLoader Spark cluster
 implemented by modifying all serializers to accept a threadLocalProperty
 defining which ClassLoader to use (see http://github.com/ryleg/spark-dynamic 
-for the fork of Spark that allows for this
-Eventually this will be implemented for all Spark versions using 
-macros/reflection to inject Executor.scala changes into the 
-cluster on a live JVM). An incremental step would be package overrides in this
-repo re-implementing the Spark Executor / SparkContext / JVM Deployment 
-with modified serializers, but that may as well be a fork of Spark due to 
-versioning / MergeStrategy / packaging issues.
+for the fork of Spark that allows for this.
+
+It's available as a jar which you need to include in /lib to compile
+https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
+
+Or build it yourself using the spark assembly process from the cloned
+1.2 branch of spark-dynamic. It's possible to implement the changes
+using org.apache.spark packages in this project, but there are too
+many files to copy over for it to be reasonable.
+
 
 Additional tests include ActorSystem wrappers to make connecting to a remote
 Spark ActorSystem easy (Spark does not package the standard Akka
@@ -40,7 +42,6 @@ client engine tested (inspired by Haoyi Li's workbench) from remote ActorSystem
 
 Run install.sh which will grab a dynamic version of Spark
 with multi-user/multi-classloader cluster patches from 
-https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
 and put it in your /lib folder.
 
 Add aliases as below to run components separately.

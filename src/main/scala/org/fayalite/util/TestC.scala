@@ -1,11 +1,15 @@
 package org.fayalite.util
 
-import java.awt.event.WindowEvent
+import java.awt.event.{KeyEvent, KeyListener, WindowEvent}
 import java.awt._
+import java.awt.image.BufferedImage
+import java.io.File
+import javax.imageio.ImageIO
 import javax.swing.JFrame
 
 import com.github.sarxos.webcam.Webcam
 
+import scala.collection.mutable
 import scala.concurrent.Future
 
 
@@ -15,7 +19,7 @@ import scala.concurrent.Future
   * able to draw directly to the buffer and
   * interface with it directly through a functional
   * process loop
- *
+  *
   * @param name : Your tag for the window
   */
 class FFrame(name: String = "fayalite") extends JFrame(name) {
@@ -26,6 +30,7 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
   def init() = {
     setBackground(Color.BLACK)
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    setPreferredSize(new Dimension(800, 600))
     setEnabled(true)
     pack()
     setVisible(true)
@@ -33,6 +38,7 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
 
   /**
     * Required for direct draws to buffer in func loop below
+    *
     * @return : Guaranteed buffer strategy
     */
   override def getBufferStrategy = {
@@ -47,17 +53,39 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
 
   import fa._
 
+  //Single graphics object available for
+  //             drawing onto
+  var draw: (Graphics => Unit) = (g: Graphics) => {
+    g.setColor(Color.black)
+    g.drawRect(0, 0, 800, 600)
+    g.setColor(Color.white)
+  }
+
+
+  /**
+    * Accumulate functions to execute in draw
+    * order beginning with original instantiation
+    * @param d : Draw func to add
+    */
+  def update(d: (Graphics => Unit)) = {
+    val oldDraw = draw
+    val newDraw = (g: Graphics) => {
+      oldDraw(g)
+      d(g)
+    }
+    draw = newDraw
+  }
+
   /**
     * Event process loop for drawing
-    * @param proc : Single graphics object available for
-    *             drawing onto
+    *
     * @return : Future of draw loop for exception handling
     */
-  def start(proc: (Graphics => Unit)) = F {
+  def start() = F {
     while(true) {
       val bs = getBufferStrategy
       val g = bs.getDrawGraphics
-      proc(g)
+      draw(g)
       g.dispose(); bs.show()
     }
   }
@@ -94,22 +122,68 @@ class FullScreenFrame(windowId: String) extends FFrame(
 
 }
 
+class CharMem() {
 
+  val h = new mutable.HashMap[String, BufferedImage]()
+
+  def get(s: String) = {
+    h.getOrElseUpdate(s, {
+      val b = new BufferedImage(25, 29, BufferedImage.TYPE_INT_ARGB)
+      val bg = b.createGraphics()
+      bg.setBackground(Color.BLACK)
+      bg.setColor(Color.WHITE)
+      bg.setFont(new Font("TimesRoman", Font.PLAIN, 27))
+      bg.drawString(s, 1, 23)
+      b
+    })
+  }
+
+  val b = get("&")
+  val outputfile = new File("image.jpg")
+  ImageIO.write(b, "jpg", outputfile)
+
+}
 
 object TestC {
-/*
+  /*
 
-  val webcam = Webcam.getDefault()
-  webcam.open()
-*/
+    val webcam = Webcam.getDefault()
+    webcam.open()
+  */
 
-  def main(args: Array[String]) {
+  import rx._
+  import rx.ops._
+
+
+  class FrameInit {
+
+    val cm = new CharMem()
 
     val f = new FFrame()
 
-    f.init()
+    class Listen extends KeyListener {
+      override def keyTyped(e: KeyEvent): Unit = {}
 
-    }/*
+      override def keyPressed(e: KeyEvent): Unit = {
+        val img = cm.get(e.getKeyChar.toString)
+        f.draw
+      }
+
+      override def keyReleased(e: KeyEvent): Unit = {}
+    }
+
+    val l = new Listen()
+    f.addKeyListener(l)
+    f.init()
+    f.start()
+  }
+
+  def main(args: Array[String]) {
+
+    val f = new FrameInit()
+
+
+  }/*
 
     val frame = new
 

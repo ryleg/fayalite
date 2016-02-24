@@ -17,7 +17,6 @@ object MainServer {
    * @param args: Unused
    */
   def main(args: Array[String]) {
-
     Future{ParseServer.main(args)}
     Server.main(args)
   }

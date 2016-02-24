@@ -23,6 +23,7 @@ object ChromeRunner {
 }
 
 class ChromeRunner(
+                  outputFile: String,
                          sourceContains: String = "job-title",
                          forcedSleep: Int = 5
                          ) extends FlatSpec with Chrome {
@@ -37,9 +38,6 @@ class ChromeRunner(
   private def extractCondition: Option[String] = pageSource.contains(
     sourceContains)
     .option {pageSource}
-
-  import ammonite.ops._
-  val dir = cwd / 'secret / 'tmp
 
   private def wd = dir / currentTime
 
