@@ -41,13 +41,13 @@ object SeleniumScrapeExample {
   }
 
 
-    def tes = {
+   /* def tes = {
    new SimpleChrome(
           cwd / 'secret / 'thelocal / 'run,
           (1 to 22).toList.map{i =>
             "http://www.thelocal.se/jobs/?job_keyword=&job_category=engineer&job_category=it&page=" +
-              i.toString},
-        "a"
+              i.toString}
+   //     "a"
         ).runBlocking()
     def parse(parsedExtr: ParsedExtr) = parsedExtr match {
       case ParsedExtr(url, q) =>
@@ -63,11 +63,11 @@ object SeleniumScrapeExample {
                 j.fsel("div.jicompany").text.split("\\|")).toMap
         }
     }
-
+*/
    /* readExtrParse(cwd / 'secret / 'thelocal / 'run, parse)
       .dedupe(getUniqueExistingCompanyNamesSanitized)
       .save((cwd / 'secret / 'thelocal / RelPath("new.csv")).toString())
 */
-  }
+
 }
 

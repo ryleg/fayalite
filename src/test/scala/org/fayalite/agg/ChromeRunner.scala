@@ -10,7 +10,6 @@ import fa._
 
 
 class SimpleChrome(
-                    override val dir: Path,
                     jobPages: List[String],
                     val srcC: String
                     ) extends ChromeRunner(srcC, 2) {
@@ -39,7 +38,7 @@ class ChromeRunner(
     sourceContains)
     .option {pageSource}
 
-  private def wd = dir / currentTime
+  private def wd = outputFile //dir / currentTime
 
   private val pages = 1 -> 202
 
@@ -61,9 +60,7 @@ class ChromeRunner(
     getPages.foreach { q =>
       println("running page num: " + x + " out of " + getPages.size + " " + q)
       x += 1
-      append(
-        wdd,
-        onePageRun(q)  + "\n")
+      wd app onePageRun(q)
     }
   }
 
@@ -93,11 +90,9 @@ class ChromeRunner(
       /**
        * Export to file current batch on completion
        */
-      append(
-        wd0,
-        run(q) + "\n"
-      )
-    }
+      wd app run(q)}
+
+
   }
 }
 

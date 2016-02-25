@@ -102,10 +102,22 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
 class FullScreenFrame(windowId: String) extends FFrame(
   name = windowId
 ) {
+  /**
+    * This causes a little flicker on context
+    * switching but it restores the max state, otherwise
+    * the window will just dissapear.
+    * @param we : Some window event, like the user clicked on a different
+    *           monitor.
+    */
   override def processWindowEvent (we: WindowEvent): Unit = {
     setExtendedState (getExtendedState | Frame.MAXIMIZED_BOTH)
   }
 
+  /**
+    * This is for assigning the monitor on discovery
+    * in case you ever need to use the reference
+    * to the monitor device for grabbing info about it.
+    */
   var graphicsDevice: GraphicsDevice = null
 
   override def init() = {
@@ -114,18 +126,40 @@ class FullScreenFrame(windowId: String) extends FFrame(
     setUndecorated(true)
     super.init()
     GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices.foreach {
-      case q if q.getIDstring.contains(windowId) => q.setFullScreenWindow(this)
-        graphicsDevice = q
-      case _ =>
+      case q if q.getIDstring.contains(windowId) =>
+        q.setFullScreenWindow(this) // This triggers fullscreen
+        graphicsDevice = q // for grabbing window info.
+      case _ => // Assign errors through overrides if requested.
     }
   }
 
 }
 
+/**
+  * Drawing characters excessively through the
+  * drawString function wastes memory and is irritating
+  * to manage.
+  *
+  * Instead we intead to route all chracter buffering
+  * through either BufferedImage hashes or VolatileImage
+  * stateless draws.
+  *
+  */
 class CharMem() {
 
+  // For storing prerendered characters and/or unicode-like
+  // strings, basically anything that would go through drawString
+  // and needs buffering/mapping in some capacity
   val h = new mutable.HashMap[String, BufferedImage]()
 
+  /**
+    * Grab the chosen unicode-like string for the Graphics2d
+    * drawString call.
+    * @param s : Some string, typically a single character that will
+    *          fit inside the typical draw window.
+    *          Override / edit to get
+    * @return : Small tile containing your draw
+    */
   def get(s: String) = {
     h.getOrElseUpdate(s, {
       val b = new BufferedImage(25, 29, BufferedImage.TYPE_INT_ARGB)
@@ -138,22 +172,27 @@ class CharMem() {
     })
   }
 
-  val b = get("&")
-  val outputfile = new File("image.jpg")
-  ImageIO.write(b, "jpg", outputfile)
+  /**
+    * Save a tile to a file for viewing or other usage.
+    * @param s : String, see get for doc
+    * @param f : String
+    * @return
+    */
+  def exportTile(s: String, f: String) = {
+    val b = get(s)
+    val q = new File(f)
+    ImageIO.write(b, "jpg", q)
+  }
 
 }
 
-object TestC {
-  /*
+import fa._
 
-    val webcam = Webcam.getDefault()
-    webcam.open()
+
+/**
+  * Frame management for Swing
   */
-
-  import rx._
-  import rx.ops._
-
+object SwingManage {
 
   class FrameInit {
 
@@ -166,7 +205,9 @@ object TestC {
 
       override def keyPressed(e: KeyEvent): Unit = {
         val img = cm.get(e.getKeyChar.toString)
-        f.draw
+        f.update((d: Graphics) => {
+          img.draw(d, 50, 50)
+        })
       }
 
       override def keyReleased(e: KeyEvent): Unit = {}

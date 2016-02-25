@@ -1,43 +1,51 @@
 package org.fayalite.aws
 
-import AWS._
-
-import java.util
-
-import com.amazonaws.ClientConfiguration
-import com.amazonaws.internal.StaticCredentialsProvider
-import com.amazonaws.regions.{Region, ServiceAbbreviations, Regions}
-import com.amazonaws.services.ec2.AmazonEC2Client
-import com.amazonaws.services.ec2.model.{Tag, LaunchSpecification, RequestSpotInstancesRequest, RunInstancesRequest}
+import com.amazonaws.services.ec2.model.Tag
+import org.fayalite.aws.AWS._
 
 import scala.collection.JavaConversions._
-import com.amazonaws.auth.{EnvironmentVariableCredentialsProvider, DefaultAWSCredentialsProviderChain}
-import com.amazonaws.auth.profile.ProfileCredentialsProvider
-import com.amazonaws.services.s3.AmazonS3Client
-import com.amazonaws.auth._
-
-import scala.io.Source
-import scala.util.Try
 
 
 /**
- * This doesn't really live up to it's name.
+ * Convenience methods for AWS
  */
 object ServerManager {
 
   case class ServerStatus()
 
+  /**
+    * Prints out some standard stuff, mostly
+    * for establishing cnnection and authentication.
+    * @return : Names of active ec2 machines.
+    */
   def requestServerInfo() = {
     val inst = ec2.describeInstances()
     val names = inst.getReservations.flatMap{
       _.getInstances.flatMap {
         i =>
           // println(i.getLaunchTime)
-          i.getTags.collectFirst { case t: Tag if t.getKey == "Name" => t.getValue}
+          i.getTags.collectFirst { case t: Tag if t.getKey == "Name" =>
+            t.getValue
+          }
       }
     }.toList
     println("getServerInfo names: " + names)
     names.mkString(",")
+  }
+
+  def getInstances = {
+    ec2.describeInstances().getReservations.flatMap{_.getInstances}
+  }
+
+  /**
+    * Return every instance containing a tag exactly matching
+    * supplied parameter
+    * @param t : Tag of instance by name or value.
+    * @return matching instances
+    */
+  def getByTag(t: String) = {
+    getInstances.withFilter({_.getTags.exists(z =>
+      z.getKey == t || z.getValue == t)})
   }
 
 }
