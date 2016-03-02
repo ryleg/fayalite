@@ -13,6 +13,18 @@ import ammonite.ops._
 
 import fa._
 
+
+object SelSer {
+
+  case class Cookie(
+                   name: String,
+                   domain: String,
+                   path: String,
+                   value: String,
+                   expiry: String
+                   )
+}
+
 /**
  * NOTE: Selenium tests require a binary of ChromeDriver
  * Download and make available during runtime by setting
@@ -23,10 +35,23 @@ class ChromeExt(startingUrl: Option[String] = None) extends FlatSpec with Chrome
   def goto(tou: String) = go to tou
   def src = pageSource
   def stop() = close
-  def dumpCookies = cookies.toString
-  startingUrl.foreach{goto}
+  def dumpCookies = {
+    import JavaConversions._ // Move to implicits
+    webDriver.manage().getCookies.iterator().toList.flatMap{
+      q => Try{SelSer.Cookie(q.getName,q.getDomain, q.getPath, q.getValue,
+        q.getExpiry.toString)}.toOption
+    }
+  }
+  def addCookieProper(
+                     c: SelSer.Cookie
+                     ) = {
+    add cookie(name=c.name, value=c.value, path=c.path, domain=c.domain)
+  }
+  startingUrl.foreach{q => F{goto(q)}}
                   }
-
+/*
+java -cp target\scala-2.10\fayalite-test-0.0.3.jar org.fayalite.agg.LIRunner -Dwebdriver.chrome.driver=C:\chromedriver.exe
+ */
 
 class SelExample(startingUrl: String) {
 
@@ -35,11 +60,9 @@ class SelExample(startingUrl: String) {
   val te = new ToyFrame
 
   te.addButton("Open Browser", {
-    val ce = new ChromeExt()
+    cee.stop()
+    val ce = new ChromeExt(Some(startingUrl))
     cee = ce
-    println("main")
-    ce.goto("http://www.google.com")
-    println(ce.src)
   })
 
   te.addButton("Close Browser", {
@@ -47,20 +70,28 @@ class SelExample(startingUrl: String) {
   })
 
   te.addButton("Dump Cookies", {
-    "cookies.txt" app cee.dumpCookies
+    ".cookies.txt" app cee.dumpCookies.json
   })
 
-  te.addButton("Load Cookies", {
-    "cookies.txt" app cee.dumpCookies
+  te.addButton("Load Cookies(TBI)", {
+     val jc = readFromFile(".mycookies.txt").json[List[SelSer.Cookie]]
+    println(jc)
+    jc.foreach{ cee.addCookieProper }
   })
-  te.addButton("Load URL CSV", {
-    readLines("urls.txt")
+  te.addButton("Load URL CSV & Run", {
+    readLines("urls.txt").foreach{
+      q => cee.goto(q)
+      Thread.sleep(15*1000)
+    }
   })
 
 }
 
+object S3QuickSave {
 
-object SeleniumScrapeExample {
+}
+
+object SelCtrl {
   case class ParsedExtr(url: String, soup: Document)
 
   import fa._

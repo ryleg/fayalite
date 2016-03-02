@@ -4,7 +4,7 @@ import java.io.{File, OutputStream}
 import java.net.URL
 
 import ammonite.ops.ls
-import org.fayalite.io.RemoteTerminalEmulator
+//import org.fayalite.io.RemoteTerminalEmulator
 import rx.ops._
 import scala.concurrent.Future
 import scala.sys.process.ProcessIO
@@ -44,15 +44,15 @@ object JsREPL {
   def writeCompile(s: String) : Unit = {
 
     import ammonite.ops._
-    val t = new RemoteTerminalEmulator()
-    t.out.foreach{println}
+   // val t = new RemoteTerminalEmulator()
+ //   t.out.foreach{println}
 
     write.over(
     cwd / 'tmp / 'template2 / 'src / 'main / 'scala /
     RelPath("Inject.scala"),
     MAIN + s + MAIN_TERMINATION
     )
-    t.run() = 0 -> SBT_COMPILE
+ //   t.run() = 0 -> SBT_COMPILE
     // SBT_COMPILE_LOCAL.!!
 
   }

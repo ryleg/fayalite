@@ -8,6 +8,9 @@ import javax.imageio.ImageIO
 import javax.swing.{JButton, JPanel, JLabel, JFrame}
 
 import com.github.sarxos.webcam.Webcam
+import org.scalatest.FlatSpec
+import org.scalatest.selenium.Chrome
+import org.scalatest.selenium.WebBrowser.go
 
 import scala.collection.mutable
 import scala.concurrent.Future
@@ -195,6 +198,7 @@ import fa._
 
 /**
   * Just a really simple button
+  *
   * @param title : Name of button
   * @param action : When someone clicks on it, don't
   *               expect much information here, this is
@@ -212,7 +216,6 @@ class Button(title: String, action: () => Unit) {
     override def mouseReleased(e: MouseEvent): Unit = {}
   })
 }
-
 
 /**
   * Direct draw frame builder
@@ -271,6 +274,7 @@ object SwingManage {
 
   /**
     * Simple small button panel.
+    *
     * @return : Frame
     */
   def toyFrame = {

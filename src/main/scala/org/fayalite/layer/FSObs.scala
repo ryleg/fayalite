@@ -27,7 +27,7 @@ object FSObs {
 
   def observeDirectory(dir: String, callBack: String => Unit = (pt: String) => ()) = {
     import akka.actor.ActorSystem
-    import com.beachape.filemanagement.MonitorActor
+  /*  import com.beachape.filemanagement.MonitorActor
     import com.beachape.filemanagement.RegistryTypes._
     import com.beachape.filemanagement.Messages._
 
@@ -51,7 +51,8 @@ object FSObs {
 
     val desktop = Paths get dir
     //val desktopFile = Paths get "/Users/ryle/test"
-
+*/
+/*
     println("desktop " + desktop.toString)
 /*
 /*
@@ -78,6 +79,7 @@ object FSObs {
       recursive = true,
       path = desktop,
       modifyCallbackDirectory)
+*/
 
 /*
 

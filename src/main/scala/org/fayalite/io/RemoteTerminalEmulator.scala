@@ -1,3 +1,4 @@
+/*
 package org.fayalite.io
 
 import java.io.{FileOutputStream, OutputStream}
@@ -129,3 +130,4 @@ tmux show-buffer
       //}
     }
   }
+*/

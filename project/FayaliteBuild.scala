@@ -73,13 +73,13 @@ object FayaliteBuild extends sbt.Build {
         web ++
         misc ++
         Seq(
-          "org.scalatest" % "scalatest_2.10" % "2.0.M5b" % "test",
+          "org.scalatest" % "scalatest_2.10" % "2.0.M5b",
           "amplab" % "spark-indexedrdd" % "0.1",
-          "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
-          "com.googlecode.lanterna" % "lanterna" % "2.1.9",
-          "com.jcraft" % "jzlib" % "1.1.3",
-          "com.decodified" %% "scala-ssh" % "0.7.0",
-          "ch.qos.logback" % "logback-classic" % "1.1.2",
+      //    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
+   //       "com.googlecode.lanterna" % "lanterna" % "2.1.9",
+  //        "com.jcraft" % "jzlib" % "1.1.3",
+     //     "com.decodified" %% "scala-ssh" % "0.7.0",
+     //     "ch.qos.logback" % "logback-classic" % "1.1.2",
           "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
         )
   )
