@@ -1,3 +1,4 @@
+/*
 package org.fayalite.ui.io
 
 import org.fayalite.util.SparkRef
@@ -65,4 +66,4 @@ object SQLContextSingleton {
     }
     instance
   }
-}
+}*/

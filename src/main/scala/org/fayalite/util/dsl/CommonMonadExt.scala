@@ -3,7 +3,7 @@ package org.fayalite.util.dsl
 import java.io.FileWriter
 
 import akka.util.Timeout
-import org.fayalite.util.{SparkRef, JSON, Common}
+import org.fayalite.util.{JSON, Common}
 import scala.collection.TraversableLike
 import scala.concurrent.duration._
 import scala.concurrent._

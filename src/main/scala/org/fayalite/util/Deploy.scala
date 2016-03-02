@@ -1,7 +1,6 @@
 package org.fayalite.util
 
 import akka.actor.Actor
-import org.apache.spark.Logging
 
 
 /**
@@ -17,7 +16,7 @@ object Deploy {
    * @return : Wrapper around server / actorSystem for auxiliary use
    */
   def apply(rxFunc: PartialFunction[Any, Unit], port: Int) = {
-    class Deployable() extends Actor with Logging {
+    class Deployable() extends Actor {
       def receive = rxFunc
     }
     new SimpleRemoteServer({new Deployable()}, port)

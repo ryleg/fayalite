@@ -6,7 +6,7 @@ import akka.actor.ActorRef
 import com.github.tototoshi.csv.CSVParser
 import org.fayalite.repl.{ JsREPL}
 import org.fayalite.ui.ParseServer
-import org.fayalite.util.{SparkRef, JSON}
+import org.fayalite.util.{JSON}
 import spray.can.websocket.frame.TextFrame
 
 import fa._
@@ -101,7 +101,7 @@ object MessageParser {
 
   def queueJob(cnt: String) = {
     println("queuing job ")
-
+/*
     val fnm =  target.toString + "/" + cnt
     println("texting file " + fnm)
     val res = SparkRef.run("$sc.textFile(" + fnm +
@@ -120,7 +120,7 @@ object MessageParser {
     ret // change this to a func that generalizes concept
     // of recalculating previous value. this should be a request
     // against a generic rdd that does some operation like run a job
-    // and has re-run conditions.
+    // and has re-run conditions.*/
   }
 
   def parseBottleneck(msg: String, ref: ActorRef, ps: ParseServer) = {

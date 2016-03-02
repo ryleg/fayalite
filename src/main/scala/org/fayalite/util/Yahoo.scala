@@ -30,7 +30,7 @@ object Yahoo {
       _ (0)
     }.filter { q =>
       !q.contains("""^""") && !q.contains(""".""") &&
-      q.length < 5 && !q.contains(" ")
+        q.length < 5 && !q.contains(" ")
     }
   }
 
@@ -58,7 +58,7 @@ object Yahoo {
 
   def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
-  val fToSave = ".yahoo"
+  val fToSave = ".yahoo1"
 
   def intTime = System.currentTimeMillis().toInt
 
@@ -103,10 +103,10 @@ object Yahoo {
     val t: Req = r.GET
     val svc = r
     val country = Http(svc OK as.String)
-  //  println("doing request " + u)
+    //  println("doing request " + u)
     country.map{
       c =>
-       // println("processing response ")
+        // println("processing response ")
         val pp = c.json[Response].query.results.quote.toList.map{
           case ba @ BA(b, a) =>
             val res = formatNumber(a).flatMap{aa =>

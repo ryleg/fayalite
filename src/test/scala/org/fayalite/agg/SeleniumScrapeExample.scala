@@ -1,7 +1,10 @@
 package org.fayalite.agg
 
 import org.fayalite.agg.ChromeRunner.Extr
+import org.fayalite.util.ToyFrame
 import org.jsoup.nodes.Document
+import org.scalatest.FlatSpec
+import org.scalatest.selenium.Chrome
 
 import scala.collection.JavaConversions
 import scala.util.{Success, Failure, Try}
@@ -16,6 +19,45 @@ import fa._
  * VM opt -Dwebdriver.chrome.driver=/your_path_to/chromedriver
  *
  */
+class ChromeExt(startingUrl: Option[String] = None) extends FlatSpec with Chrome {
+  def goto(tou: String) = go to tou
+  def src = pageSource
+  def stop() = close
+  def dumpCookies = cookies.toString
+  startingUrl.foreach{goto}
+                  }
+
+
+class SelExample(startingUrl: String) {
+
+  var cee: ChromeExt = new ChromeExt(Some(startingUrl))
+
+  val te = new ToyFrame
+
+  te.addButton("Open Browser", {
+    val ce = new ChromeExt()
+    cee = ce
+    println("main")
+    ce.goto("http://www.google.com")
+    println(ce.src)
+  })
+
+  te.addButton("Close Browser", {
+      cee.stop()
+  })
+
+  te.addButton("Dump Cookies", {
+    "cookies.txt" app cee.dumpCookies
+  })
+
+  te.addButton("Load Cookies", {
+    "cookies.txt" app cee.dumpCookies
+  })
+  te.addButton("Load URL CSV", {
+    readLines("urls.txt")
+  })
+
+}
 
 
 object SeleniumScrapeExample {
@@ -30,18 +72,19 @@ object SeleniumScrapeExample {
   }.toList.flatten
 
 
+
+  def main(args: Array[String]) {
+      new SelExample()
+  }
+
+
+   /*
+
   def indeedRemoteJobsUrl(page: Int) = {
     "http://www.indeed.com/jobs?q=&l=Remote&start=" + page*10
   }
 
-
-  def main(args: Array[String]) {
-
-    println("main")
-  }
-
-
-   /* def tes = {
+    def tes = {
    new SimpleChrome(
           cwd / 'secret / 'thelocal / 'run,
           (1 to 22).toList.map{i =>

@@ -1,11 +1,11 @@
 package org.fayalite.util
 
-import java.awt.event.{KeyEvent, KeyListener, WindowEvent}
+import java.awt.event._
 import java.awt._
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import javax.swing.JFrame
+import javax.swing.{JButton, JPanel, JLabel, JFrame}
 
 import com.github.sarxos.webcam.Webcam
 
@@ -32,6 +32,7 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     setPreferredSize(new Dimension(800, 600))
     setEnabled(true)
+
     pack()
     setVisible(true)
   }
@@ -65,6 +66,7 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
   /**
     * Accumulate functions to execute in draw
     * order beginning with original instantiation
+    *
     * @param d : Draw func to add
     */
   def update(d: (Graphics => Unit)) = {
@@ -106,6 +108,7 @@ class FullScreenFrame(windowId: String) extends FFrame(
     * This causes a little flicker on context
     * switching but it restores the max state, otherwise
     * the window will just dissapear.
+    *
     * @param we : Some window event, like the user clicked on a different
     *           monitor.
     */
@@ -145,7 +148,7 @@ class FullScreenFrame(windowId: String) extends FFrame(
   * stateless draws.
   *
   */
-class CharMem() {
+class SymbolRegistry() {
 
   // For storing prerendered characters and/or unicode-like
   // strings, basically anything that would go through drawString
@@ -155,6 +158,7 @@ class CharMem() {
   /**
     * Grab the chosen unicode-like string for the Graphics2d
     * drawString call.
+    *
     * @param s : Some string, typically a single character that will
     *          fit inside the typical draw window.
     *          Override / edit to get
@@ -174,6 +178,7 @@ class CharMem() {
 
   /**
     * Save a tile to a file for viewing or other usage.
+    *
     * @param s : String, see get for doc
     * @param f : String
     * @return
@@ -188,41 +193,96 @@ class CharMem() {
 
 import fa._
 
+/**
+  * Just a really simple button
+  * @param title : Name of button
+  * @param action : When someone clicks on it, don't
+  *               expect much information here, this is
+  *               simple
+  */
+class Button(title: String, action: () => Unit) {
+  val jButton = new JButton(title)
+  jButton.addMouseListener(new MouseListener{
+    override def mouseExited(e: MouseEvent): Unit = {}
+    override def mouseClicked(e: MouseEvent): Unit = {
+      action()
+    }
+    override def mouseEntered(e: MouseEvent): Unit = {}
+    override def mousePressed(e: MouseEvent): Unit = {}
+    override def mouseReleased(e: MouseEvent): Unit = {}
+  })
+}
+
+
+/**
+  * Direct draw frame builder
+  */
+class FrameInit {
+
+  val cm = new SymbolRegistry()
+
+  val f = new FFrame()
+
+  class Listen extends KeyListener {
+    override def keyTyped(e: KeyEvent): Unit = {}
+
+    override def keyPressed(e: KeyEvent): Unit = {
+      val img = cm.get(e.getKeyChar.toString)
+      f.update((d: Graphics) => {
+        img.draw(d, 50, 50)
+      })
+    }
+
+    override def keyReleased(e: KeyEvent): Unit = {}
+  }
+
+  val l = new Listen()
+  f.addKeyListener(l)
+  f.init()
+  f.start()
+}
+
+
+class ToyFrame {
+  import SwingManage._
+
+  val f = toyFrame
+  //   val f = new FrameInit()
+
+  val jp = new JPanel(false)
+
+  def addButton[T](s: String, f: => T) = {
+    jp.add(
+      new Button(s, () => f).jButton)
+  }
+  f.add{jp}
+  f.pack()
+  f.setVisible(true)
+
+  f.setSize(new Dimension(160, 600)) // Trick to force layout
+
+}
+
 
 /**
   * Frame management for Swing
   */
 object SwingManage {
 
-  class FrameInit {
-
-    val cm = new CharMem()
-
-    val f = new FFrame()
-
-    class Listen extends KeyListener {
-      override def keyTyped(e: KeyEvent): Unit = {}
-
-      override def keyPressed(e: KeyEvent): Unit = {
-        val img = cm.get(e.getKeyChar.toString)
-        f.update((d: Graphics) => {
-          img.draw(d, 50, 50)
-        })
-      }
-
-      override def keyReleased(e: KeyEvent): Unit = {}
-    }
-
-    val l = new Listen()
-    f.addKeyListener(l)
-    f.init()
-    f.start()
+  /**
+    * Simple small button panel.
+    * @return : Frame
+    */
+  def toyFrame = {
+    val f = new JFrame("Selenium Control Panel")
+    f.setBackground(Color.BLACK)
+    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    f.setPreferredSize(new Dimension(150, 600))
+    f.setEnabled(true)
+    f
   }
 
   def main(args: Array[String]) {
-
-    val f = new FrameInit()
-
 
   }/*
 

@@ -2,15 +2,17 @@ package org.fayalite.util
 
 import akka.actor.{Props, Actor, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import org.apache.spark.Logging
 import org.fayalite.repl.REPL._
 import akka.pattern.ask
 import scala.tools.nsc.interpreter
 import scala.util.{Failure, Success, Try}
 
 
-
-object RemoteAkkaUtils extends Logging {
+/**
+  * Copied from Spark akka initialization routines,
+  * needs update, used for convenience / debugging
+  */
+object RemoteAkkaUtils  {
 
   def main(args: Array[String]) {
 
@@ -89,7 +91,6 @@ object RemoteAkkaUtils extends Logging {
       |akka.log-dead-letters-during-shutdown = off
       """.stripMargin)
 
-    logInfo(s"Create actor system on port $port")
     val actorSystem = ActorSystem(name, akkaConf)
 
     actorSystem

@@ -8,7 +8,11 @@ jarName in assembly := "fayalite.jar"
 
 mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 {
-  case q if q.contains(".DS_Store") => MergeStrategy.discard
+  case q if q.contains(".DS_Store") ||
+    q.contains("JS_DEPENDENCIES") ||
+    q.contains("META-INF/BCKEY.DSA") ||
+    q.contains("META-INF/BCKEY.SF") =>
+    MergeStrategy.discard
   case x => old(x)
 }
 }

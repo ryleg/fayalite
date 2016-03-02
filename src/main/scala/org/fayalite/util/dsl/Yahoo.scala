@@ -2,7 +2,6 @@ package org.fayalite.util.dsl
 
 import java.io.File
 
-import breeze.linalg.DenseMatrix
 
 import scala.util.Try
 
@@ -10,9 +9,11 @@ import scala.util.Try
   * Created by aa on 12/28/2015.
   */
 object Yahoo {
+/*
 
   def sv(dm: DenseMatrix[Double]) =
     breeze.linalg.csvwrite(new File("text.txt"), dm, separator = ' ')
+*/
 
   def gbk[T,V, Q](t: Traversable[(T, V)]) = t.groupBy(_._1).map {
     case (k,v) => k -> v.map{_._2}

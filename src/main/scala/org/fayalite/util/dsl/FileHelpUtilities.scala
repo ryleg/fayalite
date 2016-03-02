@@ -26,6 +26,9 @@ trait FileHelpUtilities {
   }
   def readFromFile(f: String) = scala.io.Source.fromFile(f).mkString
 
+  def readLines(f: String) = scala.io.Source.fromFile(f).getLines()
+
+
   type KVC = Map[String, Array[String]]
 
   implicit class ap(f: String)  {
