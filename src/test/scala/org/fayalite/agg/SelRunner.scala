@@ -3,13 +3,11 @@ package org.fayalite.agg
 /**
   * Created by aa on 3/1/2016.
   */
-object LIRunner {
+object SelRunner {
 
-  class PrivSel extends SelExample("http://www.linkedin.com"){
-
-  }
+  class Quick extends SelExample("http://www.google.com")
 
   def main(args: Array[String]) {
-    new PrivSel()
+    new Quick()
   }
 }

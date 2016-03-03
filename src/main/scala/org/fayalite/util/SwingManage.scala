@@ -258,12 +258,25 @@ class ToyFrame {
     jp.add(
       new Button(s, () => f).jButton)
   }
+
+  val bigFont = new Font("monospace", Font.PLAIN, 20)
+  def addTextInput[T](s: String) = {
+    val ta = new TextArea(s, 1, 15, TextArea.SCROLLBARS_NONE)
+    ta.setText("your query")
+    ta.setFont(bigFont)
+    ta.setForeground(Color.WHITE)
+    jp.add(ta)
+    ta
+  }
+
+
   f.add{jp}
-  f.pack()
-  f.setVisible(true)
 
-  f.setSize(new Dimension(160, 600)) // Trick to force layout
-
+  def finish() = {
+    f.pack()
+    f.setVisible(true)
+    f.setSize(new Dimension(320, 600)) // Trick to force layout
+  }
 }
 
 
