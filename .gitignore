@@ -20,4 +20,4 @@
 data
 binaries/
 secret/
-rootkey.csv
+.rootkey.csv

@@ -11,9 +11,15 @@ import java.util.Calendar
 trait CommonJunk {
 
   def currentTime = {
-    val today = Calendar.getInstance().getTime()
+    val today = Calendar.getInstance().getTime
     val minuteFormat = new SimpleDateFormat("YYYY_MM_dd_hh_mm_ss")
     minuteFormat.format(today)}
+
+  def currentDay = {
+    val today = Calendar.getInstance().getTime
+    val minuteFormat = new SimpleDateFormat("YYYY_MM_dd")
+    minuteFormat.format(today)
+  }
 
   implicit class BufferedImageHelp(bi: BufferedImage) {
     def draw(g: Graphics, x: Int, y: Int) = {

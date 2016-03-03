@@ -25,3 +25,5 @@ mergeStrategy in (Test, assembly) <<= (mergeStrategy in assembly) { (old) =>
 //assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutput = false)
 
 //run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
+
+mainClass in (Test, assembly) := Some("org.fayalite.agg.SelCtrl")

@@ -1,11 +1,15 @@
 package org.fayalite.agg
 
+import java.awt.Component
 import java.util.Scanner
-import javax.swing.JFileChooser
+import javax.swing.{JScrollPane, JList, JLabel, JFileChooser}
 
 import org.fayalite.agg.ChromeRunner.Extr
+import org.fayalite.agg.SelSer.Cookie
 import org.fayalite.util.ToyFrame
 import org.jsoup.nodes.Document
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.{ChromeOptions, ChromeDriver}
 import org.scalatest.FlatSpec
 import org.scalatest.selenium.Chrome
 
@@ -26,6 +30,9 @@ object SelSer {
                      value: String,
                      expiry: String
                    )
+
+  def parseCookiesFromFile(s: String) =
+    readFromFile(s).json[List[SelSer.Cookie]]
 }
 
 import rx._
@@ -39,8 +46,15 @@ import rx._
   *
   */
 class ChromeWrapper(
-                 startingUrl: Option[String] = None
-               ) extends FlatSpec with Chrome {
+                     startingUrl: Option[String] = None
+                   ) extends org.scalatest.selenium.WebBrowser {
+
+  val opts = new ChromeOptions()
+
+  val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
+  opts.addArguments("user-agent=" + userAgent)
+
+  implicit val webDriver =  new ChromeDriver(opts)
 
   def size(x: Int, y: Int) = {
     webDriver.manage().window.setSize(new org.openqa.selenium.Dimension(x, y))
@@ -62,15 +76,19 @@ class ChromeWrapper(
         q.getExpiry.toString)}.toOption
     }
   }
+
   def addCookieProper(
                        c: SelSer.Cookie
                      ) = {
     add cookie(name=c.name, value=c.value, path=c.path, domain=c.domain)
   }
+
   def loadCookiesFrom(s: String) = {
-    val jc = readLines(s).flatMap{_.json[List[SelSer.Cookie]]}
+    val jc = SelSer.parseCookiesFromFile(s)
     jc.foreach{ addCookieProper }
   }
+
+  val isStarted = Var(false) // change to monad of switch on/off dag
 
   /**
     * Use this for reacting off of to determine when
@@ -89,12 +107,22 @@ java -cp target\scala-2.10\fayalite-test-0.0.3.jar org.fayalite.agg.LIRunner -Dw
 
 
 object SelExample {
+
   val myCookies = ".mycookies.txt"
 
+  val storeFile = ".metaback"
+
+  val storeZero = MetaStore(List[Cookie](), Map[String, Int]())
+
+  def cookiesZeroS = SelSer.parseCookiesFromFile(myCookies)
+
+  def optStoreZero = Try{storeZero.copy(
+    cookies = cookiesZeroS
+  )}.getOrElse(storeZero)
 
   case class MetaStore(
                         cookies: List[SelSer.Cookie],
-                        pageVistsByDomain: Map[String, Int]
+                        pageVistsByDomainTime: Map[String, Int]
                       )
 }
 
@@ -103,57 +131,131 @@ class JSONSerHelper(fileBacking: String = ".metaback") {
 
 }
 
+import rx.ops._
+
 class SelExample(startingUrl: String) {
 
   import SelExample._
 
-  var cee: ChromeWrapper = null //new ChromeExt() //Some(startingUrl))
+  println("cookiezero " + cookiesZeroS)
 
-  def reInit() = {
-    if (cee != null) cee.stop()
-    cee = new ChromeWrapper(Some(startingUrl))
-    cee.started.foreach{_.onComplete{_ => cee.loadCookiesFrom(myCookies)}}
+  val cev = Var(null.asInstanceOf[ChromeWrapper])
+
+  val store = Var{Try{getStore}.getOrElse(optStoreZero)}
+
+  def getStore: MetaStore = {
+    readFromFile(".metaback").json[MetaStore]
   }
+
+  def writeStore() = {
+    writeToFile(".metaback", store().json)
+  }
+
+  store.foreach{_ => writeStore()}
+
+  def cee = cev()
 
   val te = new ToyFrame
 
   import te.{addButton => button}
 
+
+  val jll = new JLabel("Num page visits: 0")
+
+  def reInit() = {
+    if (cee != null) cee.stop()
+    cev() = new ChromeWrapper(Some(startingUrl))
+    cee.started.foreach{_.onComplete{_ =>
+      cee.loadCookiesFrom(myCookies)
+      /*      cee.numVisits.foreach{
+              v =>
+
+            }*/
+    }}
+  }
+
   button("Open Browser", reInit())
+
   button("Close Browser", cee.stop())
-  button("Clear Cookies", cee.clearCookies())
-  button("Save Cookie Session", {
+
+  def ad(e: Component) = te.jp.add(e)
+
+  ad (new JLabel("Stored Cookies:"))
+
+  private val cookies0: List[Cookie] = store().cookies
+  val cookiesZero = cookies0.map{_.name}.toArray
+  println("store " + store())
+
+
+  val jls = new JList(cookiesZero)
+
+  val jscp = new JScrollPane(jls)
+  te.jp.add(jscp)
+
+
+  button("Overwrite Cookie Session", {
+    store() = store().copy(cookies=cee.dumpCookies)
     ".cookies.txt" app cee.dumpCookies.json
   })
 
-
-  button("Load .mycookies.txt", {
+  button("Clear cookies from active browser", cee.clearCookies())
+  button("Load stored cookies into active browser", store().cookies.foreach{cee.addCookieProper})
+/*
+  button("Load .mycookies.txt *DEV*", {
     cee.loadCookiesFrom(myCookies)
   })
+*/
 
-  button("Load URL CSV & Run", {
-    readLines("urls.txt").foreach{
+ // te.jp.add(jll)
+
+  val urls = Var(List[String]())
+
+  //val selFl = Var("SELECTED_FILE.txt")
+/*
+  val slf = new JLabel("")
+  //selFl.foreach{slf.setText}
+
+  ad(slf)
+
+  val fc = new JFileChooser()
+
+  button("Select URLs File", {
+    println("file chooser")
+    fc.showOpenDialog(te.jp)
+    println("show open")
+  })
+
+  button("Process URLs", {
+    val fl = fc.getSelectedFile
+    val u = scala.io.Source.fromFile(fl).getLines.toList
+    println("u " + u)
+    slf.setText(fl.getCanonicalPath + " #lines=" + u.length)
+    urls() = u
+  })*/
+
+  button("Run .urls.txt", {
+    readLines(".urls.txt").foreach{
       q =>
         println("going to url " + q)
         val domain = q.domain
         println("url domain " + domain)
         cee.goto(q)
+        val cur = currentDay + " " + domain
+        val prvMap = store().pageVistsByDomainTime
+        val prvV = prvMap.getOrElse(cur, 0)
+        store() = store().copy(pageVistsByDomainTime=prvMap.updated(cur, prvV + 1))
         Thread.sleep(15*1000)
     }
   })
 
-  button("Select CSV File(s)", {
-    val fc = new JFileChooser()
-    fc.showOpenDialog(te.jp)
-    val fl = fc.getSelectedFiles.toList
-  })
+ // val ta = te.addTextInput("500")
 
-  val ta = te.addTextInput()
-
+/*
   button("Run Query", {
     println(ta.getText)
   })
-
+*/
+ // page history
 
   te.finish()
 
@@ -176,7 +278,8 @@ object SelCtrl {
 
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]) { //C:\chromedriver.exe
+   // System.setProperty("webdriver.chrome.driver=" + driver )
     new SelExample()
   }
 

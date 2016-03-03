@@ -34,7 +34,7 @@ object AWS {
     * @return : Access -> Secret
     */
   def getKeys = {
-    Source.fromFile("rootkey.csv")
+    Source.fromFile(".rootkey.csv")
       .mkString.split("\r\n").map{_.split("=").tail.mkString("=")} match {
       case Array(x,y) => (x,y)}
   }

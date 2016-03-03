@@ -21,3 +21,5 @@ libraryDependencies ++= Seq(
 )
 
 */
+
+mainClass in (Test, Run) := "org.fayalite.agg.SelCtrl"

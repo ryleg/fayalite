@@ -5,23 +5,28 @@ implemented by modifying all serializers to accept a threadLocalProperty
 defining which ClassLoader to use (see http://github.com/ryleg/spark-dynamic 
 for the fork of Spark that allows for this.
 
-It's available as a jar which you need to include in /lib to compile
+It's available as a jar which (to use) you need to include in /lib to compile
 https://s3-us-west-1.amazonaws.com/fayalite/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar
-
 Or build it yourself using the spark assembly process from the cloned
 1.2 branch of spark-dynamic. It's possible to implement the changes
 using org.apache.spark packages in this project, but there are too
 many files to copy over for it to be reasonable.
 
+(See SparkREPLManager or scripts for example of manual REPL ClassLoader
+constructions.)
+
+Temporarily deprecated REPL classes that rely on the 1.2.1 changes
+while I patch 1.6 here : https://github.com/fayalitedotorg/spark
 
 Additional tests include ActorSystem wrappers to make connecting to a remote
 Spark ActorSystem easy (Spark does not package the standard Akka
 lib but rather a modified version of it, to which your code must conform
-to play on the same system,) a websocket / REST server using Spray for
+to play on the same system, which imposes some heavy limits on symmetric
+NAT / etc.) a websocket / REST server using Spray for
 communicating to clients (and replacing the inability of the current Jupyter
 ipython/scala setup/API to handle multiple users editing a single kernel in 
 real-time). OAuth tests are completed as preliminary for multi-user organizations to 
-manage a cluster. A trivial SparkREPLManager is demonstrated for example
+manage a cluster. A trivial SparkREPLManager is partially demonstrated for example
 on how to manage multiple REPL's within the same JVM, and multiple conflicting
 ClassLoader tests are finished (to be documented more.)
 
@@ -36,35 +41,6 @@ for passing binary image data through websocket and back (compression
 unimplemented currently.) Live code injection into a Javascript
 client engine tested (inspired by Haoyi Li's workbench) from remote ActorSystem
 
-
-
-#Run
-
-Run install.sh which will grab a dynamic version of Spark
-with multi-user/multi-classloader cluster patches from 
-and put it in your /lib folder.
-
-Add aliases as below to run components separately.
-
-```
-export FAY=~/Documents/repo/fayalite
-alias app="cd $FAY/app-dynamic; sbt ~fastOptJS"
-alias ws="cd $FAY; sbt run org.fayalite.MainServer"
-```
-
-Or use ./run.sh (aliases are better so you can see split outputs)
-
-Open in browser:
-
-http://localhost:8080
-
-MainServer will run org.fayalite.ui.ParseServer to handle state 
-management / synchronization and org.fayalite.ui.ws.Server 
-to handle websocket management / serving page
- 
-To start additional servers to test other components.
-Run org.fayalite.repl.SparkSupervisor to handle driver / repl requests
-Not fully hooked up to UI yet.
 
 If you want to test Spark components that rely upon spark-dynamic, make an
 assembly binary of spark-dynamic with your changes and copy it to lib/

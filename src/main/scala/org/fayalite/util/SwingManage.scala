@@ -262,7 +262,7 @@ class ToyFrame {
   val bigFont = new Font("monospace", Font.PLAIN, 20)
   def addTextInput[T](s: String) = {
     val ta = new TextArea(s, 1, 15, TextArea.SCROLLBARS_NONE)
-    ta.setText("your query")
+    ta.setText(s)
     ta.setFont(bigFont)
     ta.setForeground(Color.WHITE)
     jp.add(ta)
