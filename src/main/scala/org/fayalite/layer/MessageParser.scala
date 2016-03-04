@@ -14,6 +14,14 @@ import fa._
 import scala.concurrent.Future
 import scala.util.{Failure, Try}
 
+/**
+  * For the determination of what action to perform given a message
+  * passing through the main bottleneck gateway of this project's servers.
+  *
+  * Message understanding / parsing code should be deployable throughout any
+  * layer of the Spark request 'stack' but this should be for converting /
+  * adapting / determining routes for any and all execution requests.
+  */
 object MessageParser {
 
   case class ParseRequest(

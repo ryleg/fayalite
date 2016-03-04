@@ -1,6 +1,6 @@
 package org.fayalite.util.dsl
 
-import org.fayalite.layer.Schema.FixedName
+import org.fayalite.layer.Schema.FixedPhrase
 
 /**
   * Created by aa on 2/18/2016.
@@ -83,7 +83,7 @@ trait StringFormatHelpers {
         "[\\p{InCombiningDiacriticalMarks}\\p{IsM}\\p{IsLm}\\p{IsSk}]+", "")
     }
     val qq = normalized.superClean.clean.postClean
-    FixedName(qq, q,
+    FixedPhrase(qq, q,
       qq.split(" ").toList)
     //   .filterNot{IDENT.contains}
   }

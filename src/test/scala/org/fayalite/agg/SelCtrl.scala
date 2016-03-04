@@ -1,110 +1,16 @@
 package org.fayalite.agg
 
 import java.awt.Component
-import java.util.Scanner
-import javax.swing.{JScrollPane, JList, JLabel, JFileChooser}
-
-import org.fayalite.agg.ChromeRunner.Extr
-import org.fayalite.agg.SelSer.Cookie
-import org.fayalite.util.ToyFrame
-import org.jsoup.nodes.Document
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.{ChromeOptions, ChromeDriver}
-import org.scalatest.FlatSpec
-import org.scalatest.selenium.Chrome
-
-import scala.collection.JavaConversions
-import scala.util.{Success, Failure, Try}
+import javax.swing.{JLabel, JList, JScrollPane}
 
 import ammonite.ops._
-
 import fa._
-
-
-object SelSer {
-
-  case class Cookie(
-                     name: String,
-                     domain: String,
-                     path: String,
-                     value: String,
-                     expiry: String
-                   )
-
-  def parseCookiesFromFile(s: String) =
-    readFromFile(s).json[List[SelSer.Cookie]]
-}
-
+import org.fayalite.agg.ChromeRunner.Extr
+import org.fayalite.util.ToyFrame
+import org.jsoup.nodes.Document
 import rx._
 
-/**
-  * Basic fixes to make Selenium chrome actually useful
-  *
-  * NOTE: Selenium tests require a binary of ChromeDriver
-  * Download and make available during runtime by setting
-  * VM opt -Dwebdriver.chrome.driver=/your_path_to/chromedriver
-  *
-  */
-class ChromeWrapper(
-                     startingUrl: Option[String] = None
-                   ) extends org.scalatest.selenium.WebBrowser {
-
-  val opts = new ChromeOptions()
-
-  val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
-  opts.addArguments("user-agent=" + userAgent)
-
-  implicit val webDriver =  new ChromeDriver(opts)
-
-  def size(x: Int, y: Int) = {
-    webDriver.manage().window.setSize(new org.openqa.selenium.Dimension(x, y))
-  }
-
-  size(800, 600)
-
-  def goto(tou: String) = {
-    go to tou
-    numVisits() += 1
-  }
-  def src = pageSource
-  def stop() = close
-  def clearCookies() = delete all cookies
-  def dumpCookies = {
-    import JavaConversions._ // Move to implicits
-    webDriver.manage().getCookies.iterator().toList.flatMap{
-      q => Try{SelSer.Cookie(q.getName,q.getDomain, q.getPath, q.getValue,
-        q.getExpiry.toString)}.toOption
-    }
-  }
-
-  def addCookieProper(
-                       c: SelSer.Cookie
-                     ) = {
-    add cookie(name=c.name, value=c.value, path=c.path, domain=c.domain)
-  }
-
-  def loadCookiesFrom(s: String) = {
-    val jc = SelSer.parseCookiesFromFile(s)
-    jc.foreach{ addCookieProper }
-  }
-
-  val isStarted = Var(false) // change to monad of switch on/off dag
-
-  /**
-    * Use this for reacting off of to determine when
-    * the browser has actually started and loaded something
-    */
-  val started = startingUrl.map{q => F{goto(q)}}
-
-  val numVisits = Var(0)
-
-
-
-}
-/*
-java -cp target\scala-2.10\fayalite-test-0.0.3.jar org.fayalite.agg.LIRunner -Dwebdriver.chrome.driver=C:\chromedriver.exe
- */
-
+import scala.util.Try
 
 object SelExample {
 
@@ -114,14 +20,14 @@ object SelExample {
 
   val storeZero = MetaStore(List[Cookie](), Map[String, Int]())
 
-  def cookiesZeroS = SelSer.parseCookiesFromFile(myCookies)
+  def cookiesZeroS = parseCookiesFromFile(myCookies)
 
   def optStoreZero = Try{storeZero.copy(
     cookies = cookiesZeroS
   )}.getOrElse(storeZero)
 
   case class MetaStore(
-                        cookies: List[SelSer.Cookie],
+                        cookies: List[Cookie],
                         pageVistsByDomainTime: Map[String, Int]
                       )
 }
@@ -233,6 +139,8 @@ class SelExample(startingUrl: String) {
     urls() = u
   })*/
 
+  ad { new JLabel(store().pageVistsByDomainTime.toList.toString)}
+
   button("Run .urls.txt", {
     readLines(".urls.txt").foreach{
       q =>
@@ -243,6 +151,8 @@ class SelExample(startingUrl: String) {
         val cur = currentDay + " " + domain
         val prvMap = store().pageVistsByDomainTime
         val prvV = prvMap.getOrElse(cur, 0)
+        val newMap = prvMap.updated(cur, prvV + 1)
+        println("newmap ? " + newMap)
         store() = store().copy(pageVistsByDomainTime=prvMap.updated(cur, prvV + 1))
         Thread.sleep(15*1000)
     }
@@ -279,7 +189,8 @@ object SelCtrl {
 
 
   def main(args: Array[String]) { //C:\chromedriver.exe
-   // System.setProperty("webdriver.chrome.driver=" + driver )
+    val driver = "C:\\chromedriver.exe"
+    System.setProperty("webdriver.chrome.driver", driver)
     new SelExample()
   }
 
