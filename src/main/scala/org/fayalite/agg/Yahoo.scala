@@ -1,11 +1,5 @@
-package org.fayalite.util
+package org.fayalite.agg
 
-import java.io.File
-
-import dispatch.{Req, RequestHandlerTupleBuilder}
-import org.json4s
-
-import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 /**

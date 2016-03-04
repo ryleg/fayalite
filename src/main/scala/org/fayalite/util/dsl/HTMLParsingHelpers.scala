@@ -1,7 +1,7 @@
 package org.fayalite.util.dsl
 
 import fa._
-import org.fayalite.layer.Schema.Cookie
+import Schema.Cookie
 import org.fayalite.util.JSON
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}

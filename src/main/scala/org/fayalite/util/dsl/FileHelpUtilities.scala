@@ -5,7 +5,7 @@ import ammonite.ops.{Path, read, write}
 import com.github.tototoshi.csv.CSVWriter
 import fa._
 import org.fayalite.layer.MessageParser
-import org.fayalite.layer.Schema.CodeUpdate
+import Schema.CodeUpdate
 import org.fayalite.util.JSON
 
 // TODO : Revise

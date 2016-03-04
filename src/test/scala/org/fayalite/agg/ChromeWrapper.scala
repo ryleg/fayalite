@@ -1,6 +1,5 @@
 package org.fayalite.agg
 
-import org.fayalite.layer.Schema
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import rx._
 import rx.ops._
@@ -29,7 +28,7 @@ object ChromeWrapper {
   *
   * NOTE: Selenium tests require a binary of ChromeDriver
   * Download and make available during runtime by setting
-  * VM opt -Dwebdriver.chrome.driver=/your_path_to/chromedriver
+  * VM opt -Dwebdriver.chrome.driver=/your_path_to/chromedriver-mac32
   *
   */
 class ChromeWrapper(

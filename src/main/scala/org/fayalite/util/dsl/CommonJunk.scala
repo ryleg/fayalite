@@ -6,20 +6,39 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 
 /**
-  * Created by aa on 2/18/2016.
+  * Put stuff in here that doesn't easily go elsewhere but needs
+  * to be somewhere.
   */
 trait CommonJunk {
 
+  /**
+    * Pretty obvious what it is, the operating system name.
+    * Pattern match on stuff like contains 'Win' or 'Mac' if
+    * you need, or use google to find all results this returns
+    * depending on common system types
+    */
+  val osName = System.getProperty("os.name")
+
+  /**
+    * A friendly current time for S3 logs / whatever
+    * @return Underscore delimited file-system friendly time
+    */
   def currentTime = {
     val today = Calendar.getInstance().getTime
     val minuteFormat = new SimpleDateFormat("YYYY_MM_dd_hh_mm_ss")
     minuteFormat.format(today)}
 
+  /**
+    * Filesystem friendly string representation ofjav
+    * currentDay for serialization / day key checking
+    * @return : String of exact day
+    */
   def currentDay = {
     val today = Calendar.getInstance().getTime
     val minuteFormat = new SimpleDateFormat("YYYY_MM_dd")
     minuteFormat.format(today)
   }
+
 
   implicit class BufferedImageHelp(bi: BufferedImage) {
     def draw(g: Graphics, x: Int, y: Int) = {

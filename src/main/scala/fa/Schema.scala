@@ -1,4 +1,6 @@
-package org.fayalite.layer
+package fa
+
+import org.jsoup.nodes.Document
 
 /**
   * For all message passing case classes and other
@@ -9,6 +11,7 @@ object Schema {
   /**
     * For Selenium / phantomJS / JS Cookies, expressed
     * as extracted by Scalatest Selenium in order
+    *
     * @param name : Key for identifying cookie
     * @param domain : Applicable domain cookie loads upon
     * @param path : Path
@@ -28,6 +31,7 @@ object Schema {
     * For short user inputs that require
     * understanding / breaking down into words
     * or sanitizing in some way
+    *
     * @param clean : Modified version of the user input
     * @param original : The original version
     * @param words : The cleaned version's interpreted split of words
@@ -43,9 +47,17 @@ object Schema {
     * Pretty self explanatory, mostly to be used in the context
     * of grabbing the current project code and distributing to a
     * notebook server or something.
+    *
     * @param path : Absolute file path of code, or an S3 key or something
     * @param contents : String file contents as if ripped from .mkString on file
     */
   case class CodeUpdate(path: String, contents: String)
+
+
+
+  case class ParsedExtr(url: String, soup: Document)
+
+  case class Extr(page: String, extr: Option[String])
+
 
 }

@@ -1,16 +1,15 @@
 package org.fayalite.agg
 
 import java.awt.Component
-import javax.swing.{JLabel, JList, JScrollPane}
+import java.awt.event.{ActionEvent, ActionListener}
+import java.io.File
+import javax.swing.{JFileChooser, JLabel, JList, JScrollPane}
 
 import ammonite.ops._
 import fa._
-import org.fayalite.agg.ChromeRunner.Extr
-import org.fayalite.layer.Schema
 import org.fayalite.util.ToyFrame
 import org.jsoup.nodes.Document
 import rx._
-
 import scala.util.Try
 import Schema._
 
@@ -22,11 +21,7 @@ object SelExample {
 
   val storeZero = MetaStore(List[Cookie](), Map[String, Int]())
 
-  def cookiesZeroS = parseCookiesFromFile(myCookies)
-
-  def optStoreZero = Try{storeZero.copy(
-    cookies = cookiesZeroS
-  )}.getOrElse(storeZero)
+  def optStoreZero = storeZero
 
   case class MetaStore(
                         cookies: List[Cookie],
@@ -40,7 +35,10 @@ class JSONSerHelper(fileBacking: String = ".metaback") {
   import SelExample._
   import rx.ops._
 
-  val store = Var{Try{getStore}.getOrElse(optStoreZero)}
+  val store = Var{Try{getStore}.getOrElse({
+    println("optStoreZero")
+    optStoreZero
+  })}
 
   def getStore: MetaStore = {
     readFromFile(fileBacking).json[MetaStore]
@@ -59,8 +57,6 @@ import rx.ops._
 class SelExample(startingUrl: String = "http://linkedin.com") {
 
   import SelExample._
-
-  println("cookiezero " + cookiesZeroS)
 
   val jss = new JSONSerHelper()
 
@@ -116,29 +112,50 @@ class SelExample(startingUrl: String = "http://linkedin.com") {
   val urls = Var(List[String]())
 
   //val selFl = Var("SELECTED_FILE.txt")
-/*
-  val slf = new JLabel("")
+
+  val slf = new JLabel("Selected Files -- __ empty")
   //selFl.foreach{slf.setText}
 
   ad(slf)
 
+
   val fc = new JFileChooser()
 
-  button("Select URLs File", {
+  fc.setMultiSelectionEnabled(true)
+
+  fc.addActionListener(new ActionListener{
+    override def actionPerformed(e: ActionEvent): Unit = {
+      println("action event on Select files")
+      slf.setText(
+        fc.getSelectedFiles.map{_.getName}.slice(0, 10).mkString(" | ")
+      )
+    }
+  })
+  button("Select Files", {
     println("file chooser")
     fc.showOpenDialog(te.jp)
     println("show open")
   })
-
+/*
   button("Process URLs", {
     val fl = fc.getSelectedFile
     val u = scala.io.Source.fromFile(fl).getLines.toList
     println("u " + u)
     slf.setText(fl.getCanonicalPath + " #lines=" + u.length)
     urls() = u
-  })*/
+  })
+*/
 
-  ad { new JLabel(store().pageVistsByDomainTime.toList.toString)}
+
+  class MicroList {
+    val jls = new JList(cookiesZero)
+    val jscp = new JScrollPane(jls)
+    te.jp.add(jscp)
+  }
+
+
+
+  ad { new JLabel("store" + store().pageVistsByDomainTime.toList.toString)}
 
   button("Run .urls.txt", {
     readLines(".urls.txt").foreach{
@@ -157,76 +174,42 @@ class SelExample(startingUrl: String = "http://linkedin.com") {
     }
   })
 
- // val ta = te.addTextInput("500")
-
-/*
-  button("Run Query", {
-    println(ta.getText)
-  })
-*/
- // page history
-
   te.finish()
 
 }
 
-object S3QuickSave {
-
-}
-
 object SelCtrl {
-  case class ParsedExtr(url: String, soup: Document)
 
   import fa._
-  def readExtrParse[T](path: Path, parser: ParsedExtr => Traversable[T]
-                      ) = path.jsonRec[Extr].flatMap { case Extr(url, qq) =>
-    qq.map {
-      q => parser(ParsedExtr(url, q.soup))
-    }
-  }.toList.flatten
 
+  /**
+    * Workaround requiring a packaged install with same values in
+    * directory or in working directory of IntelliJ git repo
+    * @return : Path to driver executable relative
+    */
+  def getDriverPath = {
+    val winDriver = "chromedriver.exe"
+    val macDriver = "chromedriver-mac32"
+    val driver = if (osName.toLowerCase.contains("win")) winDriver
+    else macDriver
+    driver
+  }
 
+  /**
+    * Selenium / ChromeDriver runs a secondary process that proxies
+    * communications back, this must reflect an updated binary
+    * version of the chromedriver executable release
+    * @return
+    */
+  def setDriverProperty() = {
+    System.setProperty("webdriver.chrome.driver", getDriverPath)
+  }
 
-  def main(args: Array[String]) { //C:\chromedriver.exe
-    val driver = "C:\\chromedriver.exe"
-    System.setProperty("webdriver.chrome.driver", driver)
+  def main(args: Array[String]) {
+    setDriverProperty()
     new SelExample()
   }
 
-
-  /*
-
- def indeedRemoteJobsUrl(page: Int) = {
-   "http://www.indeed.com/jobs?q=&l=Remote&start=" + page*10
- }
-
-   def tes = {
-  new SimpleChrome(
-         cwd / 'secret / 'thelocal / 'run,
-         (1 to 22).toList.map{i =>
-           "http://www.thelocal.se/jobs/?job_keyword=&job_category=engineer&job_category=it&page=" +
-             i.toString}
-  //     "a"
-       ).runBlocking()
-   def parse(parsedExtr: ParsedExtr) = parsedExtr match {
-     case ParsedExtr(url, q) =>
-       q.sel("div.jobsitem").map {
-         j =>
-           Map("JobTitle" -> j.fsel("div.jobstitle").text,
-             "JobLocation" -> j.fsel("div.jilocation").text,
-             "JobDescription" -> Try{j.fsel("div.jisummary").text}.getOrElse("---MISSING---"),
-             "JobSource" -> j.fsel("img.employer-logo").attr("alt"),
-             "JobURL" -> j.parent().attr("href")
-           ) ++
-             Array("CompanyName", "JobDatePostedAsOfCrawl").zip(
-               j.fsel("div.jicompany").text.split("\\|")).toMap
-       }
-   }
-*/
-  /* readExtrParse(cwd / 'secret / 'thelocal / 'run, parse)
-     .dedupe(getUniqueExistingCompanyNamesSanitized)
-     .save((cwd / 'secret / 'thelocal / RelPath("new.csv")).toString())
-*/
 
 }
 

@@ -1,5 +1,4 @@
 import org.fayalite.util.dsl._
-import org.jsoup.nodes.Document
 
 
 /**

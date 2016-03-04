@@ -21,3 +21,5 @@ data
 binaries/
 secret/
 .rootkey.csv
+chromedriver.exe
+chromedriver-mac32

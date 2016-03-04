@@ -1,8 +1,9 @@
 package org.fayalite.ui
 
 import akka.actor.Actor
+import fa.Schema
 import org.fayalite.layer.MessageParser
-import org.fayalite.layer.Schema.CodeUpdate
+import Schema.CodeUpdate
 import org.fayalite.ui.oauth.OAuth.OAuthInfo
 import org.fayalite.ui.ws.Server.TestEval
 import org.fayalite.util._
