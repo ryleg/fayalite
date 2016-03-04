@@ -1,3 +1,4 @@
+import org.fayalite.agg.SeleniumHelp
 import org.fayalite.util.dsl._
 
 
@@ -18,6 +19,7 @@ with HTMLParsingHelpers
 with StringFormatHelpers
 with FileHelpUtilities
 with CommonJunk
+with SeleniumHelp
 {
 
   // WARNING : This could cause you problems on import, that's why

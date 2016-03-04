@@ -16,7 +16,7 @@ object ChromeWrapper {
   val opts = new ChromeOptions()
   val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
   opts.addArguments("user-agent=" + userAgent)
-  def mkDriver = new ChromeDriver(opts)
+  def apply = new ChromeDriver(opts)
 
 }
 
@@ -33,7 +33,8 @@ object ChromeWrapper {
   */
 class ChromeWrapper(
                      startingUrl: Option[String] = None
-                   ) extends org.scalatest.selenium.WebBrowser {
+                   ) extends org.scalatest.selenium.WebBrowser
+  with CrawlerLike{
 
   import ChromeWrapper._
 
@@ -46,7 +47,7 @@ class ChromeWrapper(
     * a new instance of a webdriver into some pre-existing instance
     * of this class.
     */
-  implicit val webDriver = mkDriver
+  implicit val webDriver = apply
 
   /**
     * Change the browser window size at any time.
@@ -71,7 +72,7 @@ class ChromeWrapper(
     *
     * @param tou : To url by string
     */
-  def goto(tou: String) = {
+  def navigateToURL(tou: String) = {
     go to tou
     numVisits() += 1
   }
@@ -82,12 +83,12 @@ class ChromeWrapper(
     *
     * @return : String of src code, save it somewhere
     */
-  def src = pageSource
+  def getPageSource = pageSource
 
   /**
     * Closes the window / stops the driver process
     */
-  def stop() = close
+  def shutdown() = close
 
   /**
     * This deletes all cookies in the current active driver
@@ -103,7 +104,7 @@ class ChromeWrapper(
     *
     * @return : Scala proper cookies
     */
-  def dumpCookies = { // Move to implicits
+  def exportCookies() = { // Move to implicits
     import JavaConversions._
     webDriver.manage().getCookies.iterator().toList.flatMap{
       q => T{Cookie(q.getName,q.getDomain, q.getPath, q.getValue,
@@ -123,9 +124,9 @@ class ChromeWrapper(
     *          THAT YOU ON ARE THE SAME DOMAIN OTHERWISE YOU WILL THROW
     *          AN ERROR THAT DOESN'T EXPLAIN THIS TO YOU
     */
-  def addCookieProper(
-                       c: Cookie
-                     ) = {
+  def setCookieAsActive(
+                         c: Cookie
+                       ) = {
     add cookie(name=c.name, value=c.value, path=c.path, domain=c.domain)
   }
 
@@ -137,7 +138,7 @@ class ChromeWrapper(
     */
   def loadCookiesFrom(s: String) = {
     val jc = parseCookiesFromFile(s)
-    jc.foreach{ addCookieProper }
+    jc.foreach{ setCookieAsActive }
   }
 
   val isStarted = Var(false) // change to monad of switch on/off dag
@@ -146,7 +147,7 @@ class ChromeWrapper(
     * Use this for reacting off of to determine when
     * the browser has actually started and loaded something
     */
-  val started = startingUrl.map{q => F{goto(q)}}
+  val started = startingUrl.map{q => F{navigateToURL(q)}}
 
   val numVisits = Var(0)
 
