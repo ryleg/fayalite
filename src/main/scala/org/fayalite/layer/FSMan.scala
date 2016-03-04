@@ -2,11 +2,6 @@ package org.fayalite.layer
 
 import ammonite.ops._
 import ammonite.ops.ls.rec
-import org.fayalite.Fayalite
-import Fayalite._
-import scala.util.Try
-import scalaz.Scalaz._
-import rx._
 
 /**
  * Returns raw code files primarily for serving in the UI
@@ -45,9 +40,4 @@ object FSMan {
     }
   }*/
   }
-}
-
-class FSMan {
-
-
 }

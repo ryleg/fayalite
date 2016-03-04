@@ -1,6 +1,13 @@
 package org.fayalite.agg
 
+import org.fayalite.layer.Schema
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import rx._
+import rx.ops._
+import fa._
+import Schema._
+
+import scala.collection.JavaConversions
 
 // TODO : Get this to work in src/main without a strange compiler error.
 
@@ -29,6 +36,7 @@ class ChromeWrapper(
                      startingUrl: Option[String] = None
                    ) extends org.scalatest.selenium.WebBrowser {
 
+  import ChromeWrapper._
 
   /**
     * This is the entrypoint to browser manipulations.
@@ -39,7 +47,7 @@ class ChromeWrapper(
     * a new instance of a webdriver into some pre-existing instance
     * of this class.
     */
-  implicit val webDriver = SelSer.mkDriver
+  implicit val webDriver = mkDriver
 
   /**
     * Change the browser window size at any time.
@@ -97,8 +105,9 @@ class ChromeWrapper(
     * @return : Scala proper cookies
     */
   def dumpCookies = { // Move to implicits
+    import JavaConversions._
     webDriver.manage().getCookies.iterator().toList.flatMap{
-      q => Try{SelSer.Cookie(q.getName,q.getDomain, q.getPath, q.getValue,
+      q => T{Cookie(q.getName,q.getDomain, q.getPath, q.getValue,
         q.getExpiry.toString)}.toOption
     }
   }
@@ -116,7 +125,7 @@ class ChromeWrapper(
     *          AN ERROR THAT DOESN'T EXPLAIN THIS TO YOU
     */
   def addCookieProper(
-                       c: SelSer.Cookie
+                       c: Cookie
                      ) = {
     add cookie(name=c.name, value=c.value, path=c.path, domain=c.domain)
   }
@@ -128,7 +137,7 @@ class ChromeWrapper(
     * @param s : File, typically .cookies or something in same dir
     */
   def loadCookiesFrom(s: String) = {
-    val jc = SelSer.parseCookiesFromFile(s)
+    val jc = parseCookiesFromFile(s)
     jc.foreach{ addCookieProper }
   }
 

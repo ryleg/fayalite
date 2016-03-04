@@ -153,7 +153,7 @@ object Server extends App with MySslConfiguration {
           path("oauth_catch") {
             get {
                 parameters('access_token) { access_token =>
-                import org.fayalite.Fayalite._
+                import fa._
           oauth.OAuth.performGoogleOAuthRequest(access_token)
                   .onComplete{_.foreach{
                     q =>

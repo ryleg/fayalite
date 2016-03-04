@@ -4,7 +4,7 @@ import fa._
 
 import java.util
 
-import com.amazonaws.ClientConfiguration
+import com.amazonaws._
 import com.amazonaws.internal.StaticCredentialsProvider
 import com.amazonaws.regions.{Region, ServiceAbbreviations, Regions}
 import com.amazonaws.services.ec2.AmazonEC2Client

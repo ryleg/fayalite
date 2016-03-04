@@ -1,19 +1,15 @@
 package org.fayalite.ui
 
-import akka.actor.{ActorRef, Actor, Props}
+import akka.actor.Actor
 import fa.SCPR.CodeUpdate
-import org.fayalite.Fayalite
-import org.fayalite.aws.ServerManager
-import org.fayalite.layer.{MessageParser, FSMan}
+import org.fayalite.layer.MessageParser
 import org.fayalite.ui.oauth.OAuth.OAuthInfo
 import org.fayalite.ui.ws.Server.TestEval
 import org.fayalite.util._
-import org.json4s.JsonAST.JObject
 import spray.can.websocket.frame.{BinaryFrame, TextFrame}
-import Fayalite._
-import scala.concurrent.Future
+
 import scala.io.Source
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 object ParseServer {
 
@@ -48,10 +44,7 @@ object ParseServer {
 
 }
 
-import fa._
-
 class ParseServer extends Actor{
-  import ParseServer._
   import MessageParser._
 
   println("PARSE ACTOR PATH : " + this.self.path)

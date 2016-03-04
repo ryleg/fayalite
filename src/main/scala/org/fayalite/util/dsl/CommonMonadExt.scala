@@ -19,6 +19,7 @@ trait CommonMonadExt {
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
   def F[T](f: => T) = Future(f)
+  def T[T](f: => T) = Try(f)
 
   def getFuture[T](fut: Future[T], timeout: Int = 10) = Await.result(fut, timeout.seconds)
 

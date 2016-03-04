@@ -6,11 +6,13 @@ import javax.swing.{JLabel, JList, JScrollPane}
 import ammonite.ops._
 import fa._
 import org.fayalite.agg.ChromeRunner.Extr
+import org.fayalite.layer.Schema
 import org.fayalite.util.ToyFrame
 import org.jsoup.nodes.Document
 import rx._
 
 import scala.util.Try
+import Schema._
 
 object SelExample {
 
@@ -35,29 +37,36 @@ object SelExample {
 
 class JSONSerHelper(fileBacking: String = ".metaback") {
 
+  import SelExample._
+  import rx.ops._
+
+  val store = Var{Try{getStore}.getOrElse(optStoreZero)}
+
+  def getStore: MetaStore = {
+    readFromFile(fileBacking).json[MetaStore]
+  }
+
+  def writeStore() = {
+    writeToFile(fileBacking, store().json)
+  }
+
+  store.foreach{_ => writeStore()}
+
 }
 
 import rx.ops._
 
-class SelExample(startingUrl: String) {
+class SelExample(startingUrl: String = "http://linkedin.com") {
 
   import SelExample._
 
   println("cookiezero " + cookiesZeroS)
 
+  val jss = new JSONSerHelper()
+
+  import jss.store
+
   val cev = Var(null.asInstanceOf[ChromeWrapper])
-
-  val store = Var{Try{getStore}.getOrElse(optStoreZero)}
-
-  def getStore: MetaStore = {
-    readFromFile(".metaback").json[MetaStore]
-  }
-
-  def writeStore() = {
-    writeToFile(".metaback", store().json)
-  }
-
-  store.foreach{_ => writeStore()}
 
   def cee = cev()
 
@@ -65,19 +74,9 @@ class SelExample(startingUrl: String) {
 
   import te.{addButton => button}
 
-
-  val jll = new JLabel("Num page visits: 0")
-
   def reInit() = {
     if (cee != null) cee.stop()
     cev() = new ChromeWrapper(Some(startingUrl))
-    cee.started.foreach{_.onComplete{_ =>
-      cee.loadCookiesFrom(myCookies)
-      /*      cee.numVisits.foreach{
-              v =>
-
-            }*/
-    }}
   }
 
   button("Open Browser", reInit())

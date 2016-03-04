@@ -450,7 +450,7 @@ class WebSocketWorker2(val serverConnection: akka.actor.ActorRef) extends HttpSe
         } ~
         path("oauth_catch") {
           get { parameters('access_token) { access_token =>
-            import org.fayalite.Fayalite._ // i fa (with hovers); jump to start of line, etc.
+            import fa._ // i fa (with hovers); jump to start of line, etc.
             // split stream, split var exec into 2 paths. jump between paths.
             // given an obj, draw two edges split into a flow. F1 F2 hotkeys.
             oauth.OAuth.performGoogleOAuthRequest(access_token)
