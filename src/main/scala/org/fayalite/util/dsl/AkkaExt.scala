@@ -40,6 +40,13 @@ trait AkkaExt {
   }
 
   implicit class actorAccessories(as: ActorSystem) {
+
+    def enterToShutdown() = {
+      readLine("Hit ENTER to exit ...\n")
+      as.shutdown()
+      as.awaitTermination()
+    }
+
     def getByPath(actorPath: String) = {
       val checkExistingActor = as.actorSelection(actorPath).resolveOne()
       val foundResult = Await.ready(checkExistingActor, 1.seconds)

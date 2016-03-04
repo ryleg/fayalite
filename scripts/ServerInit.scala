@@ -16,7 +16,7 @@ import org.fayalite.layer.MessageParser.{ParseRequest, ParseResponseDebug}
 import org.fayalite.repl.{JsREPL, REPLManagerLike}
 import org.fayalite.ui.oauth.OAuth.OAuthResponse
 import org.fayalite.ui.ws.Server.Push
-import org.fayalite.util.{Common, SparkRef}
+import org.fayalite.util.SparkRef
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{TextFrame, BinaryFrame}
 import spray.can.{websocket, Http}

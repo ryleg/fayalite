@@ -1,6 +1,6 @@
 package org.fayalite.util.server
 
-import akka.actor.{Props, ActorSystem, Actor}
+import akka.actor.{ActorRef, Props, ActorSystem, Actor}
 import akka.io.IO
 import spray.can.server.UHttp
 import spray.can.websocket.FrameCommandFailed
@@ -9,24 +9,34 @@ import spray.can.{websocket, Http}
 import spray.http.HttpRequest
 import spray.routing.HttpServiceActor
 
-/**
-  * Created by aa on 3/2/2016.
+
+
+/** NOTE : Ignores unrecognized WS frames / HTTPRequests thru socket
+  * Simple wrapper around a websocket supporting
+  * Spray webserver with ability to easily implement POST
+  * requests using convenient helpers
+  * @param serverConnection : Whatever is passing a registered
+  *                         HTTP connection over here
+  * @param process : Do something with websocket messages
+  * @param error : Do something with websocket errors
   */
-
-
-abstract class WebSocketWorkerLike(
-                                 val serverConnection: akka.actor.ActorRef
+class WebSocketWorkerLike(
+                                 val serverConnection: akka.actor.ActorRef,
+                         process: (String, ActorRef) => Unit,
+                                 error: (FrameCommandFailed => Unit) = _ => ()
                                ) extends HttpServiceActor
   with websocket.WebSocketServerWorker {
   override def receive = handshaking orElse businessLogicNoUpgrade orElse closeLogic
   def businessLogic: Receive = {
+    // This is websocket garbage
     case TextFrame(xq) =>
-      val socketMsgStr = xq.utf8String
-    case x: FrameCommandFailed =>
-      println("frame failed " + x)
-    case x: HttpRequest =>
-      println("httprequest " + x)
-    case x => println("unrecognized frame" + x)
+      val socketMsgStr = xq.utf8String // You're pretty much always
+      // Just gonna be using the utf8String so unless that's an issue
+      // just use this
+      process(socketMsgStr, sender())
+    case x: FrameCommandFailed => error(x)
+    case x: HttpRequest => ()
+    case x => ()
   }
   def businessLogicNoUpgrade: Receive = {
     implicit val refFactory: akka.actor.ActorRefFactory = context
@@ -40,11 +50,14 @@ abstract class WebSocketWorkerLike(
 /**
   * All this does is pass over a registered
   * HTTP connection after it's been established to
-  * another actor.
+  * another actor. This doesn't really need to be used
+  * other than for starting up a server as the primary gateway
+  * actor, let the other actors handle the registered connections and
+  * messages
   * @param actor : Actor handling messages after connection
   *              established
   */
-abstract class SprayServerLike(actor: Actor)
+class SprayServerLike(actor: Actor)
   extends akka.actor.Actor
     with akka.actor.ActorLogging {
   def receive = {
@@ -55,10 +68,6 @@ abstract class SprayServerLike(actor: Actor)
       val conn = context.actorOf(p)
       serverConnection ! Http.Register(conn)
   }
-}
-
-class SprayServerZero(a: Actor) extends SprayServerLike(a) {
-
 }
 
 import rx._

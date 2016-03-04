@@ -27,5 +27,9 @@ trait CommonJunk {
     }
   }
 
+  val ubuntuProjectHome = "/home/ubuntu/fayalite" //System.getProperty("user.home")
+  val SPARK_HOME = s"$ubuntuProjectHome"
+  val currentDir = new java.io.File(".").getCanonicalPath + "/"
+
 
 }

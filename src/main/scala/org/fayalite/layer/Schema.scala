@@ -39,4 +39,13 @@ object Schema {
                         words: List[String]
                       )
 
+  /**
+    * Pretty self explanatory, mostly to be used in the context
+    * of grabbing the current project code and distributing to a
+    * notebook server or something.
+    * @param path : Absolute file path of code, or an S3 key or something
+    * @param contents : String file contents as if ripped from .mkString on file
+    */
+  case class CodeUpdate(path: String, contents: String)
+
 }

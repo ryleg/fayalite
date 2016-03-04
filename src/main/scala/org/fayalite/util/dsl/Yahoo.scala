@@ -1,13 +1,12 @@
 package org.fayalite.util.dsl
 
-import java.io.File
-
 
 import scala.util.Try
 
-/**
-  * Created by aa on 12/28/2015.
-  */
+import fa._
+
+// TODO : Deprecate / cleanup
+
 object Yahoo {
 /*
 
@@ -15,16 +14,9 @@ object Yahoo {
     breeze.linalg.csvwrite(new File("text.txt"), dm, separator = ' ')
 */
 
-  def gbk[T,V, Q](t: Traversable[(T, V)]) = t.groupBy(_._1).map {
-    case (k,v) => k -> v.map{_._2}
-  }
-
   val testSymbols = Array( "AAPL", "GOOG", "MSFT","YHOO")
 
   val yahooFinanceExamplePull = "data\\fnc"
-
-  def asLines(x: String) = scala.io.Source.fromFile(x)
-    .getLines
 
   def parseResponse(r: String) = scala.xml.XML.loadString(r)
       .map {

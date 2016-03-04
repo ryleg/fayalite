@@ -3,7 +3,7 @@ package org.fayalite.util.dsl
 import java.io.FileWriter
 
 import akka.util.Timeout
-import org.fayalite.util.{JSON, Common}
+import org.fayalite.util.JSON
 import scala.collection.TraversableLike
 import scala.concurrent.duration._
 import scala.concurrent._
@@ -44,6 +44,14 @@ trait CommonMonadExt {
     }
   }
 
+  def gbk[T,V, Q](t: Traversable[(T, V)]) = t.groupBy(_._1).map {
+    case (k,v) => k -> v.map{_._2}
+  }
+
+  implicit class KVListExt[K, V](l: List[(K,V)]) {
+    def gbk = l.groupBy{_._1}
+      .map{case (x,y) => x -> y.map{_._2}}
+  }
 
   implicit def getFutureAsString(some: Future[Any]): String = some.getAs[String]
 
@@ -56,7 +64,7 @@ trait CommonMonadExt {
       }
       finally fw.close()
     }
-    def appendHome(path: String) = append(Common.home + "/" + path)
+    //def appendHome(path: String) = append(Common.ubuntuProjectHome + "/" + path)
   }
 
 

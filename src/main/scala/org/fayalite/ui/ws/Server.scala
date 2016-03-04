@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorRefFactory, ActorSystem, 
 import akka.io.IO
 import org.fayalite.ui.{MySslConfiguration, oauth}
 import org.fayalite.util.RemoteAkkaUtils._
-import org.fayalite.util.{Common, JSON, RemoteClient, SimpleRemoteServer}
+import org.fayalite.util.{JSON, RemoteClient, SimpleRemoteServer}
 import spray.can.server.UHttp
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.{BinaryFrame, TextFrame}
@@ -174,8 +174,9 @@ object Server extends App with MySslConfiguration {
             //            " " + Common.currentDir + "app-dynamic/target/scala-2.11/")
             val r1 = unmatchedPath {
               path =>
+                import fa._
                 //  println(path.toString() + " unmatched path")
-                val fp = Common.currentDir +
+                val fp = currentDir +
                   "app-dynamic/target/scala-2.11/fayalite-app-dynamic" +
                   path.toString()
                 //     println(fp)
@@ -212,10 +213,12 @@ object Server extends App with MySslConfiguration {
       }
     }
 
+    import fa._
     def getIndex: routing.Route = {
-      getFromFile(Common.currentDir + "index-fastopt.html")
+      getFromFile(currentDir + "index-fastopt.html")
     }
   }
+
 
   def doMain() {
     implicit val system = ActorSystem()
@@ -224,9 +227,10 @@ object Server extends App with MySslConfiguration {
 
     IO(UHttp) ! Http.Bind(server, "0.0.0.0", 80)
 
-    readLine("Hit ENTER to exit ...\n")
-    system.shutdown()
-    system.awaitTermination()
+    import fa._
+
+    system.enterToShutdown()
+
   }
 
   doMain()

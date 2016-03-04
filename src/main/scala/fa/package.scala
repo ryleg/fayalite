@@ -25,9 +25,6 @@ with CommonJunk
   // its here at the top to make that clear.
   implicit val ecc = scala.concurrent.ExecutionContext.Implicits.global
 
-  implicit class LO[K, V](l: List[(K,V)]) { def gbk = l.groupBy{_._1}
-    .map{case (x,y) => x -> y.map{_._2}}}
-
   // DO NOT PUT CASE CLASSES HERE
   // For some reason the 2.10.4 IntelliJ sbt throws ridiculous errors if
   // they are here
