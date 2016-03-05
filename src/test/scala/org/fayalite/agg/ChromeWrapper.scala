@@ -104,7 +104,7 @@ class ChromeWrapper(
     *
     * @return : Scala proper cookies
     */
-  def exportCookies() = { // Move to implicits
+  def extractCookies: List[Cookie] = { // Move to implicits
     import JavaConversions._
     webDriver.manage().getCookies.iterator().toList.flatMap{
       q => T{Cookie(q.getName,q.getDomain, q.getPath, q.getValue,

@@ -2,6 +2,7 @@ package org.fayalite.agg
 
 import java.awt.Component
 import java.awt.event.{ActionEvent, ActionListener}
+import java.net.URL
 import javax.swing.{JFileChooser, JScrollPane, JList, JLabel}
 
 import fa.Schema.Cookie
@@ -94,65 +95,49 @@ class SelExample(startingUrl: String = "http://linkedin.com") {
 
 
   button("Overwrite Cookie Session", {
-    store() = store().copy(cookies=cee.exportCookies)
-    ".cookies.txt" app cee.exportCookies.json
+    store() = store().copy(cookies=cee.extractCookies)
+    ".cookies.txt" app cee.extractCookies.json
   })
 
   button("Clear cookies from active browser", cee.clearCookies())
   button("Load stored cookies into active browser", store().cookies.foreach{cee.setCookieAsActive})
-  /*
-    button("Load .mycookies.txt *DEV*", {
-      cee.loadCookiesFrom(myCookies)
-    })
-  */
 
-  // te.jp.add(jll)
-
-  val urls = Var(List[String]())
-
-  //val selFl = Var("SELECTED_FILE.txt")
-
-  val slf = new JLabel("Selected Files -- __ empty")
-  //selFl.foreach{slf.setText}
-
+  val slf = new JLabel("Selected a file")
   ad(slf)
 
 
   val fc = new JFileChooser()
 
-  fc.setMultiSelectionEnabled(true)
-
   fc.addActionListener(new ActionListener{
     override def actionPerformed(e: ActionEvent): Unit = {
       println("action event on Select files")
-      slf.setText(
-        fc.getSelectedFiles.map{_.getName}.slice(0, 10).mkString(" | ")
-      )
+      slf.setText(fc.getSelectedFile.getName)
+      F{
+        val f = fc.getSelectedFile
+        val cv = readCSV(f.getAbsolutePath)
+        val brs = new ChromeWrapper(Some("http://mailtester.com"))
+        cv.tail.map{_.map{_.toLowerCase}}.map{
+          q =>
+            val frs = q(0); val lst = cv(1) ; val dmn = cv(2)
+            val u = new URL(dmn).getHost
+            val fLast = frs.head.toString + lst
+            val firstLast = frs + lst
+
+q
+        }
+      }
     }
   })
-  button("Select Files", {
-    println("file chooser")
-    fc.showOpenDialog(te.jp)
-    println("show open")
-  })
-  /*
-    button("Process URLs", {
-      val fl = fc.getSelectedFile
-      val u = scala.io.Source.fromFile(fl).getLines.toList
-      println("u " + u)
-      slf.setText(fl.getCanonicalPath + " #lines=" + u.length)
-      urls() = u
-    })
-  */
 
+
+
+  button("Select Files", fc.showOpenDialog(te.jp))
 
   class MicroList {
     val jls = new JList(cookiesZero)
     val jscp = new JScrollPane(jls)
     te.jp.add(jscp)
   }
-
-
 
   ad { new JLabel("store" + store().pageVistsByDomainTime.toList.toString)}
 
@@ -162,7 +147,7 @@ class SelExample(startingUrl: String = "http://linkedin.com") {
         println("going to url " + q)
         val domain = q.domain
         println("url domain " + domain)
-        cee.goto(q)
+        cee.navigateToURL(q)
         val cur = currentDay + " " + domain
         val prvMap = store().pageVistsByDomainTime
         val prvV = prvMap.getOrElse(cur, 0)

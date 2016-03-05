@@ -77,7 +77,7 @@ trait FileHelpUtilities {
       .appendAll(cnt + "\n")
   }
 
-  def loadCSV(cv: String) = {
+  def readCSV(cv: String) = {
     import com.github.tototoshi.csv.CSVReader
     val c = CSVReader.open(new File(cv))
     val a = c.all

@@ -31,7 +31,7 @@ trait CrawlerLike {
     * Grab current session cookies as scala friendly object
     * @return : Collection of cookies
     */
-  def exportCookies() : List[Cookie]
+  def extractCookies() : List[Cookie]
 
   /**
     * Initiate action removing cookies from driver

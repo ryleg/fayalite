@@ -20,7 +20,7 @@ object Yahoo {
   val symbolsI = getSymbols.zipWithIndex.toMap
 
   def getSymbols: List[String] = {
-    loadCSV("data\\companylist.csv").tail.map {
+    readCSV("data\\companylist.csv").tail.map {
       _ (0)
     }.filter { q =>
       !q.contains("""^""") && !q.contains(""".""") &&
