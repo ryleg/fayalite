@@ -15,10 +15,11 @@ class REPLManagerLike extends java.io.Serializable {
 
   val replInputSource = new PipedInputStream()
   val replInputSink = new PipedOutputStream(replInputSource)
-  val br = new BufferedReader(new InputStreamReader(replInputSource, "UTF-8"))
+  val iLoopBufferedReader = new BufferedReader(new InputStreamReader(replInputSource, "UTF-8"))
+
   val replOutputSink = new PipedOutputStream()
   val replOutputSource = new PipedInputStream(replOutputSink)
-  val pw = new JPrintWriter(replOutputSink)
+  val iLoopOutputCatch = new JPrintWriter(replOutputSink)
 
   var allHistory : String = ""
 
@@ -36,4 +37,6 @@ class REPLManagerLike extends java.io.Serializable {
     allHistory += output
     output
   }
+
+
 }

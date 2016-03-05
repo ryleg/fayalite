@@ -3,11 +3,14 @@ package org.fayalite.util
 import java.awt.event._
 import java.awt._
 import java.awt.image.BufferedImage
-import java.io.File
+import java.io.{Reader, BufferedReader, File}
 import javax.imageio.ImageIO
 import javax.swing.{JButton, JPanel, JLabel, JFrame}
 
+import ammonite.ops.Path
+import ammonite.repl.{Ref, Storage}
 import com.github.sarxos.webcam.Webcam
+import org.fayalite.repl.REPLManagerLike
 import org.scalatest.FlatSpec
 import org.scalatest.selenium.Chrome
 import org.scalatest.selenium.WebBrowser.go
@@ -217,33 +220,6 @@ class Button(title: String, action: () => Unit) {
   })
 }
 
-/**
-  * Direct draw frame builder
-  */
-class FrameInit {
-
-  val cm = new SymbolRegistry()
-
-  val f = new FFrame()
-
-  class Listen extends KeyListener {
-    override def keyTyped(e: KeyEvent): Unit = {}
-
-    override def keyPressed(e: KeyEvent): Unit = {
-      val img = cm.get(e.getKeyChar.toString)
-      f.update((d: Graphics) => {
-        img.draw(d, 50, 50)
-      })
-    }
-
-    override def keyReleased(e: KeyEvent): Unit = {}
-  }
-
-  val l = new Listen()
-  f.addKeyListener(l)
-  f.init()
-  f.start()
-}
 
 
 class ToyFrame {

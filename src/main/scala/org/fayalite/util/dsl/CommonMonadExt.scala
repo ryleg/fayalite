@@ -20,7 +20,13 @@ trait CommonMonadExt {
 
   def F[T](f: => T) = Future(f)
   def T[T](f: => T) = Try(f)
-
+  def TPL[T](f: => T) = {
+    val t = Try(f)
+    t match {
+      case Failure(e) => e.printStackTrace()
+    }
+    t
+  }
   def getFuture[T](fut: Future[T], timeout: Int = 10) = Await.result(fut, timeout.seconds)
 
   implicit class TryExt[T](some: Try[T]) {

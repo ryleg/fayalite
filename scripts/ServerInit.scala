@@ -34,7 +34,7 @@ val sc = SparkRef.getSC
 // These tests need to be re-incorporated back into the jar.
 
 val rml = new REPLManagerLike()
-val iloop = new MagicSparkILoop(Some(rml.br), rml.pw)
+val iloop = new MagicSparkILoop(Some(rml.iLoopBufferedReader), rml.iLoopOutputCatch)
 val fy = "/home/ubuntu/fayalite"
 val cp = fy + "/lib/spark-assembly-1.2.1-SNAPSHOT-hadoop1.0.4.jar" //+
 // ":" + fy + "/target/scala-2.10/fayalite.jar"

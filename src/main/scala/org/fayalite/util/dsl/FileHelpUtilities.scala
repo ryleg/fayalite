@@ -113,6 +113,7 @@ trait FileHelpUtilities {
     .getLines
 
   implicit class LocalIOHelp(p: Path) {
+/*
 
     def lsr = {
       import ammonite.ops._
@@ -121,6 +122,7 @@ trait FileHelpUtilities {
           _.segments.last != ".DS_Store"
         }
     }.toIterable
+*/
 
     def jsa(j: Any) = {
      // write.append(p, j.json + "\n")
@@ -129,6 +131,7 @@ trait FileHelpUtilities {
 
     def text = read(p).split("\n")
       .toList
+/*
 
     def textRec = lsr.filterNot{_.isDir}.flatMap {
       jj =>
@@ -143,6 +146,7 @@ trait FileHelpUtilities {
         JSON.parse4s(q).extract[T]
       }
     }
+*/
     def jser(a: List[Any]) = {
    //   write(p, a.map{_.json}.mkString("\n"))
     }

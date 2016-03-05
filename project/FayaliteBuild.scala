@@ -47,13 +47,14 @@ object FayaliteBuild extends sbt.Build {
   val essential = Seq(
     "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
     "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
-    "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc()
+    "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc(),
+    "com.lihaoyi" % "ammonite-repl_2.10.5" % "0.5.5" withSources() withJavadoc()
   )
 
   val web = Seq(
     "org.jsoup" % "jsoup" % "1.7.2"  withSources() withJavadoc(),
     "org.scalacheck" %% "scalacheck" % "1.11.4" % "test" withSources() withJavadoc(),
-    "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" % "test",
+    "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" withSources() withJavadoc(),
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
     "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
@@ -66,7 +67,7 @@ object FayaliteBuild extends sbt.Build {
     name := "fayalite",
     organization := "fayalite",
     version := "0.0.3",
-    scalaVersion := "2.10.4",
+    scalaVersion := "2.10.5",
     libraryDependencies :=
       jsonStuff ++
         essential ++

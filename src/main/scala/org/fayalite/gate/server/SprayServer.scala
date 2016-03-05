@@ -26,7 +26,7 @@ trait MessageProcesser {
   * requests using convenient helpers
   *
   * @param mp : Do something with websocket messages
-  * @param error : Do something with websocket errors
+  * //@param error : Do something with websocket errors
   */
 class WebSocketWorkerLike(
                            val serverConnection: akka.actor.ActorRef,

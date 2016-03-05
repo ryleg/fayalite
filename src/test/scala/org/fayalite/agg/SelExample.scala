@@ -16,20 +16,16 @@ class JSONSerHelper(fileBacking: String = ".metaback") {
 
   import SelExample._
   import rx.ops._
-
   val store = Var{Try{getStore}.getOrElse({
     println("optStoreZero")
     optStoreZero
   })}
-
   def getStore: MetaStore = {
     readFromFile(fileBacking).json[MetaStore]
   }
-
   def writeStore() = {
     writeToFile(fileBacking, store().json)
   }
-
   store.foreach{_ => writeStore()}
 
 }
@@ -51,6 +47,13 @@ object SelExample {
                         cookies: List[Cookie],
                         pageVistsByDomainTime: Map[String, Int]
                       )
+
+
+  def main(args: Array[String]) {
+    new SelExample()
+  }
+
+
 }
 
 class SelExample(startingUrl: String = "http://linkedin.com") {
@@ -110,20 +113,41 @@ class SelExample(startingUrl: String = "http://linkedin.com") {
 
   fc.addActionListener(new ActionListener{
     override def actionPerformed(e: ActionEvent): Unit = {
-      println("action event on Select files")
+   //   println("action event on Select files")
       slf.setText(fc.getSelectedFile.getName)
       F{
         val f = fc.getSelectedFile
         val cv = readCSV(f.getAbsolutePath)
+        println("csv " + cv)
         val brs = new ChromeWrapper(Some("http://mailtester.com"))
-        cv.tail.map{_.map{_.toLowerCase}}.map{
-          q =>
-            val frs = q(0); val lst = cv(1) ; val dmn = cv(2)
-            val u = new URL(dmn).getHost
-            val fLast = frs.head.toString + lst
-            val firstLast = frs + lst
+        brs.started.get.get
+        println("chrome init")
+        val lcv =
+          cv.tail.map{_.map{_.toLowerCase}}
+            println("cv  " + lcv)
 
-q
+            lcv.map{
+          q =>
+            TPL {
+              val frs = q(0);
+              val lst = q(1);
+              val dmn = q(2)
+              val u = new URL(dmn).getHost
+              val uu = u match {
+                case z if z.contains("\\.") => z.split("\\.").tail.mkString
+                case z => z
+              }
+              val fLast = frs.head.toString + lst
+              val firstLast = frs + lst
+              println("fl " + firstLast)
+              val email = brs.webDriver.findElementByXPath("//*[@id=\"content\"]/form/table/tbody/tr[1]/td/input")
+              val ev = fLast + "@" + uu
+              println("ev " + ev)
+              email.sendKeys(ev)
+              brs.webDriver.findElementByClassName("Button").click()
+              Thread.sleep(3000)
+              q
+            }
         }
       }
     }
