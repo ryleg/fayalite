@@ -1,17 +1,18 @@
 package org.fayalite.agg
 
+import fa.Schema._
+import fa._
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import rx._
-import rx.ops._
-import fa._
-import Schema._
 
 import scala.collection.JavaConversions
 
 // TODO : Get this to work in src/main without a strange compiler error.
 
 
-object ChromeWrapper {
+object SeleniumChrome {
+
+  setDriverProperty()
 
   val opts = new ChromeOptions()
   val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
@@ -31,12 +32,12 @@ object ChromeWrapper {
   * VM opt -Dwebdriver.chrome.driver=/your_path_to/chromedriver-mac32
   *
   */
-class ChromeWrapper(
+class SeleniumChrome(
                      startingUrl: Option[String] = None
                    ) extends org.scalatest.selenium.WebBrowser
   with CrawlerLike{
 
-  import ChromeWrapper._
+  import SeleniumChrome._
 
   /**
     * This is the entrypoint to browser manipulations.

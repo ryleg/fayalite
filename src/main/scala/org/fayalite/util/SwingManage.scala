@@ -234,6 +234,7 @@ class ToyFrame {
     jp.add(
       new Button(s, () => f).jButton)
   }
+  def ad(e: Component) = jp.add(e)
 
   val bigFont = new Font("monospace", Font.PLAIN, 20)
   def addTextInput[T](s: String) = {

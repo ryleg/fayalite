@@ -53,6 +53,8 @@ trait HTMLParsingHelpers {
       JSON.parse4s(s).extract[T]
     }
     def domain = s.split("http://").tail.mkString.split("/").head
+
+
   }
 
 

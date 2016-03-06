@@ -1,7 +1,6 @@
 package org.fayalite.util
 
 import scala.sys.process._
-import fa.SPARK_HOME
 // TODO: Switch to ammonite-ops. Merge with remote server management code ala EMR/EC2
 
 /**
@@ -14,9 +13,9 @@ import fa.SPARK_HOME
 object SparkRuntimeManager {
 
   // TODO: Pickup from configs.
-  val shome = SPARK_HOME
+  val shome = "" //SPARK_HOME
   val SPARK_PRINT_LAUNCH_COMMAND = "SPARK_PRINT_LAUNCH_COMMAND"
-  val sbin = SPARK_HOME + "sbin/"
+  val sbin = "" //SPARK_HOME + "sbin/"
   val bin = shome + "bin/"
   val masterHost = "ubuntu"
 

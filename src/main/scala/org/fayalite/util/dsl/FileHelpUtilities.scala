@@ -64,6 +64,8 @@ trait FileHelpUtilities {
       .writeAll(cnt)
   }
 
+  def fromFile(f: File) = scala.io.Source.fromFile(f)
+
   def readFromFile(f: String) = scala.io.Source.fromFile(f).mkString
 
   def readLines(f: String) = scala.io.Source.fromFile(f).getLines()
@@ -83,6 +85,12 @@ trait FileHelpUtilities {
     val a = c.all
     c.close()
     a
+  }
+
+  def writeCSV(output: String, cv: Seq[Seq[String]]) = {
+    val f2 = new File(output)
+    val writer = CSVWriter.open(f2)
+    writer.writeAll(cv)
   }
 
   implicit class DirtyCSVOps[T](

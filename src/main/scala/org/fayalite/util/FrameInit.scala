@@ -27,7 +27,7 @@ class FrameInit {
     override def keyPressed(e: KeyEvent): Unit = {
       val img = cm.get(e.getKeyChar.toString)
       f.update((d: Graphics) => {
-        img.draw(d, 50, 50)
+        // img.draw(d, 50, 50)
       })
     }
 
@@ -40,6 +40,9 @@ class FrameInit {
   f.start()
 }
 
+
+
+
 object FrameInit {
 
   import scala.tools.nsc.interpreter.ILoop
@@ -49,38 +52,6 @@ object FrameInit {
     val storage = Storage(ammonite.ops.home, None)
     //   val r = new Repl(System.in, System.out, System.err, Ref(storage))
     //  r.run()
-
-    val rml = new REPLManagerLike()
-
-    val i = new ILoop(Some(rml.iLoopBufferedReader), rml.iLoopOutputCatch) {
-      def addThunk2(body: => Unit) = addThunk(body)
-    }
-
-
-    import i.{intp, addThunk2 => addThunk}
-
-    savingContextLoader {
-
-      i.createInterpreter()
-      val in0 = SimpleReader(rml.iLoopBufferedReader,  rml.iLoopOutputCatch, true)
-      // Bind intp somewhere out of the regular namespace where
-      // we can get at it in generated code.
-      addThunk(intp.quietBind(NamedParam[IMain]("$intp", intp)(tagOfIMain, classTag[IMain])))
-      addThunk({
-        import scala.tools.nsc.io._
-        import Properties.userHome
-        import scala.compat.Platform.EOL
-        val autorun = replProps.replAutorunCode.option flatMap (f => io.File(f).safeSlurp())
-        if (autorun.isDefined) intp.quietRun(autorun.get)
-      })
-      // it is broken on startup; go ahead and exit
-      if (intp.reporter.hasErrors) println("has errors")
-      intp.initializeSynchronous()
-      postInitialization()
-
-    }
-
-    println(i.intp.interpret("val x = 1"))
 
     Thread.sleep(Long.MaxValue)
 

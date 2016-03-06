@@ -17,8 +17,19 @@ trait StringFormatHelpers {
     */
   implicit class WithAdditions(se: String) {
     def withQuotes = {
-    '"'.toString + se + '"'.toString
-  }}
+      '"'.toString + se + '"'.toString
+    }
+      /**
+        * Replace all occurrences of any pattern
+        * in this collection within string
+        *
+        * @param out : Stuff to throw out, replace with
+        *            emptyString
+        */
+    def withOut(out: List[String]) = {
+        out.foldLeft(se) { case (x,y) => x.replaceAll(y, "") }
+      }
+  }
 
 
 
