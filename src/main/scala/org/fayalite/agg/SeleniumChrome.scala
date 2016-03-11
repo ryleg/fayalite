@@ -1,8 +1,15 @@
 package org.fayalite.agg
 
+import java.awt.event.KeyEvent
+import java.awt.{Toolkit, Robot}
+import java.awt.datatransfer.StringSelection
+
 import fa.Schema._
 import fa._
+import org.openqa.selenium.Proxy
+import org.openqa.selenium.Proxy.ProxyType
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 import rx._
 
 import scala.collection.JavaConversions
@@ -12,12 +19,94 @@ import scala.collection.JavaConversions
 
 object SeleniumChrome {
 
+
+  /**
+    * This works for an authenticated proxy but it forces a
+    * browser prompt which is solved by a Robot
+    * @param desiredProxy : Ip:port string as expected from proxy lists
+    * @param opt : Extra options, defaults to normal to spoof user agent.
+    * @return
+    */
+  def mkProxy(desiredProxy: String, opt: ChromeOptions = getOpts) = {
+    val prox = new Proxy()
+    prox.setHttpProxy(desiredProxy)
+    prox.setFtpProxy(desiredProxy)
+    prox.setSslProxy(desiredProxy)
+    val cap = new DesiredCapabilities()
+    cap.setCapability(CapabilityType.PROXY, prox)
+    cap.setCapability("chromeOptions", opt)
+    cap
+  }
+
+  /**
+    * This deals with nasty browser authentication window
+    * popups that aren't website based.
+    *
+    * @param username : HTML username to login with as you would encode
+    *                 for a http request
+    * @param pass : Password
+    */
+  def browserLogin(username: String, pass: String) = {
+    val user = new StringSelection(username)
+    val rb = new Robot()
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(user, null)
+    println("set clip")
+    rb.keyPress(KeyEvent.VK_CONTROL)
+    rb.keyPress(KeyEvent.VK_V)
+    rb.keyRelease(KeyEvent.VK_V)
+    rb.keyRelease(KeyEvent.VK_CONTROL)
+    //tab to password entry field
+    rb.keyPress(KeyEvent.VK_TAB)
+    rb.keyRelease(KeyEvent.VK_TAB)
+    Thread.sleep(600)
+    //Enter password by ctrl-v
+    val pwd = new StringSelection(pass)
+    Toolkit.getDefaultToolkit().getSystemClipboard().setContents(pwd, null)
+    rb.keyPress(KeyEvent.VK_CONTROL)
+    rb.keyPress(KeyEvent.VK_V)
+    rb.keyRelease(KeyEvent.VK_V)
+    rb.keyRelease(KeyEvent.VK_CONTROL)
+    //press enter
+    rb.keyPress(KeyEvent.VK_ENTER)
+    rb.keyRelease(KeyEvent.VK_ENTER)
+  }
+
+  /**
+    * This needs to be set because otherwise you need a -D java
+    * option to let Selenium know where the binary for Chrome is
+    */
   setDriverProperty()
 
-  val opts = new ChromeOptions()
-  val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
-  opts.addArguments("user-agent=" + userAgent)
-  def apply = new ChromeDriver(opts)
+  def getOpts = {
+    val opts = new ChromeOptions()
+    val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
+    opts.addArguments("user-agent=" + userAgent)
+    opts
+  }
+
+  def apply = new ChromeDriver(getOpts)
+
+  def driverByProxy(proxyEnc: String) = {
+    val opts = getOpts
+    //  opts.addArguments("--proxy-server=" + proxyEnc)
+    import org.openqa.selenium.Proxy
+    import JavaConversions._
+
+    val ma = Map(
+      "httpProxy" -> proxyEnc,
+      "ftpProxy" -> proxyEnc,
+      "sslProxy" -> proxyEnc,
+      "noProxy" -> "None",
+      "proxyType" -> "MANUAL",
+      "class" -> "org.openqa.selenium.Proxy",
+      "autodetect" -> false
+    )
+    val prox = new Proxy(ma)
+    val cap = new DesiredCapabilities()
+    cap.setCapability("proxy", prox)
+    //  cap.setCapability("chromeOptions", opts)
+    new ChromeDriver(opts)
+  }
 
 }
 
@@ -33,8 +122,9 @@ object SeleniumChrome {
   *
   */
 class SeleniumChrome(
-                     startingUrl: Option[String] = None
-                   ) extends org.scalatest.selenium.WebBrowser
+                      startingUrl: Option[String] = None,
+                      proxy: Option[String] = None
+                    ) extends org.scalatest.selenium.WebBrowser
   with CrawlerLike{
 
   import SeleniumChrome._
@@ -48,7 +138,7 @@ class SeleniumChrome(
     * a new instance of a webdriver into some pre-existing instance
     * of this class.
     */
-  implicit val webDriver = apply
+  implicit val webDriver = proxy.map{driverByProxy}.getOrElse{apply}
 
   /**
     * Change the browser window size at any time.

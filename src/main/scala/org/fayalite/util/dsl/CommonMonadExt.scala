@@ -18,6 +18,15 @@ trait CommonMonadExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
+  implicit class SimpleArrayExt[A](a: Array[A]) {
+    def _2 = {
+      a match {
+        case Array(x,y) => (x, y)
+      }
+    }
+  }
+
+
   def F[T](f: => T) = Future(f)
   def T[T](f: => T) = Try(f)
   def TPL[T](f: => T) = {

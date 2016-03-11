@@ -10,10 +10,6 @@ import akka.actor.{ActorSystem, ActorRef}
 import akka.pattern.ask
 import org.fayalite.repl.REPL._
 
-
-import JSON._
-
-import scala.reflect.ClassTag
 import scala.util.Random
 
 
@@ -29,12 +25,12 @@ trait AkkaExt {
   implicit class ActorExt(actor: ActorRef) {
 
     def ??[T](msg: Any) = {
-      (actor ? msg).getAs[T]
+      ask(actor, msg).getAs[T]
     }
 
 
     def ??[T](msg: Any, timeout: Int=3) = {
-      (actor ? msg).getAs[T](timeout)
+      ask(actor, msg).getAs[T](timeout)
     }
 
   }

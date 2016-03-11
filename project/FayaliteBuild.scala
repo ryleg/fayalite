@@ -11,7 +11,8 @@ object FayaliteBuild extends sbt.Build {
   override lazy val settings = super.settings ++
     Seq(
       resolvers := Seq(
-
+        "bintray" at "http://jcenter.bintray.com",
+        "softprops-maven" at "http://dl.bintray.com/content/softprops/maven",
         "mvnrepository" at "http://mvnrepository.com/artifact/",
         "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
         "Spray" at "http://repo.spray.io",
@@ -57,7 +58,9 @@ object FayaliteBuild extends sbt.Build {
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
     "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
-    "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
+    "me.lessis" %% "courier" % "0.1.3" withSources() withJavadoc(),
+    "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources(),
+    "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc()
   )
 
   lazy val root = Project(
@@ -75,6 +78,8 @@ object FayaliteBuild extends sbt.Build {
         Seq(
           "org.scalatest" % "scalatest_2.10" % "2.0.M5b",
           "amplab" % "spark-indexedrdd" % "0.1",
+          "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
+          "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc(),
       //    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
    //       "com.googlecode.lanterna" % "lanterna" % "2.1.9",
   //        "com.jcraft" % "jzlib" % "1.1.3",
