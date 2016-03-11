@@ -9,148 +9,6 @@ import javax.swing.{JButton, JFrame, JPanel}
 
 import scala.collection.mutable
 
-
-/**
-  * Same as regular frame but with irritating
-  * init methods wrapped up and a fix for being
-  * able to draw directly to the buffer and
-  * interface with it directly through a functional
-  * process loop
-  *
-  * @param name : Your tag for the window
-  */
-class FFrame(name: String = "fayalite") extends JFrame(name) {
-
-  /**
-    * Does the gross stuff to get you a frame
-    */
-  def init() = {
-    setBackground(Color.BLACK)
-    setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
-    setPreferredSize(new Dimension(800, 600))
-    setEnabled(true)
-    pack()
-    setVisible(true)
-  }
-
-  /**
-    * Required for direct draws to buffer in func loop below
-    *
-    * @return : Guaranteed buffer strategy
-    */
-  override def getBufferStrategy = {
-    val bs = super.getBufferStrategy
-    if (bs == null) {
-      super.createBufferStrategy(4)
-      super.getBufferStrategy
-    } else bs
-  }
-
-  def graphics = getBufferStrategy.getDrawGraphics
-
-  import fa._
-
-  //Single graphics object available for
-  //             drawing onto
-  var draw: (Graphics => Unit) = (g: Graphics) => {
-    g.setColor(Color.black)
-    g.drawRect(0, 0, 800, 600)
-    g.setColor(Color.white)
-  }
-
-
-  /**
-    * Accumulate functions to execute in draw
-    * order beginning with original instantiation
-    *
-    * @param d : Draw func to add
-    */
-  def update(d: (Graphics => Unit)) = {
-    val oldDraw = draw
-    val newDraw = (g: Graphics) => {
-      oldDraw(g)
-      d(g)
-    }
-    draw = newDraw
-  }
-
-  def doDraw() = {
-    draw(graphics)
-    postDraw()
-  }
-
-  def postDraw() = {
-    val bs = getBufferStrategy
-    val g = bs.getDrawGraphics
-    g.dispose(); bs.show()
-  }
-
-  /**
-    * Event process loop for drawing
-    *
-    * @return : Future of draw loop for exception handling
-    */
-  def start() = F {
-      doDraw() // This can use a lot of cpu potentially if repeated
-  }
-
-}
-
-
-
-/**
-  * Drawing characters excessively through the
-  * drawString function wastes memory and is irritating
-  * to manage.
-  *
-  * Instead we intead to route all chracter buffering
-  * through either BufferedImage hashes or VolatileImage
-  * stateless draws.
-  *
-  */
-class SymbolRegistry() {
-
-  // For storing prerendered characters and/or unicode-like
-  // strings, basically anything that would go through drawString
-  // and needs buffering/mapping in some capacity
-  val h = new mutable.HashMap[String, BufferedImage]()
-
-  /**
-    * Grab the chosen unicode-like string for the Graphics2d
-    * drawString call.
-    *
-    * @param s : Some string, typically a single character that will
-    *          fit inside the typical draw window.
-    *          Override / edit to get
-    * @return : Small tile containing your draw
-    */
-  def get(s: String) = {
-    h.getOrElseUpdate(s, {
-      val b = new BufferedImage(25, 29, BufferedImage.TYPE_INT_ARGB)
-      val bg = b.createGraphics()
-      bg.setBackground(Color.BLACK)
-      bg.setColor(Color.WHITE)
-      bg.setFont(new Font("TimesRoman", Font.PLAIN, 27))
-      bg.drawString(s, 1, 23)
-      b
-    })
-  }
-
-  /**
-    * Save a tile to a file for viewing or other usage.
-    *
-    * @param s : String, see get for doc
-    * @param f : String
-    * @return
-    */
-  def exportTile(s: String, f: String) = {
-    val b = get(s)
-    val q = new File(f)
-    ImageIO.write(b, "jpg", q)
-  }
-
-}
-
 /**
   * Just a really simple button
   *
@@ -171,8 +29,6 @@ class FButton(title: String, action: () => Unit) {
     override def mouseReleased(e: MouseEvent): Unit = {}
   })
 }
-
-
 
 class ToyFrame {
   import SwingManage._
@@ -197,8 +53,6 @@ class ToyFrame {
     jp.add(ta)
     ta
   }
-
-
   f.add{jp}
 
   def finish() = {
@@ -230,25 +84,6 @@ object SwingManage {
 
   def main(args: Array[String]) {
 
-  }/*
-
-    val frame = new
-
-    while(true) {
-      val bs = frame.getBufferStrategy
-        val g = bs.getDrawGraphics
-        val img = webcam.getImage
-        val h = img.getHeight; val w = img.getWidth()
-        val sw =  sd.getDisplayMode.getWidth
-        val sh =  sd.getDisplayMode.getHeight
-        val sbi = img.getSubimage(50, 50, w-150, h-50)
-
-        g.drawImage(sbi, 0, 0, sd.getDisplayMode.getWidth, sd.getDisplayMode.getHeight, Color.BLACK, null)
-        g.dispose(); bs.show()
-        //   println("drew img.")
-      }
-*/
-
-
+  }
 
 }

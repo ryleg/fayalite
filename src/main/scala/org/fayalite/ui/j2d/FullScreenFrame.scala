@@ -3,7 +3,6 @@ package org.fayalite.ui.j2d
 import java.awt.{GraphicsEnvironment, GraphicsDevice, Frame}
 import java.awt.event.WindowEvent
 
-import org.fayalite.util.FFrame
 
 /**
   * Creates a fullscreen window with a workaround

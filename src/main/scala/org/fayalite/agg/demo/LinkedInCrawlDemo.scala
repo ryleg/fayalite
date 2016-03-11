@@ -1,4 +1,4 @@
-package org.fayalite.agg
+package org.fayalite.agg.demo
 
 import java.awt.BorderLayout
 import java.io.File
@@ -6,6 +6,7 @@ import javax.swing.JPanel
 
 import fa.Schema._
 import fa._
+import org.fayalite.agg.{QuickFile, QuickPanel, SeleniumChrome}
 
 
 /**

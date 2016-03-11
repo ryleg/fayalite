@@ -19,7 +19,6 @@ object Swing {
 
   def main(args: Array[String]) {
 
-    val u = new U()
     val m = new MouseListener {
       override def mouseExited(e: MouseEvent): Unit = {}
 
