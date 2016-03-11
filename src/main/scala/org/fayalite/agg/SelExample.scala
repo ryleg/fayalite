@@ -8,7 +8,8 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import fa.Schema.Cookie
 import fa._
-import org.fayalite.util.{Button, ToyFrame}
+import org.fayalite.repl.REPLFrame
+import org.fayalite.util.{FButton, ToyFrame}
 import rx._
 
 import scala.util.Try
@@ -36,7 +37,7 @@ abstract class QuickPanel
   subPanel.add(descr)
   parentPanel.add(subPanel, childToParentLayout)
   def button(s: String, t: => Unit) = {
-    subPanel.add(new Button(s, () => t).jButton)
+    subPanel.add(new FButton(s, () => t).jButton)
   }
   def text(s: String) = {
     val jl = new JLabel(s)
@@ -50,7 +51,7 @@ class QuickFile(title: String, proc: File => Unit)
  extends QuickPanel(title)(parentPanel, BorderLayout.CENTER) {
   val slf = new JLabel("no file selected")
   val fc = new JFileChooser()
-  val but = new Button("Select File",
+  val but = new FButton("Select File",
     () => fc.showOpenDialog(parentPanel)
   ).jButton
   fc.addActionListener(new ActionListener {
@@ -159,5 +160,9 @@ class SelExample extends KVStore {
   new MailTesterDemo()
 
   te.finish()
+
+  val rr = new REPLFrame()
+
+
 
 }

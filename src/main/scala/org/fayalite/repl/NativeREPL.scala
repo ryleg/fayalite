@@ -1,17 +1,25 @@
 package org.fayalite.repl
 
+import rx.core.Var
+
 import scala.reflect._
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.io
 import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.reflect.StdRuntimeTags._
 
+import fa._
+
 /**
   * Created by aa on 3/4/2016.
   */
 class NativeREPL {
 
-  def interpret(s: String) = i.intp.interpret(s)
+  def interpret(s: String) = {
+    i.intp.interpret(s)
+    rml.read()
+  }
+
 
   val rml = new REPLManagerLike()
   val i = new ILoop(Some(rml.iLoopBufferedReader), rml.iLoopOutputCatch) {
@@ -33,6 +41,6 @@ class NativeREPL {
         postInitialization()
       }
     }
-    betterProcess
+    betterProcess // THIS STARTS EVERYTHING
   }
 }

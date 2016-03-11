@@ -25,9 +25,10 @@ object Proxy {
   /**
     * This assumes you have a local text file filled with
     * colon delimited host:port:user:pass proxies
+    *
     * @return Parsed usable proxies
     */
-  def proxies = readLines("proxies.txt").toSeq.map{
+  def proxies = readLines(".proxies").toSeq.map{
     q =>
       q.split(":") match {
         case Array(x,y,z,w) =>
@@ -47,11 +48,7 @@ object Proxy {
 
     println("Testing with proxy " + tes)
 
-    val cap = mkProxy(tes.hostPort)
-
-    val driver = new ChromeDriver(cap)
-    println(getIp)
-    driver.get(getIp)
+    new SeleniumChrome(None, Some(tes))
 
     //  Thread.sleep(5000)
 /*

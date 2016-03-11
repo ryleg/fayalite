@@ -23,6 +23,10 @@ class REPLManagerLike extends java.io.Serializable {
 
   var allHistory : String = ""
 
+  var onRead = (s: String) => {
+    println("REPL Readout: " + s)
+  }
+
   def read() : String = {
     var output = ""
     var bytesRead = 0
@@ -30,9 +34,14 @@ class REPLManagerLike extends java.io.Serializable {
       bytesRead = replOutputSource.available()
       val buffer = new Array[Byte](bytesRead)
       replOutputSource.read(buffer)
-      output += buffer.map {
+      val newRead = buffer.map {
         _.toChar
       }.mkString("")
+      if (newRead.nonEmpty) {
+        onRead(newRead)
+      }
+
+      output += newRead
     } while (bytesRead > 0)
     allHistory += output
     output

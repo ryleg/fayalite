@@ -1,20 +1,41 @@
-package org.fayalite.util
+package org.fayalite.util.img
 
-import java.awt.GraphicsEnvironment
+import java.awt.{Color, Graphics, GraphicsEnvironment}
 import java.io.File
-import java.util
 import javax.imageio.ImageIO
 import javax.swing.JFrame
 
-import com.github.sarxos.webcam.{WebcamEvent, WebcamListener, Webcam}
+import com.github.sarxos.webcam.{Webcam, WebcamEvent, WebcamListener}
 
-import scala.collection.JavaConversions
 import scala.collection.JavaConversions._
 
 /**
  * Created by aa on 11/28/2015.
  */
 object MutaCam {
+
+
+  def randBytes(len: Int) = {
+    val vb: Array[Byte] = Array.fill(len)(0.toByte)
+    scala.util.Random.nextBytes(vb)
+    vb
+  }
+
+  implicit class WebCamOps(wc: Webcam) {
+    def savePNG(out: String) = {
+      ImageIO.write(
+        wc.getImage(), "PNG", new File(out))
+    }
+    def drawTo(g: Graphics) = {
+      val img = wc.getImage
+      g.drawImage(img, 0, 0, img.getWidth, img.getHeight, Color.BLACK, null)
+    }
+  }
+
+  def readImg(f: String) = {
+    val image = ImageIO.read(
+      new File(f))
+  }
 
   // lets attempt to draw a graph of numbers
   // and there operative relations to one another using
@@ -41,9 +62,6 @@ object MutaCam {
 
   //need hotkey for jump to right of declaration. on line.
   def graphics = { GraphicsEnvironment getLocalGraphicsEnvironment }
-
-
-  import JavaConversions._
   def devices = { graphics getScreenDevices }.toList
 
 

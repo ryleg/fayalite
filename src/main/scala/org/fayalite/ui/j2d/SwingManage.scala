@@ -1,22 +1,13 @@
-package org.fayalite.util
+package org.fayalite.ui.j2d
 
-import java.awt.event._
 import java.awt._
+import java.awt.event._
 import java.awt.image.BufferedImage
-import java.io.{Reader, BufferedReader, File}
+import java.io.File
 import javax.imageio.ImageIO
-import javax.swing.{JButton, JPanel, JLabel, JFrame}
-
-import ammonite.ops.Path
-import ammonite.repl.{Ref, Storage}
-import com.github.sarxos.webcam.Webcam
-import org.fayalite.repl.REPLManagerLike
-import org.scalatest.FlatSpec
-import org.scalatest.selenium.Chrome
-import org.scalatest.selenium.WebBrowser.go
+import javax.swing.{JButton, JFrame, JPanel}
 
 import scala.collection.mutable
-import scala.concurrent.Future
 
 
 /**
@@ -38,7 +29,6 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     setPreferredSize(new Dimension(800, 600))
     setEnabled(true)
-
     pack()
     setVisible(true)
   }
@@ -84,65 +74,29 @@ class FFrame(name: String = "fayalite") extends JFrame(name) {
     draw = newDraw
   }
 
+  def doDraw() = {
+    draw(graphics)
+    postDraw()
+  }
+
+  def postDraw() = {
+    val bs = getBufferStrategy
+    val g = bs.getDrawGraphics
+    g.dispose(); bs.show()
+  }
+
   /**
     * Event process loop for drawing
     *
     * @return : Future of draw loop for exception handling
     */
   def start() = F {
-    while(true) {
-      val bs = getBufferStrategy
-      val g = bs.getDrawGraphics
-      draw(g)
-      g.dispose(); bs.show()
-    }
+      doDraw() // This can use a lot of cpu potentially if repeated
   }
 
 }
 
-/**
-  * Creates a fullscreen window with a workaround
-  * to not minimize to the background, flickers a
-  * little on context change but whatever, beats alternative
-  *
-  * @param windowId: String of 0,1,2 etc. corresponding to monitor id
-  */
-class FullScreenFrame(windowId: String) extends FFrame(
-  name = windowId
-) {
-  /**
-    * This causes a little flicker on context
-    * switching but it restores the max state, otherwise
-    * the window will just dissapear.
-    *
-    * @param we : Some window event, like the user clicked on a different
-    *           monitor.
-    */
-  override def processWindowEvent (we: WindowEvent): Unit = {
-    setExtendedState (getExtendedState | Frame.MAXIMIZED_BOTH)
-  }
 
-  /**
-    * This is for assigning the monitor on discovery
-    * in case you ever need to use the reference
-    * to the monitor device for grabbing info about it.
-    */
-  var graphicsDevice: GraphicsDevice = null
-
-  override def init() = {
-    setExtendedState(getExtendedState)
-    setAlwaysOnTop(true)
-    setUndecorated(true)
-    super.init()
-    GraphicsEnvironment.getLocalGraphicsEnvironment.getScreenDevices.foreach {
-      case q if q.getIDstring.contains(windowId) =>
-        q.setFullScreenWindow(this) // This triggers fullscreen
-        graphicsDevice = q // for grabbing window info.
-      case _ => // Assign errors through overrides if requested.
-    }
-  }
-
-}
 
 /**
   * Drawing characters excessively through the
@@ -197,8 +151,6 @@ class SymbolRegistry() {
 
 }
 
-import fa._
-
 /**
   * Just a really simple button
   *
@@ -207,7 +159,7 @@ import fa._
   *               expect much information here, this is
   *               simple
   */
-class Button(title: String, action: () => Unit) {
+class FButton(title: String, action: () => Unit) {
   val jButton = new JButton(title)
   jButton.addMouseListener(new MouseListener{
     override def mouseExited(e: MouseEvent): Unit = {}
@@ -232,7 +184,7 @@ class ToyFrame {
 
   def addButton[T](s: String, f: => T) = {
     jp.add(
-      new Button(s, () => f).jButton)
+      new FButton(s, () => f).jButton)
   }
   def ad(e: Component) = jp.add(e)
 

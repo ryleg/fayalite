@@ -1,25 +1,25 @@
-package org.fayalite.util
+package org.fayalite.repl
 
 import java.awt.Graphics
-import java.awt.event.{KeyListener, KeyEvent}
+import java.awt.event.{KeyEvent, KeyListener}
 
 import ammonite.repl.Storage
-import org.fayalite.repl.REPLManagerLike
-
-import scala.reflect._
-import scala.tools.nsc.{io, Properties, Settings}
-import scala.tools.nsc.interpreter._
-import scala.tools.nsc.util.ScalaClassLoader._
-import scala.tools.reflect.StdRuntimeTags._
+import org.fayalite.util.{FFrame, SymbolRegistry}
+import fa._
 
 /**
   * Direct draw frame builder
   */
-class FrameInit {
+class REPLFrame {
 
   val cm = new SymbolRegistry()
 
   val f = new FFrame()
+
+  val nr = new NativeREPL()
+
+  val rs = F{ nr.interpret("val x = 1")}
+  rs.onComplete(q => println("Interpreter output " + q.get))
 
   class Listen extends KeyListener {
     override def keyTyped(e: KeyEvent): Unit = {}
@@ -27,7 +27,7 @@ class FrameInit {
     override def keyPressed(e: KeyEvent): Unit = {
       val img = cm.get(e.getKeyChar.toString)
       f.update((d: Graphics) => {
-        // img.draw(d, 50, 50)
+         img.draw(d, 50, 50)
       })
     }
 
@@ -38,17 +38,18 @@ class FrameInit {
   f.addKeyListener(l)
   f.init()
   f.start()
+
+
+
+
 }
 
 
 
 
-object FrameInit {
-
-  import scala.tools.nsc.interpreter.ILoop
+object REPLFrame {
 
   def main(args: Array[String]) {
-    import ammonite.repl.Repl
     val storage = Storage(ammonite.ops.home, None)
     //   val r = new Repl(System.in, System.out, System.err, Ref(storage))
     //  r.run()

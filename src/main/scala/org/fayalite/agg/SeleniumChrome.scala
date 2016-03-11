@@ -6,6 +6,7 @@ import java.awt.datatransfer.StringSelection
 
 import fa.Schema._
 import fa._
+import org.fayalite.agg.Proxy.ProxyDescr
 import org.openqa.selenium.Proxy
 import org.openqa.selenium.Proxy.ProxyType
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
@@ -23,6 +24,7 @@ object SeleniumChrome {
   /**
     * This works for an authenticated proxy but it forces a
     * browser prompt which is solved by a Robot
+    *
     * @param desiredProxy : Ip:port string as expected from proxy lists
     * @param opt : Extra options, defaults to normal to spoof user agent.
     * @return
@@ -77,6 +79,10 @@ object SeleniumChrome {
     */
   setDriverProperty()
 
+  /**
+    * User agent spoof for not getting banned from everything
+    * @return : Options for passing onto driver
+    */
   def getOpts = {
     val opts = new ChromeOptions()
     val userAgent = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
@@ -86,27 +92,43 @@ object SeleniumChrome {
 
   def apply = new ChromeDriver(getOpts)
 
-  def driverByProxy(proxyEnc: String) = {
-    val opts = getOpts
-    //  opts.addArguments("--proxy-server=" + proxyEnc)
-    import org.openqa.selenium.Proxy
-    import JavaConversions._
-
-    val ma = Map(
-      "httpProxy" -> proxyEnc,
-      "ftpProxy" -> proxyEnc,
-      "sslProxy" -> proxyEnc,
-      "noProxy" -> "None",
-      "proxyType" -> "MANUAL",
-      "class" -> "org.openqa.selenium.Proxy",
-      "autodetect" -> false
-    )
-    val prox = new Proxy(ma)
-    val cap = new DesiredCapabilities()
-    cap.setCapability("proxy", prox)
-    //  cap.setCapability("chromeOptions", opts)
-    new ChromeDriver(opts)
+  /**
+    * Forcibly authenticate a proxy
+    * @param proxyEnc : Full proxy description for
+    *                 dedication proxy
+    * @return Driver logged in and ready
+    */
+  def driverByProxy(proxyEnc: ProxyDescr) = {
+    val cap = mkProxy(proxyEnc.hostPort)
+    val driver = new ChromeDriver(cap)
+    driver.get(Proxy.getIp)
+    SeleniumChrome.browserLogin(proxyEnc.user, proxyEnc.pass)
+    driver
   }
+
+
+  // This might also work but had issues
+  /*  def driverByProxy(proxyEnc: String) = {
+      val opts = getOpts
+      //  opts.addArguments("--proxy-server=" + proxyEnc)
+      import org.openqa.selenium.Proxy
+      import JavaConversions._
+
+      val ma = Map(
+        "httpProxy" -> proxyEnc,
+        "ftpProxy" -> proxyEnc,
+        "sslProxy" -> proxyEnc,
+        "noProxy" -> "None",
+        "proxyType" -> "MANUAL",
+        "class" -> "org.openqa.selenium.Proxy",
+        "autodetect" -> false
+      )
+      val prox = new Proxy(ma)
+      val cap = new DesiredCapabilities()
+      cap.setCapability("proxy", prox)
+      //  cap.setCapability("chromeOptions", opts)
+      new ChromeDriver(opts)
+    }*/
 
 }
 
@@ -123,7 +145,7 @@ object SeleniumChrome {
   */
 class SeleniumChrome(
                       startingUrl: Option[String] = None,
-                      proxy: Option[String] = None
+                      proxy: Option[ProxyDescr] = None
                     ) extends org.scalatest.selenium.WebBrowser
   with CrawlerLike{
 
