@@ -2,13 +2,9 @@ import AssemblyKeys._ // put this at the top of the file
 
 assemblySettings
 
-Project.inConfig(Test)(baseAssemblySettings)
+jarName in assembly := s"${name.value}-test-${version.value}.jar"
 
-parallelExecution in Test := false
-
-jarName in (Test, assembly) := s"${name.value}-test-${version.value}.jar"
-
-mergeStrategy in (Test, assembly) <<= (mergeStrategy in assembly) { (old) =>
+mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 {
   case q if q.contains(".DS_Store") ||
     q.contains("JS_DEPENDENCIES") ||
@@ -26,4 +22,4 @@ mergeStrategy in (Test, assembly) <<= (mergeStrategy in assembly) { (old) =>
 
 //run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
 
-mainClass in (Test, assembly) := Some("org.fayalite.agg.SelCtrl")
+mainClass in assembly := Some("org.fayalite.agg.SelCtrl")

@@ -3,6 +3,7 @@ package org.fayalite.agg
 import java.io.File
 
 import fa._
+import org.fayalite.util.JSON
 import rx._
 
 /**
@@ -44,14 +45,15 @@ class FileBackedKVStore[T](dirBack: String = ".hidden")(
   }
 }
 
-class KVStore(dirBack: String = ".hidden")
-{
+trait KVStore {
+
+  val dirBack: String = ".hidden"
   val dirbk = new File(dirBack)
   if (!dirbk.isDirectory && !dirbk.isFile) dirbk.mkdir()
 
-  def store[T](relFnm: String, contents: T)(
-    implicit manifest: Manifest[T]
-  ) = {
+  def store[T](relFnm: String, contents: T)
+       //       (implicit manifest: Manifest[T])
+  = {
     val f = new File(dirbk, relFnm)
     writeToFile(f.getCanonicalPath, contents.json)
   }

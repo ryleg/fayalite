@@ -31,11 +31,10 @@ object FayaliteBuild extends sbt.Build {
 
 
   val jsonStuff = Seq(
-    "org.json4s" %% "json4s-core" % "3.2.10" % "provided" withSources() withJavadoc(),
-    "org.json4s" %% "json4s-jackson" % "3.2.10" % "provided" withSources() withJavadoc(),
-    "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8" % "provided" withSources(),
-    "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8" % "provided" withSources(),
-    "org.json4s" %% "json4s-ext" % "3.2.10" withSources() withJavadoc(),
+    "org.json4s" %% "json4s-core" % "3.2.10" withSources() withJavadoc(),
+    "org.json4s" %% "json4s-jackson" % "3.2.10" withSources() withJavadoc(),
+    "org.codehaus.jackson" % "jackson-core-asl" % "1.8.8" withSources(),
+    "org.codehaus.jackson" % "jackson-mapper-asl" % "1.8.8" withSources(),
     "com.github.fge" % "jackson-coreutils" % "1.8" withSources()
   )
 
@@ -90,6 +89,6 @@ object FayaliteBuild extends sbt.Build {
     base = file("./sjs")
   )
 
-  mainClass in (Compile, run) := Some("org.fayalite.sjs.App")
+  mainClass in (Compile, run) := Some("org.fayalite.agg.SelExample")
 
 }

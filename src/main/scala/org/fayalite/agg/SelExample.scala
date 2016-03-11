@@ -1,6 +1,6 @@
 package org.fayalite.agg
 
-import java.awt.Component
+import java.awt.BorderLayout
 import java.awt.event.{ActionEvent, ActionListener}
 import java.io.File
 import javax.swing._
@@ -8,7 +8,6 @@ import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import fa.Schema.Cookie
 import fa._
-import org.fayalite.agg.SelExample.MetaStore
 import org.fayalite.util.{Button, ToyFrame}
 import rx._
 
@@ -21,20 +20,34 @@ object SelExample {
                         cookies: List[Cookie],
                         pageVistsByDomainTime: Map[String, Int]
                       )
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
+    new SelExample()
   }
 
 }
 
-abstract class QuickPanel(title: String)(implicit parentPanel: JPanel) {
+abstract class QuickPanel
+(title: String)
+(implicit parentPanel: JPanel,
+ childToParentLayout: String
+) extends KVStore {
   val subPanel = new JPanel()
   val descr = new JLabel(title)
   subPanel.add(descr)
-  parentPanel.add(subPanel)
+  parentPanel.add(subPanel, childToParentLayout)
+  def button(s: String, t: => Unit) = {
+    subPanel.add(new Button(s, () => t).jButton)
+  }
+  def text(s: String) = {
+    val jl = new JLabel(s)
+    subPanel.add(jl)
+    jl
+  }
 }
 
-class QuickFile(title: String, proc: => Unit)(implicit parentPanel: JPanel)
- extends QuickPanel(title)(parentPanel){
+class QuickFile(title: String, proc: File => Unit)
+               (implicit parentPanel: JPanel)
+ extends QuickPanel(title)(parentPanel, BorderLayout.CENTER) {
   val slf = new JLabel("no file selected")
   val fc = new JFileChooser()
   val but = new Button("Select File",
@@ -43,11 +56,11 @@ class QuickFile(title: String, proc: => Unit)(implicit parentPanel: JPanel)
   fc.addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       slf.setText(fc.getSelectedFile.getName)
-      proc
+      proc(fc.getSelectedFile)
     }
   })
   subPanel.add(slf)
-  subPanel.add(fc)
+ // subPanel.add(fc)
   subPanel.add(but)
   }
 
@@ -57,7 +70,7 @@ class MicroList(
                  values: Seq[String]
                )
                (implicit parentPanel: JPanel)
-  extends QuickPanel(title)(parentPanel){
+  extends QuickPanel(title)(parentPanel, BorderLayout.CENTER)
 {
   val jls = new JList(values.toArray)
   val jscp = new JScrollPane(jls)
@@ -70,40 +83,80 @@ class MicroList(
   subPanel add jscp
 }
 
+class MailTesterDemo()(
+  implicit parentPanel: JPanel
+)
+  extends QuickPanel(
+  "MailTester Demo"
+)(parentPanel, BorderLayout.SOUTH) {
+
+  val lqf = new QuickFile(
+    "MailTester CSV Input",
+    (f: File) => {
+      val cb = new MailTester()
+
+      val (headers, res) = MailTester.processFile(f)
+
+      val proc = res.map{MailTester.processLine}
+
+      val newHeaders = headers ++ Seq(
+        "VerifiedEmail", "PossibleEmail", "BadEmail", "MailTesterDebugResponse"
+      )
+
+      val newRes = proc.map{e =>
+        val perm = MailTester.getPermutations(e.name)
+        println("Guessing email " + e)
+        println("Permutations " + perm)
+
+        val emailsToTest = perm.map{
+          p =>
+            p + "@" + e.domain
+        }
+
+        println("EmailsToTest : " + emailsToTest)
+
+        val emailToColor = emailsToTest.map{e =>
+          println("Testing Email : " + e)
+          val cl = Try { cb.testEmail(e) }
+
+          println("Email color : " + cl)
+          println("Waiting 10 seconds to test another email")
+          Thread.sleep(10*1000)
+          e -> cl.getOrElse("ERROR")
+        }
+
+        def getMaxEmail(c: String) = {
+          emailToColor.filter{
+            _._2 == c
+          }.sortBy{_._1.length}.lastOption.map{_._1}.getOrElse("")
+        }
+
+        val newLine = Seq(e.name.first, e.name.last, e.domain) ++
+          Seq("Green", "Yellow", "Red").map{getMaxEmail} :+ {
+          emailToColor.map{
+            case (x,y) => x + " " + y
+          }.mkString("|")
+        }
+        println("New CSV Line " + newLine)
+        newLine
+      }
+
+      val newCSV = newHeaders :: newRes
+      writeCSV("output.csv", newCSV)
+
+    })
+
+}
+
 class SelExample extends KVStore {
 
   val te = new ToyFrame
-  import te.{ad, addButton => button}
+
   implicit val parPanel = te.jp
 
-  new QuickFile("LinkedIn URL Run", {
+  new LinkedInCrawlDemo()
 
-  }
-  )
-
-  // Cookies by domain map.
-  /*
-
-  */
-  //ad { new JLabel("store" + store().pageVistsByDomainTime.toList.toString)}
-  /*
-    button("Run .urls.txt", {
-      readLines(".urls.txt").foreach{
-        q =>
-          println("going to url " + q)
-          val domain = q.domain
-          println("url domain " + domain)
-          cee.navigateToURL(q)
-          val cur = currentDay + " " + domain
-          val prvMap = store().pageVistsByDomainTime
-          val prvV = prvMap.getOrElse(cur, 0)
-          val newMap = prvMap.updated(cur, prvV + 1)
-          println("newmap ? " + newMap)
-          store() = store().copy(pageVistsByDomainTime=prvMap.updated(cur, prvV + 1))
-          Thread.sleep(15*1000)
-      }
-    })
-  */
+  new MailTesterDemo()
 
   te.finish()
 

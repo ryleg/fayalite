@@ -228,7 +228,7 @@ class ToyFrame {
   val f = toyFrame
   //   val f = new FrameInit()
 
-  val jp = new JPanel(false)
+  val jp = new JPanel()
 
   def addButton[T](s: String, f: => T) = {
     jp.add(
@@ -252,7 +252,7 @@ class ToyFrame {
   def finish() = {
     f.pack()
     f.setVisible(true)
-    f.setSize(new Dimension(320, 600)) // Trick to force layout
+    f.setSize(new Dimension(900, 600)) // Trick to force layout
   }
 }
 

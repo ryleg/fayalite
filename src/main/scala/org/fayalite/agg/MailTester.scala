@@ -5,7 +5,7 @@ import java.io.File
 import fa._
 
 
-class MailTester(toTest: Seq[String])
+class MailTester
   extends SeleniumChrome(Some("http://mailtester.com")) {
 
   import MailTester._
@@ -15,14 +15,14 @@ class MailTester(toTest: Seq[String])
   def getEmailInputBox = webDriver
     .findElementByXPath(emailInputXPath)
 
-  def submit() = webDriver
+  def submitEmailInputQuery() = webDriver
     .findElementByClassName("Button").click()
 
   def submitEmailTestRequest(email: String) = {
     val e = getEmailInputBox
     e.clear()
     e.sendKeys(email)
-    submit()
+    submitEmailInputQuery()
   }
 
   def getEmailColorCode = webDriver
@@ -34,6 +34,12 @@ class MailTester(toTest: Seq[String])
     if (c == redEmailBgColor) "Red" else
     if (c == yellowEmailBgColor) "Yellow" else "Green"
   }
+
+  def testEmail(e: String) = {
+    submitEmailTestRequest(e)
+    getEmailColor
+  }
+
 }
 
 /**
@@ -59,7 +65,7 @@ object MailTester {
     (headers, withLowercase)
   }
 
-  def getPermutations(n: Name) = {
+  def getPermutations(n: Name): List[String] = {
     val f = n.first
     val l = n.last
     List(
@@ -70,7 +76,7 @@ object MailTester {
       f + l,
       f + "." + l,
       f + "." + l(0),
-      f(0) + l(0)
+      f(0).toString + l(0)
     )
   }
 
@@ -86,6 +92,10 @@ object MailTester {
       case z => z
     }
    EmailGuessRequirements(Name(frs, lst), uu)
+  }
+
+  def apply(path : String ) = {
+    //processLine(new File(path))
   }
 
 /*
