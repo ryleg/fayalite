@@ -24,3 +24,4 @@ chromedriver.exe
 chromedriver-mac32
 *.csv
 output*
+phantomjs.exe

@@ -5,6 +5,7 @@ import java.io.File
 import fa._
 
 
+
 class MailTester
   extends SeleniumChrome(Some("http://mailtester.com")) {
 

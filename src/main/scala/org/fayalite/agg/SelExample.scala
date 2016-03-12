@@ -99,7 +99,7 @@ class SelExample extends KVStore {
 
   te.finish()
 
-  te.jp.add(new JLabel("Native Scala REPL! Built-in to this jar"))
+  te.jp.add(new JLabel("Native Scala REPL"))
   val tb = new JTextField("val x = 1")
 
 
