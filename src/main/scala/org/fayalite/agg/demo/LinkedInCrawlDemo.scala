@@ -64,6 +64,8 @@ class LinkedInCrawlDemo()(implicit parentPanel: JPanel)
         }
 
     }
-  })
+  }) {
+  }
+
 
 }

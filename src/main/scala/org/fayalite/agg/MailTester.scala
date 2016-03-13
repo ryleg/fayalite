@@ -3,18 +3,26 @@ package org.fayalite.agg
 import java.io.File
 
 import fa._
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.phantomjs.PhantomJSDriver
+import org.openqa.selenium.remote.RemoteWebDriver
 
 
-
-class MailTester
-  extends SeleniumChrome(Some("http://mailtester.com")) {
+class PJSMailTester(val webDriver: RemoteWebDriver
+                   ) extends MailTesterLike
+//domainAllowsVerification
+trait MailTesterLike {
 
   import MailTester._
 
-  val forceStarted = started.get.get
+  val webDriver : RemoteWebDriver
 
   def getEmailInputBox = webDriver
     .findElementByXPath(emailInputXPath)
+
+  def getReport = {
+    webDriver.findElementByXPath(fullDebugReportXPath).getText
+  }
 
   def submitEmailInputQuery() = webDriver
     .findElementByClassName("Button").click()
@@ -32,14 +40,28 @@ class MailTester
 
   def getEmailColor = {
     val c = getEmailColorCode
-    if (c == redEmailBgColor) "Red" else
-    if (c == yellowEmailBgColor) "Yellow" else "Green"
+    colorTransl.getOrElse(c, "MISSING BGCOLOR CODE")
   }
 
   def testEmail(e: String) = {
     submitEmailTestRequest(e)
     getEmailColor
   }
+
+  def testEmailDbg(e: String) = {
+    submitEmailTestRequest(e)
+    getEmailColor -> getReport
+  }
+
+}
+
+class MailTester
+  extends SeleniumChrome(Some("http://mailtester.com"))
+  with MailTesterLike
+{
+
+
+  val forceStarted = started.get.get
 
 }
 
@@ -48,16 +70,24 @@ class MailTester
   */
 object MailTester {
 
+  val fullDebugReportXPath = "//*[@id=\"content\"]/table/tbody"
   val addressMotFoundOnServer = "E-mail address does not exist on this server"
   val invalidMailDomain = "Invalid mail domain."
   val emailInputXPath =  "//*[@id=\"content\"]/form/table/tbody/tr[1]/td/input"
   val colorXPath = "//*[@id=\"content\"]/table/tbody/tr[1]/td[1]"
   val yellowEmailBgColor = "#FFBB00"
   val redEmailBgColor = "#FF4444"
+  val greenEmailBgColor = "#00DD00"
+  val colorTransl = Map(
+    "#FFBB00" -> "Yellow",
+  "#FF4444" -> "Red",
+  "#00DD00" -> "Green"
+  )
 
   case class Name(first: String, last: String)
 
-  case class EmailGuessRequirements(name: Name, domain: String)
+  case class EmailGuessRequirements(name: Name, domain: String,
+                                    preExistingEmail: Option[String] = None)
 
   def processFile(f: File) = {
     val csv = readCSV(f.getAbsolutePath)
@@ -81,10 +111,11 @@ object MailTester {
     )
   }
 
-  def processLine(q: Seq[String]) = {
-    val frs = q(0)
-    val lst = q(1)
-    val dmn = q(2)
+  def processLine(q: Seq[String], firstIdx: Int, lastIdx: Int,
+                  domainIdx: Int) = {
+    val frs = q(firstIdx)
+    val lst = q(lastIdx)
+    val dmn = q(domainIdx)
     val u = dmn.withOut(
       List("http://", "https://", "www\\.", "/")
     )

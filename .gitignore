@@ -25,3 +25,5 @@ chromedriver-mac32
 *.csv
 output*
 phantomjs.exe
+phantomjs
+*.log

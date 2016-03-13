@@ -10,20 +10,25 @@ trait SeleniumHelp {
   /**
     * Workaround requiring a packaged install with same values in
     * directory or in working directory of IntelliJ git repo
+ *
     * @return : Path to driver executable relative
     */
   def getDriverPath = {
     val winDriver = "chromedriver.exe"
     val macDriver = "chromedriver-mac32"
-    val driver = if (osName.toLowerCase.contains("win")) winDriver
+    val driver = if (isWindows) winDriver
     else macDriver
     driver
   }
 
-  /**
+  def isWindows: Boolean = {
+    osName.toLowerCase.contains("win")
+  }
+/**
     * Selenium / ChromeDriver runs a secondary process that proxies
     * communications back, this must reflect an updated binary
     * version of the chromedriver executable release
+ *
     * @return
     */
   def setDriverProperty() = {

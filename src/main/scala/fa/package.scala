@@ -1,5 +1,9 @@
+import java.util.concurrent.Executors
+
 import org.fayalite.agg.SeleniumHelp
 import org.fayalite.util.dsl._
+
+import scala.concurrent.ExecutionContext
 
 
 /**
@@ -24,7 +28,7 @@ with SeleniumHelp
 
   // WARNING : This could cause you problems on import, that's why
   // its here at the top to make that clear.
-  implicit val ecc = scala.concurrent.ExecutionContext.Implicits.global
+  implicit val ecc = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(60)) //scala.concurrent.ExecutionContext.Implicits.global
 
   // DO NOT PUT CASE CLASSES HERE
   // For some reason the 2.10.4 IntelliJ sbt throws ridiculous errors if

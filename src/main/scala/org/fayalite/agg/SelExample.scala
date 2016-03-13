@@ -47,17 +47,26 @@ abstract class QuickPanel
   }
 }
 
-class QuickFile(title: String, proc: File => Unit)
+class QuickFile(title: String, val proc: File => Unit)
                (implicit parentPanel: JPanel)
  extends QuickPanel(title)(parentPanel, BorderLayout.CENTER) {
   val slf = new JLabel("no file selected")
   val fc = new JFileChooser()
+
+  var lastSelectedFile : File = Try{
+    new File(read[String]("lastSelectedFile" + title) )}.getOrElse(null)
+
+
+
+
   val but = new FButton("Select File",
     () => fc.showOpenDialog(parentPanel)
   ).jButton
   fc.addActionListener(new ActionListener {
     override def actionPerformed(e: ActionEvent): Unit = {
       slf.setText(fc.getSelectedFile.getName)
+      lastSelectedFile = fc.getSelectedFile
+      store("lastSelectedFile" + title, lastSelectedFile.getCanonicalPath)
       proc(fc.getSelectedFile)
     }
   })
@@ -99,19 +108,15 @@ class SelExample extends KVStore {
 
   te.finish()
 
+/*
   te.jp.add(new JLabel("Native Scala REPL"))
   val tb = new JTextField("val x = 1")
-
-
   val co = new JTextArea(10, 10)
   co.setEditable(false)
   val sp = new JScrollPane(co)
   sp.setMaximumSize(  new Dimension(500, 500))
-
   parPanel.add(sp)
-
   parPanel.add(tb)
-
   val rr = new REPLFrame()
   tb.addActionListener(new ActionListener{
     override def actionPerformed(e: ActionEvent): Unit = {
@@ -122,6 +127,7 @@ class SelExample extends KVStore {
   })
 
 
+*/
 
 
 
