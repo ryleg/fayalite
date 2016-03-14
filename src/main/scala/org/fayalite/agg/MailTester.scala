@@ -3,13 +3,94 @@ package org.fayalite.agg
 import java.io.File
 
 import fa._
+import org.fayalite.agg.MailTester.EmailGuessRequirements
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.RemoteWebDriver
 
 
+object PJSMailTester {
+  def apply() = {
+
+  }
+
+}
+
 class PJSMailTester(val webDriver: RemoteWebDriver
-                   ) extends MailTesterLike
+                   ) extends MailTesterLike {
+
+  val pjD = this
+
+  def processLineActual(
+                         line: List[String],
+                         egr:EmailGuessRequirements
+                       ) = {
+    println("Processing line " + line + " with EGR " + egr)
+    val preEm = egr.preExistingEmail
+    val perm = MailTester.getPermutations(egr.name)
+    val firstPerm = perm.head
+    val firstEmailToTest = preEm.getOrElse(firstPerm + "@" + egr.domain)
+
+    println("Testing first email " + firstEmailToTest)
+    val (clr) = pjD.testEmail(firstEmailToTest)
+    println("Tested first email " + firstEmailToTest + " with " + clr + " " + "usercolor" + pjD.getEmailColorCode
+    )
+
+    import MailTester._
+
+    val rep = pjD.webDriver.getPageSource
+
+    val acceptsConnections = !rep.contains("Mailserver does not accept connections")
+    val isDomainValid = !rep.contains(invalidMailDomain)
+    val canMakeVerificationTests = !rep.contains("Server doesn't allow e-mail address verification")
+
+    println("isDomainValid " + isDomainValid + " " + egr.domain)
+    println("canMakeVerificationTests " + canMakeVerificationTests + " " + egr.domain)
+
+    var reps = List((clr, firstEmailToTest))
+
+    if (isDomainValid && canMakeVerificationTests && acceptsConnections) {
+      perm.tail.map {
+        qq =>
+          val q = qq + "@" + egr.domain
+            println("Waiting before testing next email 10s")
+            Thread.sleep(10000)
+            println("Testing permutation email : " + q)
+            val (cl) = pjD.testEmail(q)
+            println("Tested permutation email : " + q + " with color " + cl + " " + rep)
+            println("Waiting before testing next email 10s")
+            Thread.sleep(10000)
+            reps :+= (cl, q)
+          }
+    }
+
+    val testedEmails = reps
+    val longestGreenOpt = reps
+      .filter{_._1 == "Green"}.map{_._2}.sortBy{_.length}.reverse.headOption
+
+    val debugLine =  List(
+      egr.name.first, egr.name.last, egr.domain,
+      egr.preExistingEmail.getOrElse(""),
+      isDomainValid.toString,
+      canMakeVerificationTests.toString
+    )
+
+ //   println("debugLine " + debugLine)
+
+    val startNewLine = line ++ Seq(
+      longestGreenOpt.getOrElse(""), reps.filter{_._1 != "Red"}.map{_._2}.mkString("")
+    )
+
+    /* ++ getFormatted("Green") ++
+      getFormatted("Yellow") ++
+      getFormatted("Red") // :+ repStr
+*/
+   // println("newLine " + startNewLine)
+    startNewLine
+  }
+
+
+}
 //domainAllowsVerification
 trait MailTesterLike {
 
@@ -44,13 +125,16 @@ trait MailTesterLike {
   }
 
   def testEmail(e: String) = {
-    submitEmailTestRequest(e)
-    getEmailColor
+    TPL {
+      println("submitEmailTestRequest " + e)
+      submitEmailTestRequest(e)
+      getEmailColor
+    }.getOrElse("DRIVER BAD")
   }
 
   def testEmailDbg(e: String) = {
     submitEmailTestRequest(e)
-    getEmailColor -> getReport
+    getEmailColor  -> getReport
   }
 
 }

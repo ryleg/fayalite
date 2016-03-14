@@ -33,6 +33,7 @@ trait CommonMonadExt {
     val t = Try(f)
     t match {
       case Failure(e) => e.printStackTrace()
+      case _ =>
     }
     t
   }

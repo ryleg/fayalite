@@ -9,6 +9,7 @@ import org.openqa.selenium.phantomjs.{PhantomJSDriverService, PhantomJSDriver}
 import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 
 import scala.concurrent.{Future, ExecutionContext}
+import scala.util.Try
 
 
 /**
@@ -43,16 +44,16 @@ object PJS {
     driver
   }
 
-  def launchProxyDrivers(url: String) = {
+  def launchProxyDrivers(url: String, numDrivers: Int = 5) = {
     import fa._
-    val pr = Proxy.proxies
-    val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(20))
+    val pr = Proxy.proxies.slice(0, numDrivers)
+    val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(8))
     pr.map { p =>
       Future{
-        val d = mkProxyDriver(p)
+        val d = Try{mkProxyDriver(p)}.getOrElse(mkProxyDriver(p))
         d.get(url)
         d
-      }//(ec)
+      }(ec)
     }
   }
 

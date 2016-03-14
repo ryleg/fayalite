@@ -7,11 +7,12 @@ import javax.swing.{JComboBox, JPanel}
 
 import com.github.tototoshi.csv.CSVWriter
 import org.fayalite.agg.MailTester.{Name, EmailGuessRequirements}
-import org.fayalite.agg.demo.EmailTester.EmailTestResults
+import org.fayalite.agg.demo.EmailTester.{ProcessLine, EmailTestResults}
 import org.fayalite.agg._
+import org.openqa.selenium.phantomjs.PhantomJSDriver
 import rx.core.Var
 
-import scala.collection.JavaConversions
+import scala.collection.{mutable, JavaConversions}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
 
@@ -25,6 +26,8 @@ object EmailTester {
                                emailDomainColor: String,
                                debugReport: String
                              )
+
+  case class ProcessLine(line: List[String], emailGuessRequirements: EmailGuessRequirements)
 }
 
 trait EmailTester {
@@ -44,6 +47,14 @@ class MailTesterDemo()(
 
 
 
+  val debugHeaders = Seq(
+    "SanitizedFirstName",
+    "SanitizedLastName",
+    "SanitizedDomain",
+    "SanitizedPreExistingEmail",
+    "isDomainValid",
+    "domainAllowsVerification"
+  )
 //
 //subPanel.add(aa)
 
@@ -55,44 +66,87 @@ val lqf = new QuickFile(
 
   val (headers, res) = MailTester.processFile(f)
 
-  val combos = Seq("First Name", "Last Name", "Domain/Email").map{
-  q =>
-  import JavaConversions._
-  text(q)
-  val aa = new JComboBox(headers.toArray)
-  subPanel.add(aa)
-  aa
-}
+  val combos = Seq("First Name", "Last Name", "Domain/Email").map {
+    q =>
+      import JavaConversions._
+      text(q)
+      val aa = new JComboBox(headers.toArray)
+      subPanel.add(aa)
+      aa
+  }
   combos(1).setSelectedIndex(1)
 
-  val domainEmIdx = headers.zipWithIndex.collectFirst{
-    case (x,i) if x.toLowerCase.contains("email") || x.toLowerCase.contains("domain") => i
+  val domainEmIdx = headers.zipWithIndex.collectFirst {
+    case (x, i) if x.toLowerCase.contains("email") || x.toLowerCase.contains("domain") => i
   }.getOrElse(2)
 
   combos(2).setSelectedIndex(domainEmIdx)
 
+  val lineProcessQ = new mutable.Queue[ProcessLine]()
+
+  val newHeaders = headers ++ Seq(
+    "GreenEmailLongest",
+    "GreenOrYellowAlternateEmails")
+  /*   "RedEmail"
+  ).flatMap {
+    q =>
+      Seq.tabulate(9) {
+        i =>
+          q + "_" + i
+      }
+  }// :+ "ReportDebugString"
+  */
+  println("New headers " + newHeaders)
+  val xx = Var(newHeaders)
+  import rx.ops._
+  xx.foreach { q =>
+    val writ = CSVWriter.open(outputFnm, true)
+    writ.writeRow(q)
+    writ.close()
+  }
+
+
+  def onDriverReady(pjsd: PhantomJSDriver) = {
+
+    val cap = pjsd.getCapabilities
+
+    val pjm = new PJSMailTester(pjsd)
+    while (lineProcessQ.nonEmpty) {
+      println("Driver is ready on Thread-ID: " + Thread.currentThread().getId)
+      val sample = synchronized {
+        val dq = lineProcessQ.dequeue()
+        println("Synchronized line process dq " + dq)
+        dq
+      }
+
+
+      val newLine = TPL {
+        pjm.processLineActual(sample.line, sample.emailGuessRequirements)
+      }.getOrElse(sample.line)
+      println("Saving newline " + newLine)
+      synchronized {
+        xx() = newLine
+      }
+    }
+    pjsd.close()
+  }
 
   button("Start MailTester PhantomJS Run", {
 
+
     println("Launching proxy drivers ")
-    val pjs = PJS.launchProxyDrivers("http://www.mailtester.com")
-
-    pjs.foreach{_.onComplete{_ => println("driver loaded")}}
-
-    while (pjs.exists { q => !q.isCompleted }) {
-      println(pjs.filter{_.isCompleted}.length.toString + " drivers loaded out of " + pjs.length)
-      Thread.sleep(2000)
-      println("waiting for drivers to launch and load page")
+    val pjs = PJS.launchProxyDrivers("http://www.mailtester.com", numDrivers = 10)
+    pjs.foreach {
+      _.onComplete {
+        _.foreach { z =>
+          println("ON DRIVER READY START " + Thread.currentThread().getId)
+          Future {
+            onDriverReady(z)
+          }
+        }
+      }
     }
 
-    println("All pages loaded! Drivers ready")
-    println("WARNING : Future operations depend on driver " +
-      "process staying online. Any driver failures will lead to" +
-      "skipped rows left as in original")
-
-    val pjj = pjs.map {
-      _.get
-    }
     val idxs = combos.map {
       _.getSelectedIndex
     }
@@ -113,136 +167,16 @@ val lqf = new QuickFile(
           case z if z.contains("\\.") => z.split("\\.").tail.mkString
           case z => z
         }
-        line -> EmailGuessRequirements(Name(first, last), guardDot, preExi)
+        ProcessLine(line, EmailGuessRequirements(Name(first, last), guardDot, preExi))
     }
 
-    val newHeaders = headers ++ Seq(
-      "SanitizedFirstName",
-      "SanitizedLastName",
-      "SanitizedDomain",
-      "SanitizedPreExistingEmail",
-      "isDomainValid",
-      "domainAllowsVerification"
-    ) ++ Seq(
-      "GreenEmail",
-      "YellowEmail",
-      "RedEmail"
-    ).flatMap {
-      q =>
-        Seq.tabulate(9) {
-          i =>
-            q + "_" + i
-        }
-    } :+ "ReportDebugString"
-
-
-    val xx = Var(newHeaders)
-    import rx.ops._
-
-    val writ = CSVWriter.open(outputFnm, true)
-
-    xx.foreach { q =>
-      writ.writeRow(q)
+    rdy.foreach { r =>
+      lineProcessQ += r
     }
 
-    val rdyGrp =  rdy.grouped(rdy.length / (pjj.length - 1)).toSeq
+    println("Line process queue ready with # elements: " + lineProcessQ.size)
 
-    println("rdyGrp " + rdyGrp.length)
-
-  //  val ec = ExecutionContext.fromExecutor(Executors.newFixedThreadPool(rdyGrp.length))
-
-
-   rdyGrp.zip(pjj).map {
-      case (batch, driver) =>
-        Future {
-          val pjD = new PJSMailTester(driver)
-          batch.foreach {
-            case (line, egr) =>
-
-              val preEm = egr.preExistingEmail
-              val perm = MailTester.getPermutations(egr.name)
-              val firstPerm = perm.head
-              val firstEmailToTest = preEm.getOrElse(firstPerm + "@" + egr.domain)
-
-              println("Testing first email " + firstEmailToTest)
-              val (clr, rep) = pjD.testEmailDbg(firstEmailToTest)
-              println("Tested first email " + firstEmailToTest + " with " + clr + " " + rep)
-
-              import MailTester._
-
-              val isDomainValid = !rep.contains(invalidMailDomain)
-              val canMakeVerificationTests = !rep.contains("Server doesn't allow e-mail address verification")
-
-              println("isDomainValid " + isDomainValid + " " + egr.domain)
-              println("canMakeVerificationTests " + canMakeVerificationTests + " " + egr.domain)
-
-              var reps = List((clr, rep, firstEmailToTest))
-
-              var foundGreen = clr == "Green"
-
-              if (!foundGreen && isDomainValid && canMakeVerificationTests) {
-                perm.tail.foreach {
-                  qq =>
-                    val q = qq + "@" + egr.domain
-                    if (!foundGreen) {
-                      println("Waiting before testing next email 10s")
-                      Thread.sleep(10000)
-                      println("Testing permutation email : " + q)
-                      val (cl, rp) = pjD.testEmailDbg(q)
-                      println("Tested permutation email : " + q + " with color " + cl + " " + rep)
-                      println("Waiting before testing next email 10s")
-                      Thread.sleep(10000)
-                      if (cl == "Green") foundGreen = true
-                      reps :+=(cl, rp, q)
-                    }
-                }
-              }
-
-              val testedEmails = reps
-
-              def getFormatted(c: String) = {
-                val e = reps.filter {
-                  _._1 == c
-                }.map {
-                  _._3
-                }
-                val ms = 9 - e.length
-                e ++ List.fill(ms)("")
-              }
-
-              val repStr = testedEmails.map {
-                case (x, y, z) =>
-                  z + ":" + x + "  " + y
-              }.mkString("         ")
-
-              val startNewLine = line ++ List(
-                egr.name.first, egr.name.last, egr.domain,
-                egr.preExistingEmail.getOrElse(""),
-                isDomainValid.toString,
-                canMakeVerificationTests.toString
-              ) ++ getFormatted("Green") ++
-                getFormatted("Yellow") ++
-                getFormatted("Red") :+ repStr
-
-              println("newLine " + startNewLine)
-              xx() = startNewLine
-
-          }
-        }//(ec)
-
-    }
   })
 })
-
-/*
-
-  if (lqf.lastSelectedFile != null) {
-    println("loading last selected file " + lqf.lastSelectedFile.getCanonicalPath)
-    lqf.fc.setSelectedFile(lqf.lastSelectedFile)
-    lqf.slf.setText(lqf.lastSelectedFile.getName)
-  }
-*/
-
-
 
 }
