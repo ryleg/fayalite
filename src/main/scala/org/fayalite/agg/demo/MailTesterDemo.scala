@@ -85,6 +85,9 @@ val lqf = new QuickFile(
   val lineProcessQ = new mutable.Queue[ProcessLine]()
 
   val newHeaders = headers ++ Seq(
+    "isDomainValid",
+    "canMakeVerifications",
+    "acceptsConnections",
     "GreenEmailLongest",
     "GreenOrYellowAlternateEmails")
   /*   "RedEmail"
@@ -97,51 +100,69 @@ val lqf = new QuickFile(
   }// :+ "ReportDebugString"
   */
   println("New headers " + newHeaders)
-  val xx = Var(newHeaders)
   import rx.ops._
-  xx.foreach { q =>
-    val writ = CSVWriter.open(outputFnm, true)
-    writ.writeRow(q)
-    writ.close()
+  val writ = CSVWriter.open(outputFnm, true)
+  writ.writeRow(newHeaders)
+
+
+
+  val threadsToEmails = mutable.Map[Int, Int]()
+
+  F {
+    while (true) {
+      Thread.sleep(5000)
+      println(synchronized(threadsToEmails))
+    }
   }
 
+  def onDriverReady(pjm: PJSMailTester) = {
 
-  def onDriverReady(pjsd: PhantomJSDriver) = {
-
-    val cap = pjsd.getCapabilities
-
-    val pjm = new PJSMailTester(pjsd)
-    while (lineProcessQ.nonEmpty) {
-      println("Driver is ready on Thread-ID: " + Thread.currentThread().getId)
+    //val cap = pjsd.getCapabilities
+   // val pjm = new PJSMailTester(pjsd)
+    while (synchronized(lineProcessQ.nonEmpty)) {
+     // println("Driver is ready on Thread-ID: " + Thread.currentThread().getId)
       val sample = synchronized {
         val dq = lineProcessQ.dequeue()
-        println("Synchronized line process dq " + dq)
+      //  println("Synchronized line process dq " + dq)
         dq
       }
 
+      var success = false
 
-      val newLine = TPL {
-        pjm.processLineActual(sample.line, sample.emailGuessRequirements)
-      }.getOrElse(sample.line)
-      println("Saving newline " + newLine)
+      var newLine = sample.line
+
+      while (!success) {
+        val newLinse = T {
+          pjm.processLineActual(sample.line, sample.emailGuessRequirements)
+        }
+        if (newLinse.isSuccess) {
+          synchronized{threadsToEmails(pjm.id) = pjm.numEmailsTested()}
+          newLine = newLinse.get
+          success = true
+        }
+        else {
+          println("restartDriverThread-ID: " + Thread.currentThread().getId)
+          pjm.restartDriver()
+        }
+      }
+
       synchronized {
-        xx() = newLine
+        println("Saving newline " + newLine)
+        writ.writeRow(newLine)
       }
     }
-    pjsd.close()
   }
 
   button("Start MailTester PhantomJS Run", {
 
-
     println("Launching proxy drivers ")
-    val pjs = PJS.launchProxyDrivers("http://www.mailtester.com", numDrivers = 10)
-    pjs.foreach {
-      _.onComplete {
+    val pjs = PJS.launchProxyDrivers("http://www.mailtester.com", numDrivers = 60)
+    pjs.zipWithIndex.foreach { case (x,y) =>
+      x.onComplete {
         _.foreach { z =>
           println("ON DRIVER READY START " + Thread.currentThread().getId)
           Future {
-            onDriverReady(z)
+            onDriverReady(new PJSMailTester(z, id=y))
           }
         }
       }

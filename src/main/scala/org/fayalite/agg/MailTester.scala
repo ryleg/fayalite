@@ -7,6 +7,7 @@ import org.fayalite.agg.MailTester.EmailGuessRequirements
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.RemoteWebDriver
+import rx.core.Var
 
 
 object PJSMailTester {
@@ -16,25 +17,33 @@ object PJSMailTester {
 
 }
 
-class PJSMailTester(val webDriver: RemoteWebDriver
-                   ) extends MailTesterLike {
+class PJSMailTester(var webDriver: RemoteWebDriver, val id: Int = 0) extends MailTesterLike {
 
   val pjD = this
+
+  def restartDriver() = {
+    val cap = webDriver.getCapabilities
+    T{webDriver.close()}
+    webDriver = new PhantomJSDriver(cap)
+    webDriver.get("http://www.mailtester.com")
+  }
+
+  val numEmailsTested = Var(0)
 
   def processLineActual(
                          line: List[String],
                          egr:EmailGuessRequirements
                        ) = {
-    println("Processing line " + line + " with EGR " + egr)
+    //println("Processing line " + line + " with EGR " + egr)
     val preEm = egr.preExistingEmail
     val perm = MailTester.getPermutations(egr.name)
     val firstPerm = perm.head
     val firstEmailToTest = preEm.getOrElse(firstPerm + "@" + egr.domain)
 
-    println("Testing first email " + firstEmailToTest)
+    //println("Testing first email " + firstEmailToTest)
     val (clr) = pjD.testEmail(firstEmailToTest)
-    println("Tested first email " + firstEmailToTest + " with " + clr + " " + "usercolor" + pjD.getEmailColorCode
-    )
+    numEmailsTested() += 1
+    println("First " + firstEmailToTest + " " + clr)
 
     import MailTester._
 
@@ -53,13 +62,14 @@ class PJSMailTester(val webDriver: RemoteWebDriver
       perm.tail.map {
         qq =>
           val q = qq + "@" + egr.domain
-            println("Waiting before testing next email 10s")
-            Thread.sleep(10000)
-            println("Testing permutation email : " + q)
+      //      println("Waiting before testing next email 10s")
+            Thread.sleep(6000)
+         //   println("Testing permutation email : " + q)
             val (cl) = pjD.testEmail(q)
-            println("Tested permutation email : " + q + " with color " + cl + " " + rep)
-            println("Waiting before testing next email 10s")
-            Thread.sleep(10000)
+          numEmailsTested() += 1
+          println(q + " " + cl)
+       //     println("Waiting before testing next email 10s")
+            Thread.sleep(6000)
             reps :+= (cl, q)
           }
     }
@@ -69,24 +79,15 @@ class PJSMailTester(val webDriver: RemoteWebDriver
       .filter{_._1 == "Green"}.map{_._2}.sortBy{_.length}.reverse.headOption
 
     val debugLine =  List(
-      egr.name.first, egr.name.last, egr.domain,
-      egr.preExistingEmail.getOrElse(""),
       isDomainValid.toString,
-      canMakeVerificationTests.toString
+      canMakeVerificationTests.toString,
+      acceptsConnections.toString
     )
-
- //   println("debugLine " + debugLine)
-
-    val startNewLine = line ++ Seq(
-      longestGreenOpt.getOrElse(""), reps.filter{_._1 != "Red"}.map{_._2}.mkString("")
+    line ++ debugLine ++ Seq(
+      longestGreenOpt.getOrElse(""), reps.filter{
+        q => q._1 != "Red" && !longestGreenOpt.contains(q._1) && !preEm.contains(q._1)
+      }.map{_._2}.mkString(" ")
     )
-
-    /* ++ getFormatted("Green") ++
-      getFormatted("Yellow") ++
-      getFormatted("Red") // :+ repStr
-*/
-   // println("newLine " + startNewLine)
-    startNewLine
   }
 
 
@@ -96,7 +97,7 @@ trait MailTesterLike {
 
   import MailTester._
 
-  val webDriver : RemoteWebDriver
+  var webDriver : RemoteWebDriver
 
   def getEmailInputBox = webDriver
     .findElementByXPath(emailInputXPath)
@@ -125,11 +126,9 @@ trait MailTesterLike {
   }
 
   def testEmail(e: String) = {
-    TPL {
-      println("submitEmailTestRequest " + e)
+     // println("submitEmailTestRequest " + e)
       submitEmailTestRequest(e)
       getEmailColor
-    }.getOrElse("DRIVER BAD")
   }
 
   def testEmailDbg(e: String) = {
@@ -139,15 +138,7 @@ trait MailTesterLike {
 
 }
 
-class MailTester
-  extends SeleniumChrome(Some("http://mailtester.com"))
-  with MailTesterLike
-{
 
-
-  val forceStarted = started.get.get
-
-}
 
 /**
   * Created by aa on 3/5/2016.
