@@ -123,7 +123,7 @@ val lqf = new QuickFile(
      // println("Driver is ready on Thread-ID: " + Thread.currentThread().getId)
       val sample = synchronized {
         val dq = lineProcessQ.dequeue()
-      //  println("Synchronized line process dq " + dq)
+        println("Synchronized line process dq " + dq)
         dq
       }
 
@@ -156,39 +156,54 @@ val lqf = new QuickFile(
   button("Start MailTester PhantomJS Run", {
 
     println("Launching proxy drivers ")
-    val pjs = PJS.launchProxyDrivers("http://www.mailtester.com", numDrivers = 60)
-    pjs.zipWithIndex.foreach { case (x,y) =>
-      x.onComplete {
-        _.foreach { z =>
-          println("ON DRIVER READY START " + Thread.currentThread().getId)
-          Future {
-            onDriverReady(new PJSMailTester(z, id=y))
+    def startDrivers: Unit = {
+      val pjs = PJS.launchProxyDrivers("http://www.mailtester.com", numDrivers = 60)
+      pjs.zipWithIndex.foreach { case (x, y) =>
+        x.onComplete {
+          _.foreach { z =>
+            println("ON DRIVER READY START " + Thread.currentThread().getId)
+            Future {
+              onDriverReady(new PJSMailTester(z, id = y))
+            }
           }
         }
       }
     }
+    startDrivers
 
     val idxs = combos.map {
       _.getSelectedIndex
     }
 
-    val rdy = res.map {
+    println("Combo idxs" + idxs)
+
+    def processLineActual: (List[String]) => ProcessLine = {
       line =>
         val first = line(idxs(0)).withOut(List(" "))
         val last = line(idxs(1)).withOut(List(" "))
+       // println("Domain debug " + line(idxs(2)))
         val domain = line(idxs(2)).withOut(List(" "))
+       // println("Domain debug " + domain)
         val preExi = if (domain.contains("@")) Some(domain) else None
 
         val strippd = domain.withOut(
-          List("http://", "https://", "www\\.", "/")
+            List("http://", "https://", "www\\.", "/")
         )
-        val guardEmail = strippd.split("@").tail.mkString
+      //  println("Domain debug " + strippd)
+        val guardEmail =  if (strippd.contains("@")) {
+          strippd.split("@").tail.mkString
+        } else strippd
+       // println("Domain guardEmail " + guardEmail)
+        /*
+                val guardDot = guardEmail match {
+                  case z if z.contains("\\.") => z.split("\\.").tail.mkString
+                  case z => z
+                }*/
+        ProcessLine(line, EmailGuessRequirements(Name(first, last), guardEmail, preExi))
+    }
 
-        val guardDot = guardEmail match {
-          case z if z.contains("\\.") => z.split("\\.").tail.mkString
-          case z => z
-        }
-        ProcessLine(line, EmailGuessRequirements(Name(first, last), guardDot, preExi))
+    val rdy = res.map {
+      processLineActual
     }
 
     rdy.foreach { r =>

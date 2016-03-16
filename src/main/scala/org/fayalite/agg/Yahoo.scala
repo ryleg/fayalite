@@ -57,7 +57,17 @@ object Yahoo {
   def intTime = System.currentTimeMillis().toInt
 
   def main(args: Array[String]): Unit = {
+      import fa._
+      val readIn = readLines(".yahoo").map{_.json[Observe]}.toSeq
+      val maxS = readIn.map{_.symPrice.map(_._2.ask).max}.max
+      val minS = readIn.map{_.symPrice.map(_._2.ask).min}.min
+      println("min max " + minS + " " + maxS)
 
+
+//    runCrawl
+  }
+
+  def runCrawl: Unit = {
     val smp = getSamples.toList
 
     while (true) {
@@ -66,10 +76,15 @@ object Yahoo {
 
         val rr = doRequest(url, syms)
 
-        val obs = rr.map { _.flatMap {
-          case (sp, pr) =>
-            pr.map{ _ -> sp }.map{_.swap}
-        }
+        val obs = rr.map {
+          _.flatMap {
+            case (sp, pr) =>
+              pr.map {
+                _ -> sp
+              }.map {
+                _.swap
+              }
+          }
         }
 
         obs.onComplete {

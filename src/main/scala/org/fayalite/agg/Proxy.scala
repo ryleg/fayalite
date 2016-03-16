@@ -12,7 +12,8 @@ import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 
 
 /**
-  * Created by aa on 3/10/2016.
+  * Simple example of proxy usage for PhantomJS / Selenium
+  * and tests to get proxy support
   */
 object Proxy {
 

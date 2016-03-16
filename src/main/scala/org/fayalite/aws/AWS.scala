@@ -8,7 +8,7 @@ import com.amazonaws._
 import com.amazonaws.internal.StaticCredentialsProvider
 import com.amazonaws.regions.{Region, ServiceAbbreviations, Regions}
 import com.amazonaws.services.ec2.AmazonEC2Client
-import com.amazonaws.services.ec2.model.{LaunchSpecification, RequestSpotInstancesRequest, RunInstancesRequest}
+import com.amazonaws.services.ec2.model._
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient
 import com.amazonaws.services.rds.{AmazonRDSClient, AmazonRDS}
 
@@ -19,7 +19,7 @@ import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth._
 
 import scala.io.Source
-import scala.util.Try
+import scala.util.{Random, Try}
 
 
 
@@ -46,6 +46,7 @@ object AWS {
 
   /**
     * Quick and dirty check
+    *
     * @return : EC2 should be online
     */
   def verifyAuthenticated = {
@@ -76,7 +77,8 @@ object AWS {
   }
 
   def main(args: Array[String]) {
-   testDescribeInstances()
+   //testDescribeInstances()
+
   //  getKeys
   }
 
@@ -87,11 +89,21 @@ object AWS {
     requestRequest.setInstanceCount(Integer.valueOf(1))
     val launchSpecification = new LaunchSpecification()
     launchSpecification.setImageId(AppLauncher.ubuntu1404HVM)
-    launchSpecification.setInstanceType("c4.large")
+    launchSpecification.setInstanceType("c4.xlarge")
 
     // Add the security group to the request.
     val securityGroups = new util.ArrayList[String]()
-    securityGroups.add("super-permissive")
+
+
+    val vpc = ec2.describeVpcs().getVpcs.map{
+      q =>
+        q.getVpcId
+    }
+    println("VPC ids " + vpc.toList)
+
+    ensureSG
+
+    securityGroups.add("fayalite")
     launchSpecification.setSecurityGroups(securityGroups)
 
     // Add the launch specifications to the request.
@@ -101,6 +113,22 @@ object AWS {
     val requestResult = ec2.requestSpotInstances(requestRequest)
 
 
+
   }
 
+  def ensureSG: Unit = {
+    val sgs = ec2.describeSecurityGroups().getSecurityGroups
+    if (!sgs.contains("fayalite")) {
+      println("Creating security group")
+      val csg = new CreateSecurityGroupRequest(
+        "fayalite", "na")
+      csg.withVpcId("vpc-a9757ccb")
+      ec2.createSecurityGroup(csg)
+      val ipp = new IpPermission()
+      ipp.setFromPort(22)
+      ipp.setToPort(22)
+      val ac = new AuthorizeSecurityGroupIngressRequest("fayalite", List(ipp))
+      ec2.authorizeSecurityGroupIngress(ac)
+    }
+  }
 }
