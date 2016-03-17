@@ -1,16 +1,11 @@
 package org.fayalite.gate.server
 
-import akka.actor.{ActorRef, Props, ActorSystem, Actor}
-import akka.io.IO
-import spray.can.server.UHttp
+import spray.can.websocket
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.TextFrame
-import spray.can.{websocket, Http}
 import spray.http.HttpRequest
 import spray.routing
 import spray.routing.HttpServiceActor
-import rx._
-import rx.ops._
 
 /** NOTE : Ignores unrecognized WS frames / HTTPRequests thru socket
   * Simple wrapper around a websocket supporting

@@ -1,14 +1,6 @@
 package org.fayalite.agg
 
-import java.awt.datatransfer.StringSelection
-import java.awt.{Toolkit, Robot}
-import java.awt.event.KeyEvent
-
 import fa._
-import org.openqa.selenium.Proxy
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.firefox.{FirefoxProfile, FirefoxDriver}
-import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 
 
 /**
@@ -41,7 +33,6 @@ object Proxy {
 
   //https://Aladdin:OpenSesame@www.example.com/index.html doesn't seem to work
   // with selenium
-  import SeleniumChrome.mkProxy
 
   def main(args: Array[String]) {
 
@@ -62,9 +53,6 @@ object Proxy {
         def err = driver.getErrorHandler.isIncludeServerErrors
         println(q + " is err " + err)
 */
-
-
-      import org.openqa.selenium
 /*
 
     val (host, port) = q.split("\\:")._2

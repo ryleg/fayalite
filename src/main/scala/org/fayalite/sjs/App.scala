@@ -1,15 +1,8 @@
 package org.fayalite.sjs
 
-import org.scalajs.dom
-import org.scalajs.dom._
-
-import scala.concurrent.Future
-import scala.io.Source
-import scala.scalajs.js
 import scala.scalajs.js.Dynamic.{global => g}
+import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.js.{JSON, JSApp}
-import scala.util.{Failure, Success, Try}
 
 object App extends JSApp {
 

@@ -1,19 +1,21 @@
 package org.fayalite.gate.server
 
+import java.io.File
+
 import akka.actor.{ActorRef, Props, ActorSystem}
 import akka.io.IO
 import spray.can.server.UHttp
 import spray.can.Http
 import rx._
 import spray.routing
-import spray.routing.HttpServiceActor
+import spray.routing.{StandardRoute, HttpServiceActor}
 
 /**
   * A disposable / changeable message processing
   * loop for deployed actors. Dead simple, no
   * side effects allowed. Process loop in a vacuum
   */
-trait MessageProcesser extends HttpServiceActor {
+trait MessageProcesser extends spray.routing.Directives {
 
   /**
     * Reassign to this to fill out your server deployment
@@ -28,6 +30,27 @@ trait MessageProcesser extends HttpServiceActor {
     */
   val route: Var[routing.Route]
 
+  /**
+    * Allows use of ScalaTags to render HTML
+    * and complete a get request with a String of full html
+    * for the page render
+    *
+    * @param html : Full HTML of page to render as if you
+    *             read it from index.html
+    * @return : Route with response.
+    */
+  def completeWith(html: String): StandardRoute = {
+    import spray.http.MediaTypes._
+    respondWithMediaType(`text/html`) & complete {
+      html
+    }
+  }
+  def completeWithJS(js: String): StandardRoute = {
+    import spray.http.MediaTypes._
+    respondWithMediaType(`application/javascript`) & complete {
+      js
+    }
+  }
 }
 
 /**
@@ -36,8 +59,21 @@ trait MessageProcesser extends HttpServiceActor {
   *
   * @param port : To bind on, assumes open host ip
   */
-class SprayServer(port: Int = 8080) {
+class SprayServer(
+                   port: Int = 8080
+                 ) {
 
+  val currentPath = new File(".")
+  val targetPath = {
+    new File(currentPath, "target")
+  }
+  val targetS210Path = new File(targetPath, "scala-2.10")
+  val sjsFastOpt = new File(targetS210Path, "fayalite-fastopt.js")
+
+  /**
+    * Barebones actor system to get you started
+    * override with your choice
+    */
   val system = ActorSystem()
 
   /**
@@ -46,11 +82,42 @@ class SprayServer(port: Int = 8080) {
     * sender to return a response to
     */
   val messageProcesser = new MessageProcesser {
+
     val process = Var { (a: String, b: ActorRef) => {
       println("Recieved msg: " + a + " from " + b.path)
       b ! "Response"
     }
     }
+
+    /**
+      * Testable route to serve a rendered page
+      * override or reassign for real-time change
+      */
+    val route = Var {
+      import scalatags.Text.all._
+      import fa._
+      {
+        get {
+          completeWith(
+            html(
+              scalatags.Text.all.head(
+                scalatags.Text.tags2.title("fayalite"),
+                meta(charset := "UTF-8")
+                )
+               ,
+              body(
+                script(
+                  readLines(sjsFastOpt.getCanonicalPath).mkString("\n"),
+                `type`:="application/javascript"),
+                  script("org.fayalite.sjs.App().main()",
+                    `type`:="text/javascript")
+              )
+            ).render
+          )
+        }
+      }
+    }
+
   }
 
   /**
