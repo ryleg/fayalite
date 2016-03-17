@@ -1,190 +1,15 @@
 package org.fayalite.ui.app.state
 
-import org.fayalite.ui.app.canvas.Canvas
-import org.fayalite.ui.app.canvas.Schema
-import org.fayalite.ui.app.canvas.{Canvas, Schema}
-import org.fayalite.ui.app.comm.Disposable
 import org.fayalite.ui.app.comm.PersistentWebSocket
-import org.fayalite.ui.app.comm.{Disposable, PersistentWebSocket}
-import org.fayalite.ui.app.manager.Editor
-import org.fayalite.ui.app.manager.Editor
-import org.fayalite.ui.app.state.StateSync.ParseRequest
 import org.fayalite.ui.app.state.auth.OAuth
-import org.fayalite.ui.app.state.auth.OAuth
-import org.fayalite.ui.app.text.CellManager
-import org.fayalite.ui.app.text.CellManager
 import org.scalajs.dom
-import org.scalajs.dom.Event
-import org.scalajs.dom._
-import org.scalajs.dom._
-import org.scalajs.dom.raw.DataTransfer
-import org.scalajs.dom.raw.Element
-import org.scalajs.dom.raw.Element
-import org.scalajs.dom.raw.File
-import org.scalajs.dom.raw.FileList
-import org.scalajs.dom.raw.FileReader
-import org.scalajs.dom.raw.HTMLCanvasElement
-import org.scalajs.dom.raw.HTMLElement
-import org.scalajs.dom.raw.MouseEvent
-import org.scalajs.dom.raw._
+import org.scalajs.dom.{Event, _}
+import org.scalajs.dom.raw.{Element, HTMLCanvasElement, HTMLElement, MouseEvent, _}
 import rx._
-
-import scala.scalajs.js.{JSON, Dynamic}
-import scala.util.{Random, Try}
-
 import rx.ops._
 
-object UIExt {
-
-  def byClass(c: String) = document.getElementsByClassName(c)
-
-  implicit class HTE2(ht: HTMLElement) {
-    def click(f: MouseEvent => Unit) = {
-      ht.onclick = f
-      ht
-    }
-    def withClass(c: String) = {
-      ht.setAttribute("class", c)
-      ht
-    }
-    def code(e: => String, f: => Unit = ()) = this.click { me: MouseEvent =>
-      mkRequest(e)
-      f
-    }
-
-    def clickEach(f : () => Unit) = click{me: MouseEvent => f}
-  }
-
-
-  def button(s: String) = {
-    import org.scalajs.dom
-    import scalajs.js._
-    // dom.document.body
-    val obj: dom.Element = dom.document.createElement("button")
-    val tn = dom.document.createTextNode(s)
-    obj.appendChild(tn)
-    obj.asInstanceOf[HTMLElement]
-  }
-
-  implicit class jf (j: HTMLElement) {
-    def wa(a: String, v: String) = {
-      j.setAttribute(a, v)
-      j
-    }
-    def wt(s: String) = {
-      j.textContent = s
-      j
-    }
-  }
-
-
-  val ce =  (e : String) => {
-    dom.document.createElement(e)
-  }.asInstanceOf[HTMLElement]
-  val cet =  (e : String, ttt: String) => {
-    val eee =ce(e)
-    eee.appendChild(dom.document.createTextNode(ttt))
-    eee
-  }.asInstanceOf[HTMLElement].withStyle("color:" + methodGold)
-
-  val ceb =  (e : String) => {
-    val ce1: Element = ce(e)
-    appendBody(ce1);
-    ce1
-  }
-
-
-  def div = ce("div")
-
-  implicit class ela(e: Element) {
-    def withChild(c: Element) = {
-      e.appendChild(c)
-      c
-    }
-    def wc(c: Element) = withChild(c)
-    def wc(c: List[Element]) = {
-      c.foreach{e.ac}
-      e
-    }
-    def ac(c: Element) = e.appendChild(c)
-  }
-  val txRes = Var("")
-
-  val methodOrange = "color:#FFC66D;"
-  val methodGold = "#FFC66D;"
-  val gold = "#FFC66D"
-  val burntGold = "#CC7832"
-
-  def bigMO = "color:#FFC66D;font-size:200%;"
-  def bigM2O = "color:#CC7832;font-size:200%;"
-
-  def appendBody(s: Element) = {
-    dom.document.body.appendChild(s)
-  }
-  def ab(s: Element) = {
-    dom.document.body.appendChild(s)
-  }
-
-  implicit class htex(hte: HTMLElement) {
-    def style = hte.getAttribute("style")
-    def plusStyle(s: String) = hte.withStyle(style + s)
-    def withStyle(s: String) = {
-      hte.setAttribute("style", s)
-      hte // Change to mutex in-place @mutex ; i.e. its a block side effect
-      // returning the same node in vertex pipeline.
-    }
-    def setLT(l: Int, t: Int) = {
-      hte.setAttribute("style", hte.style + ";font-size:20px;position:absolute" +
-        ";left:" + l + "%;top:" + t + "%")
-    }
-  }
-
-  def plainButtonStyle = """background-color: Transparent;
-                           |    background-repeat:no-repeat;
-                           |    border: none;
-                           |    cursor:pointer;
-                           |    overflow: hidden;
-                           |    outline:none;""".stripMargin
-
-  val bgGrey = "#2B2B2B"
-  val lightBlue = "#A9B7C6"
-  val commentGrey = "#808080"
-  val ansiGrey = "#555555"
-  val ansiDarkGrey = "#1F1F1F"
-
-  case class ParseRequest (
-                            code: String,
-                            cookies: String,
-                            requestId: String
-                            )
-
-  def mkRequest(code: String) = {
-    import upickle._
-    val request = ParseRequest(code=code, cookies = dom.document.cookie,
-      requestId = scala.util.Random.nextLong().toString)
-    val write1: String = write(request)
-    //  println("sending parserequest" + write1)
-    PersistentWebSocket
-      .send(write1)
-
-  }
-
-
-  def hb(s: String) = {
-    button(s)
-      .wa("class", "login")
-      .wa("align", "center")
-      .withStyle("font-size:18px;" + plainButtonStyle + methodOrange)
-      .clickEach { () => {
-        //  println("butn") // OAuth redirect()
-      }
-      }
-  }
-}
 
 object StateSync2 {
-
-  import UIExt._
 
   Input.heartBeat.foreach{
     e =>
@@ -216,8 +41,6 @@ object StateSync2 {
 
     document.body.withStyle("background-color:#2B2B2B;z-index:0;margin:0;padding:0;")
     import org.scalajs.dom
-
-    import scalajs.js._
     // dom.docume
 
     val b = hb("OAuth")

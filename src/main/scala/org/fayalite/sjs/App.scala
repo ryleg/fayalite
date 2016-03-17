@@ -1,14 +1,20 @@
 package org.fayalite.sjs
 
+import rx.ops.{DomScheduler, Timer}
+
 import scala.scalajs.js.Dynamic.{global => g}
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
 
 object App extends JSApp {
 
-  val filePrefix = "file:///"
-  val compileOutput = "/target/scala-2.10/fayalite-fastopt.js"
-  val WS_URI = "ws://localhost:8080/"
+  import scala.concurrent.ExecutionContext.Implicits.global
+  import scala.concurrent.duration._
+
+  implicit val scheduler = new DomScheduler()
+
+  val heartBeat = Timer(15.seconds)
+
 
   @JSExport
   def main(): Unit = {

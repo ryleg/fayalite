@@ -18,6 +18,15 @@ trait CommonMonadExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
+  implicit class SeqExt[A](s: Seq[A]) {
+    def mapHead(f: (A => A)) = {
+      s.headOption.map{f}.map{
+        ho =>
+          Seq(ho) ++ s
+      }.getOrElse(Seq())
+    }
+  }
+
   implicit class SimpleArrayExt[A](a: Array[A]) {
     def _2 = {
       a match {

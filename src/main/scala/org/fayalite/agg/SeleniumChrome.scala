@@ -7,8 +7,6 @@ import java.awt.datatransfer.StringSelection
 import fa.Schema._
 import fa._
 import org.fayalite.agg.Proxy.ProxyDescr
-import org.openqa.selenium.Proxy
-import org.openqa.selenium.Proxy.ProxyType
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 import rx._
@@ -20,7 +18,6 @@ import scala.collection.JavaConversions
 
 object SeleniumChrome {
 
-
   /**
     * This works for an authenticated proxy but it forces a
     * browser prompt which is solved by a Robot
@@ -30,6 +27,7 @@ object SeleniumChrome {
     * @return
     */
   def mkProxy(desiredProxy: String, opt: ChromeOptions = getOpts) = {
+    import org.openqa.selenium.Proxy
     val prox = new Proxy()
     prox.setHttpProxy(desiredProxy)
     prox.setFtpProxy(desiredProxy)

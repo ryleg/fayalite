@@ -1,6 +1,5 @@
 package org.fayalite.ui.app.canvas.elem
 
-import org.fayalite.ui.app.App
 import org.fayalite.ui.app.canvas.{PositionHelpers, Schema, Canvas}
 import org.fayalite.ui.app.state.Input
 import Input.{Key, Mouse}

@@ -26,11 +26,6 @@ import PositionHelpers._
 
 object Input {
 
-  def time = {
-    import scala.scalajs.js.Date
-    new Date().getTime()
-  }
-
   // TODO : Move old canvas input references here.
 
   // Need to kill clipboard Obs on dynamic class reload.

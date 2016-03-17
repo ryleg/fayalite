@@ -2,6 +2,7 @@ import java.util.concurrent.Executors
 
 import org.fayalite.agg.SeleniumHelp
 import org.fayalite.util.dsl._
+import org.fayalite.util.img.ImageHelp
 
 import scala.concurrent.ExecutionContext
 
@@ -24,6 +25,7 @@ with StringFormatHelpers
 with FileHelpUtilities
 with CommonJunk
 with SeleniumHelp
+with ImageHelp
 {
 
   // WARNING : This could cause you problems on import, that's why
