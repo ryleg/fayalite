@@ -15,7 +15,7 @@ class PuttyExec {
     Seq(puttyWinExecPath,
      "-m", tempScriptPath, "-T", "-A", "-l", "ubuntu", "fayalite.org").!!
   }
-  def run(s: Seq[String]) = run(s.mkString("\n"))
+  //def run(s: Seq[String]) = run(s.mkString("\n"))
 
 }
 

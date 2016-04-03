@@ -3,11 +3,16 @@ package org.fayalite.agg
 import fa._
 
 
+class ProxyManager  {
+
+
+}
+
 /**
   * Simple example of proxy usage for PhantomJS / Selenium
   * and tests to get proxy support
   */
-object Proxy {
+object ProxyManager {
 
   case class ProxyDescr(
                          hostPort: String,

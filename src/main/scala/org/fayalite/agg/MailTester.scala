@@ -4,7 +4,6 @@ import java.io.File
 
 import fa._
 import org.fayalite.agg.MailTester.EmailGuessRequirements
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.RemoteWebDriver
 import rx.core.Var
@@ -17,7 +16,10 @@ object PJSMailTester {
 
 }
 
-class PJSMailTester(var webDriver: RemoteWebDriver, val id: Int = 0) extends MailTesterLike {
+class PJSMailTester(
+                     var webDriver: RemoteWebDriver,
+                     val id: Int = 0
+                   ) extends MailTesterLike {
 
   val pjD = this
 
@@ -141,7 +143,7 @@ trait MailTesterLike {
 
 
 /**
-  * Created by aa on 3/5/2016.
+  * Example of how to wrap mailtester.com
   */
 object MailTester {
 
@@ -166,11 +168,19 @@ object MailTester {
 
   def processFile(f: File) = {
     val csv = readCSV(f.getAbsolutePath)
-    val withLowercase = csv.tail.map{_.map{_.toLowerCase}}
+    //val withLowercase = csv.tail.map{_.map{_.toLowerCase}}
     val headers = csv.head
-    (headers, withLowercase)
+    (headers, csv.tail)
   }
 
+  /**
+    * Some guesses for permutations of a name that
+    * might appear in an email for submitting to
+    * MailTester
+    * @param n : Series of names to build email guesses
+    *          from
+    * @return : Guesses at usernames for an email address
+    */
   def getPermutations(n: Name): List[String] = {
     val f = n.first
     val l = n.last
@@ -203,6 +213,12 @@ object MailTester {
 
   def apply(path : String ) = {
     //processLine(new File(path))
+  }
+
+  def main(args: Array[String]) {
+
+
+
   }
 
 /*

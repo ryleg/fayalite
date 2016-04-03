@@ -6,7 +6,7 @@ import java.awt.datatransfer.StringSelection
 
 import fa.Schema._
 import fa._
-import org.fayalite.agg.Proxy.ProxyDescr
+import org.fayalite.agg.ProxyManager.ProxyDescr
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import org.openqa.selenium.remote.{CapabilityType, DesiredCapabilities}
 import rx._
@@ -79,6 +79,7 @@ object SeleniumChrome {
 
   /**
     * User agent spoof for not getting banned from everything
+ *
     * @return : Options for passing onto driver
     */
   def getOpts = {
@@ -92,6 +93,7 @@ object SeleniumChrome {
 
   /**
     * Forcibly authenticate a proxy
+ *
     * @param proxyEnc : Full proxy description for
     *                 dedication proxy
     * @return Driver logged in and ready
@@ -99,7 +101,7 @@ object SeleniumChrome {
   def driverByProxy(proxyEnc: ProxyDescr) = {
     val cap = mkProxy(proxyEnc.hostPort)
     val driver = new ChromeDriver(cap)
-    driver.get(Proxy.getIp)
+    driver.get(ProxyManager.getIp)
     SeleniumChrome.browserLogin(proxyEnc.user, proxyEnc.pass)
     driver
   }

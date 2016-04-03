@@ -48,26 +48,16 @@ object Yahoo {
   case class Price(ask: Double, bid: Double)
 
 
-  def getPolls: Iterator[Poll] = {
+  def getPolls = {
     asLines(yahooFinanceExamplePull)
       .withFilter(q => q != "null" && q.stripLineEnd.nonEmpty) // junk from aggregation
       .grouped(3)
       .map {_.mkString}
       .flatMap {parseResponse}
       .zipWithIndex
-      .flatMap {
-      case (r, i) =>
-        r.map { case (s, a, b) => Poll(s, a, b, i) }
-    }
   }
 
   def main(args: Array[String]) {
-
-    val bs = getPolls
-
-    bs.map{
-        case Poll(s,a,b,i) => List(s,a,b,i).map{_.toString}
-    }.take(1).foreach(println)
 
 
 

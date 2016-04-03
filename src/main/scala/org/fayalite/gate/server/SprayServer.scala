@@ -10,6 +10,8 @@ import rx._
 import spray.routing
 import spray.routing.{StandardRoute, HttpServiceActor}
 
+import scalatags.Text.all._
+
 /**
   * A disposable / changeable message processing
   * loop for deployed actors. Dead simple, no
@@ -69,6 +71,8 @@ class SprayServer(
   }
   val targetS210Path = new File(targetPath, "scala-2.10")
   val sjsFastOpt = new File(targetS210Path, "fayalite-fastopt.js")
+  val sjsFastOptMap = new File(targetS210Path, "fayalite-fastopt.js.map")
+  val sjsFastOptDep = new File(targetS210Path, "fayalite-jsdeps.js")
 
   /**
     * Barebones actor system to get you started
@@ -89,6 +93,22 @@ class SprayServer(
     }
     }
 
+    val dbg = // "<!DOCTYPE html>" +
+      html(
+        scalatags.Text.all.head(
+          scalatags.Text.tags2.title("fayalite"),
+          meta(charset := "UTF-8")
+        )
+        ,
+        body(
+          script(
+            src := "./target/scala-2.10/fayalite-fastopt.js",
+            `type` := "text/javascript"),
+          script("org.fayalite.sjs.App().main()",
+            `type` := "text/javascript")
+        )
+      ).render
+
     /**
       * Testable route to serve a rendered page
       * override or reassign for real-time change
@@ -97,24 +117,49 @@ class SprayServer(
       import scalatags.Text.all._
       import fa._
       {
-        get {
+        val defaultRoute = get {
           completeWith(
-            html(
-              scalatags.Text.all.head(
-                scalatags.Text.tags2.title("fayalite"),
-                meta(charset := "UTF-8")
-                )
-               ,
-              body(
-                script(
-                  readLines(sjsFastOpt.getCanonicalPath).mkString("\n"),
-                `type`:="application/javascript"),
-                  script("org.fayalite.sjs.App().main()",
-                    `type`:="text/javascript")
-              )
-            ).render
+           s"""
+              |<!DOCTYPE html>
+              |<html>
+              |  <head>
+              |    <meta charset="UTF-8">
+              |    <title>fayalite</title>
+              |  </head>
+              |  <body>
+              |    <!-- Include Scala.js compiled code -->
+              |    <script type="text/javascript" src="./target/scala-2.10/fayalite-fastopt.js"></script>
+              |    <!-- Run tutorial.webapp.TutorialApp -->
+              |    <script type="text/javascript">
+              |      org.fayalite.sjs.App().main();
+              |    </script>
+              |  </body>
+              |</html>
+            """.stripMargin
           )
         }
+
+        path("fayalite-fastopt.js.map") {
+          completeWith(readLines(sjsFastOptMap.getCanonicalPath).mkString("\n"))
+        } ~
+          pathPrefix("target") {
+            get {
+              println("Pathprefix traget get")
+              val r1 = unmatchedPath {
+                path =>
+                  println("PAth " + path)
+                  complete(readLines(sjsFastOpt.getCanonicalPath).mkString("\n"))
+              }
+              r1
+            }
+          } ~
+/*        path("email") {
+          post {
+            val x = extract {_.request.entity.asString}
+            complete { " yo "}
+          }
+        } ~*/
+        defaultRoute
       }
     }
 
