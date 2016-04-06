@@ -166,6 +166,11 @@ object MailTester {
   case class EmailGuessRequirements(name: Name, domain: String,
                                     preExistingEmail: Option[String] = None)
 
+  case class EmailTestRequest(
+                             email: String,
+                             authentication: String
+                             )
+
   def processFile(f: File) = {
     val csv = readCSV(f.getAbsolutePath)
     //val withLowercase = csv.tail.map{_.map{_.toLowerCase}}

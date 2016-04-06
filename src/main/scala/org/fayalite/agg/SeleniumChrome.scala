@@ -13,9 +13,6 @@ import rx._
 
 import scala.collection.JavaConversions
 
-// TODO : Get this to work in src/main without a strange compiler error.
-
-
 object SeleniumChrome {
 
   /**
@@ -42,6 +39,15 @@ object SeleniumChrome {
     * This deals with nasty browser authentication window
     * popups that aren't website based.
     *
+    * Pretty unsafe but it works at least for a single
+    * Selenium window if you're not allowing any other
+    * input side effects.
+    *
+    * THIS HAS ENVIRONMENTAL DEPENDENCIES / SIDE EFFECTS
+    * It is not monadic! It messes with system clipboard also
+    *
+    * // TODO : Fix somehow
+    *
     * @param username : HTML username to login with as you would encode
     *                 for a http request
     * @param pass : Password
@@ -50,7 +56,7 @@ object SeleniumChrome {
     val user = new StringSelection(username)
     val rb = new Robot()
     Toolkit.getDefaultToolkit().getSystemClipboard().setContents(user, null)
-    println("set clip")
+  //  println("set clip")
     rb.keyPress(KeyEvent.VK_CONTROL)
     rb.keyPress(KeyEvent.VK_V)
     rb.keyRelease(KeyEvent.VK_V)

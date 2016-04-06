@@ -1,3 +1,4 @@
+/*
 package org.fayalite.sjs
 
 import org.scalajs.dom
@@ -78,3 +79,4 @@ trait SJSHelp {
 
 
 }
+*/

@@ -1,3 +1,4 @@
+/*
 package org.fayalite.sjs
 
 import rx.core.Var
@@ -47,3 +48,4 @@ trait Drawable {
   }
 
 }
+*/

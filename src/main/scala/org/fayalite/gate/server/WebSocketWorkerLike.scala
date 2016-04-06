@@ -1,5 +1,6 @@
 package org.fayalite.gate.server
 
+import akka.actor.ActorRefFactory
 import spray.can.websocket
 import spray.can.websocket.FrameCommandFailed
 import spray.can.websocket.frame.TextFrame
@@ -44,10 +45,10 @@ class WebSocketWorkerLike(
     *         like
     *         getFromFile("index.html") ~  // put your rest API here after this tilda
     */
-  def route : routing.Route = mp.route()
+  def route(rf: ActorRefFactory) : routing.Route = mp.route()(rf)
 
   def businessLogicNoUpgrade: Receive = {
     implicit val refFactory: akka.actor.ActorRefFactory = context
-    runRoute { route }
+    runRoute { route(refFactory) }
   }
 }

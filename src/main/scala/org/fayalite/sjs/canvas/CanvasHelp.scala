@@ -1,3 +1,4 @@
+/*
 package org.fayalite.sjs.canvas
 
 import org.fayalite.sjs.Schema.CanvasStyling
@@ -34,3 +35,4 @@ trait CanvasHelp {
     ret
   }
 }
+*/

@@ -2,13 +2,13 @@ package org.fayalite.gate.server
 
 import java.io.File
 
-import akka.actor.{ActorRef, Props, ActorSystem}
+import akka.actor.{ActorRefFactory, ActorRef, Props, ActorSystem}
 import akka.io.IO
 import spray.can.server.UHttp
 import spray.can.Http
 import rx._
 import spray.routing
-import spray.routing.{StandardRoute, HttpServiceActor}
+import spray.routing.{RoutingSettings, StandardRoute, HttpServiceActor}
 
 import scalatags.Text.all._
 
@@ -18,6 +18,8 @@ import scalatags.Text.all._
   * side effects allowed. Process loop in a vacuum
   */
 trait MessageProcesser extends spray.routing.Directives {
+
+  // For making getFromFile work
 
   /**
     * Reassign to this to fill out your server deployment
@@ -30,7 +32,7 @@ trait MessageProcesser extends spray.routing.Directives {
   /**
     * The route for REST requests to be processed
     */
-  val route: Var[routing.Route]
+  val route: Var[(akka.actor.ActorRefFactory => routing.Route)]
 
   /**
     * Allows use of ScalaTags to render HTML
@@ -113,100 +115,96 @@ class SprayServer(
       * Testable route to serve a rendered page
       * override or reassign for real-time change
       */
-    val route = Var {
+    val route = Var { (ctx: ActorRefFactory) => {
       import scalatags.Text.all._
       import fa._
       {
         val defaultRoute = get {
           completeWith(
-           s"""
-              |<!DOCTYPE html>
-              |<html>
-              |  <head>
-              |    <meta charset="UTF-8">
-              |    <title>fayalite</title>
-              |  </head>
-              |  <body>
-              |    <!-- Include Scala.js compiled code -->
-              |    <script type="text/javascript" src="./target/scala-2.10/fayalite-fastopt.js"></script>
-              |    <!-- Run tutorial.webapp.TutorialApp -->
-              |    <script type="text/javascript">
-              |      org.fayalite.sjs.App().main();
-              |    </script>
-              |  </body>
-              |</html>
+            s"""
+               |<!DOCTYPE html>
+               |<html>
+               |  <head>
+               |    <meta charset="UTF-8">
+               |    <title>fayalite</title>
+               |  </head>
+               |  <body>
+               |    <script type="text/javascript" src="fayalite-fastopt.js"></script>
+               |    <script type="text/javascript"> org.fayalite.sjs.App().main();</script>
+               |  </body>
+               |</html>
             """.stripMargin
           )
         }
+        implicit val refFactory = ctx
 
-        path("fayalite-fastopt.js.map") {
-          completeWith(readLines(sjsFastOptMap.getCanonicalPath).mkString("\n"))
-        } ~
-          pathPrefix("target") {
-            get {
-              println("Pathprefix traget get")
-              val r1 = unmatchedPath {
-                path =>
-                  println("PAth " + path)
-                  complete(readLines(sjsFastOpt.getCanonicalPath).mkString("\n"))
-              }
-              r1
+        pathPrefix("fayalite") {
+          println("Path prefix fayalaite")
+          get {
+            println("fayget")
+            unmatchedPath { path =>
+              println("unmatched path " + path)
+              val f = new File(targetS210Path, "fayalite" + path.toString)
+              println( " new file " + f.getCanonicalPath)
+              getFromFile(f)
             }
-          } ~
-/*        path("email") {
-          post {
-            val x = extract {_.request.entity.asString}
-            complete { " yo "}
           }
-        } ~*/
-        defaultRoute
+        } ~ defaultRoute
+
       }
     }
+    }
+  }
+
+    // unmatchedPath {
+    //    path =>
+
+    // post {
+    //   val x = extract {_.request.entity.asString
+
+
+    /**
+      * Reassigns new connections to a different process
+      *
+      * @param a : process to receive connections
+      */
+    def resetProcess(a: ((String, ActorRef) =>
+      Unit)) = messageProcesser.process() = a
+
+    /**
+      * Handler that issues incoming connections new actors
+      * deployed with message processer
+      */
+    val server = system.actorOf(
+      Props(
+        classOf[ConnectionRegistrationHandler],
+        messageProcesser
+      ),
+      "ConnectionRegistrationHandler"
+    )
+
+    /**
+      * Bind the port and serve connections to our
+      * pre-initialized simple ActorSystem and actor
+      */
+    def start(): Unit = {
+      IO(UHttp)(system) ! Http.Bind(server, "0.0.0.0", port)
+    }
+
+    // Automatically start, pretty typical since our
+    // thread management is at the connection message deploy level.
+    // Try and rely on ConnectionReg handler unless you need
+    // something complicated
+    start()
 
   }
 
   /**
-    * Reassigns new connections to a different process
-    *
-    * @param a : process to receive connections
+    * Run for simple demonstration, check localhost:8080 for a rendered
+    * page
     */
-  def resetProcess(a: ((String, ActorRef) =>
-    Unit)) = messageProcesser.process() = a
-
-  /**
-    * Handler that issues incoming connections new actors
-    * deployed with message processer
-    */
-  val server = system.actorOf(
-    Props(
-      classOf[ConnectionRegistrationHandler],
-      messageProcesser
-    ),
-    "ConnectionRegistrationHandler"
-  )
-
-  /**
-    * Bind the port and serve connections to our
-    * pre-initialized simple ActorSystem and actor
-    */
-  def start(): Unit = {
-    IO(UHttp)(system) ! Http.Bind(server, "0.0.0.0", port)
+  object SprayServer {
+    def main(args: Array[String]) {
+      new SprayServer()
+    }
   }
-
-  // Automatically start, pretty typical since our
-  // thread management is at the connection message deploy level.
-  // Try and rely on ConnectionReg handler unless you need
-  // something complicated
-  start()
-
-}
-
-/**
-  * Run for simple demonstration, check localhost:8080 for a rendered
-  * page
-  */
-object SprayServer {
-  def main(args: Array[String]) {
-    new SprayServer()
-  }
-}
