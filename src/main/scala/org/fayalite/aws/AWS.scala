@@ -12,6 +12,7 @@ import com.amazonaws.services.ec2.model._
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient
 import com.amazonaws.services.rds.{AmazonRDSClient, AmazonRDS}
 
+import scala.collection.JavaConversions
 import scala.collection.JavaConversions._
 import com.amazonaws.auth.{EnvironmentVariableCredentialsProvider, DefaultAWSCredentialsProviderChain}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
@@ -21,6 +22,7 @@ import com.amazonaws.auth._
 import scala.io.Source
 import scala.util.{Random, Try}
 
+import JavaConversions._
 
 
 /**
@@ -76,10 +78,52 @@ object AWS {
     ServerManager.requestServerInfo()
   }
 
+  def instances = ec2.describeInstances().getReservations.toList.flatMap{
+    _.getInstances
+  }
+  def instanceIds = instances.map{_.getInstanceId}
+
+  def destroyInstances = {
+    val tr = new TerminateInstancesRequest(instanceIds)
+    ec2.terminateInstances(tr)
+  }
+
   def main(args: Array[String]) {
    //testDescribeInstances()
-
+  //checkSpotRequests()
+   // destroyInstances
   //  getKeys
+    resetElasticIP
+   // spot()
+  }
+
+  def resetElasticIP = {
+    val ar = new AssociateAddressRequest(
+      getRunningInstances.head.getInstanceId,"52.8.59.72")
+    ec2.associateAddress(ar)
+  }
+
+  def getRunningInstances = {
+    ec2.describeInstances()
+      .getReservations
+      .flatMap {
+        _.getInstances
+      }
+      .filter {
+        _.getState.getName == "running"
+      }.toList
+  }
+
+  def checkSpotRequests(): Unit = {
+    ec2.describeSpotInstanceRequests().getSpotInstanceRequests.foreach {
+      q =>
+        println(
+          q.getType + " @ " +
+          q.getSpotPrice + " " +
+          q.getState + " " +
+          q.getStatus.getMessage
+        )
+    }
   }
 
   def spot() = {
@@ -90,10 +134,10 @@ object AWS {
     val launchSpecification = new LaunchSpecification()
     launchSpecification.setImageId(AppLauncher.ubuntu1404HVM)
     launchSpecification.setInstanceType("c4.xlarge")
+    launchSpecification.setKeyName("fa")
 
     // Add the security group to the request.
     val securityGroups = new util.ArrayList[String]()
-
 
     val vpc = ec2.describeVpcs().getVpcs.map{
       q =>
@@ -112,11 +156,15 @@ object AWS {
     // Call the RequestSpotInstance API.
     val requestResult = ec2.requestSpotInstances(requestRequest)
 
+    while (requestResult.getSpotInstanceRequests.head.getState == "open") {
+      checkSpotRequests()
+      Thread.sleep(10 * 1000)
+    }
 
 
   }
 
-  def ensureSG: Unit = {
+  def ensureSG: Unit = Try {
     val sgs = ec2.describeSecurityGroups().getSecurityGroups
     if (!sgs.contains("fayalite")) {
       println("Creating security group")
@@ -127,6 +175,7 @@ object AWS {
       val ipp = new IpPermission()
       ipp.setFromPort(22)
       ipp.setToPort(22)
+      ipp.setIpProtocol("TCP")
       val ac = new AuthorizeSecurityGroupIngressRequest("fayalite", List(ipp))
       ec2.authorizeSecurityGroupIngress(ac)
     }

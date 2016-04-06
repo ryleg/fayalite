@@ -9,7 +9,7 @@ python-software-properties python-dev python-setuptools \
 git make gcc autoconf automake sbt \
 docker docker-engine libssl-dev \
 openjdk-7-jdk software-properties-common build-essential \
-postfix wget unzip redis-server nano tmux \
+wget unzip redis-server nano tmux \
 psmisc curl net-tools vim-tiny sudo openssh-server vim
 sudo easy_install pip
 

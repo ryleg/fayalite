@@ -1,21 +1,14 @@
 package org.fayalite.util.img
 
-import java.awt.Color
-
 import org.fayalite.ui.WebsocketPipeClient
-import spray.can.websocket.frame.BinaryFrame
 import java.awt.image.{DataBufferByte, DataBufferInt, RenderedImage}
 import javax.imageio.ImageIO;
-
 import akka.util.ByteString
 import rx._
 import scala.collection.Iterable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
-
-import sun.awt.image.codec.JPEGImageEncoderImpl
 import java.awt.image.BufferedImage
-
 import java.awt.Color
 
 /**
