@@ -2,7 +2,7 @@ import AssemblyKeys._ // put this at the top of the file
 
 assemblySettings
 
-jarName in assembly := s"${name.value}-test-${version.value}.jar"
+jarName in assembly := s"${name.value}-${version.value}.jar"
 
 mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 {
@@ -18,8 +18,6 @@ mergeStrategy in assembly <<= (mergeStrategy in assembly) { (old) =>
 }
 }
 
-//assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutput = false)
+assemblyOption in assembly := (assemblyOption in assembly).value.copy(cacheOutput = false)
 
-//run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))
-
-mainClass in assembly := Some("org.fayalite.agg.SelCtrl")
+run in Compile <<= Defaults.runTask(fullClasspath in Compile, mainClass in (Compile, run), runner in (Compile, run))

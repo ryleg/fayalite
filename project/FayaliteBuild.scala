@@ -87,13 +87,19 @@ object FayaliteBuild extends sbt.Build {
      //     "ch.qos.logback" % "logback-classic" % "1.1.2",
           "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
         )
-  )
+  ).aggregate(gate, sjs)
+
+  lazy val gate = Project(
+    id = "gate",
+    base = file("gate")).settings()
+
+  gate.dependsOn(root)
 
   lazy val sjs = Project(
     id = "sjs",
     base = file("./sjs")
   )
 
-  mainClass in (Compile, run) := Some("org.fayalite.agg.SelExample")
+  mainClass in (Compile, run) := Some("org.fayalite.sjs.App")
 
 }

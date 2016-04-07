@@ -2,12 +2,7 @@ package org.fayalite.ui.j2d
 
 import java.awt._
 import java.awt.event._
-import java.awt.image.BufferedImage
-import java.io.File
-import javax.imageio.ImageIO
 import javax.swing.{JButton, JFrame, JPanel}
-
-import scala.collection.mutable
 
 /**
   * Just a really simple button

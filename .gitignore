@@ -5,6 +5,7 @@
 
 !.gitignore
 
+target
 /dist
 /tmp
 /lib

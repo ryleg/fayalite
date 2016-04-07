@@ -1,6 +1,6 @@
-package org.fayalite.ui.app.canvas.elem
+/*
+package org.fayalite.sjs
 
-import org.fayalite.ui.app.state.Input
 import rx._
 
 
@@ -26,3 +26,4 @@ trait Flasher extends Drawable {
   }
 
 }
+*/

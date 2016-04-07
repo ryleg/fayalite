@@ -119,7 +119,8 @@ class SprayServer(
       import scalatags.Text.all._
       import fa._
       {
-        val defaultRoute = get {
+
+        /*get {
           completeWith(
             s"""
                |<!DOCTYPE html>
@@ -135,9 +136,9 @@ class SprayServer(
                |</html>
             """.stripMargin
           )
-        }
+        }*/
         implicit val refFactory = ctx
-
+        val defaultRoute = getFromFile("index.html")
         pathPrefix("fayalite") {
           println("Path prefix fayalaite")
           get {
