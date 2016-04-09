@@ -1,6 +1,7 @@
 package org.fayalite.util.img
 
 import java.awt.Color
+import java.awt.image.{BufferedImage, DataBufferByte, RenderedImage}
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -24,6 +25,24 @@ trait ImageHelp {
     import java.awt.image.BufferedImage
     val image = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR)
     image
+  }
+
+  implicit class BuffImageExt (bi: BufferedImage ) {
+
+    val hasAlphaChannel = bi.getAlphaRaster() != null
+    val pixelLength = if (hasAlphaChannel) 4  else 3
+
+    def getAllData = bi
+      .getRaster
+      .getDataBuffer
+      .asInstanceOf[DataBufferByte]
+      .getData
+
+    def save(path: String) = {
+      val ri = bi.asInstanceOf[RenderedImage]
+      val fi = new java.io.File(path)
+      ImageIO.write(ri, "PNG", fi)
+    }
   }
 
 }

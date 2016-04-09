@@ -77,9 +77,17 @@ trait CommonMonadExt {
     case (k,v) => k -> v.map{_._2}
   }
 
-  implicit class KVListExt[K, V](l: List[(K,V)]) {
+  implicit class KVTupExt[K,V](kv: (K,V)) {
+    def tabDelim = kv._1 + "\t" +   kv._2
+  }
+
+
+  implicit class KVListExt[K, V](l: Seq[(K,V)]) {
     def gbk = l.groupBy{_._1}
       .map{case (x,y) => x -> y.map{_._2}}
+    def prettyTSVString = {
+      l.map{_.tabDelim}.mkString("\n")
+    }
   }
 
   implicit def getFutureAsString(some: Future[Any]): String = some.getAs[String]

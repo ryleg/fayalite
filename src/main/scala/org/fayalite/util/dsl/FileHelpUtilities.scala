@@ -64,9 +64,17 @@ trait FileHelpUtilities {
       .writeAll(cnt)
   }
 
+  def writeToFile(f: File, cnt: String) = {
+    scala.tools.nsc.io.File(
+      f)
+      .writeAll(cnt)
+  }
+
   def fromFile(f: File) = scala.io.Source.fromFile(f)
 
   def readFromFile(f: String) = scala.io.Source.fromFile(f).mkString
+
+  def readLines(f: File) = scala.io.Source.fromFile(f).getLines()
 
   def readLines(f: String) = scala.io.Source.fromFile(f).getLines()
 
