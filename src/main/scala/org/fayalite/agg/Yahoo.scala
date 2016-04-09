@@ -1,5 +1,8 @@
 package org.fayalite.agg
 
+import org.fayalite.agg.ProxyManager.ProxyDescr
+
+import scala.collection.mutable
 import scala.util.{Failure, Success, Try}
 
 /**
@@ -48,7 +51,11 @@ object Yahoo {
 
   case class Price(ask: Double, bid: Double)
 
+  case class SymbolPrice(symbol: String, price: Price)
+
   case class Observe(time: Int, symPrice: List[(String, Price)])
+
+  case class Observe2(time: Int, symPrice: List[SymbolPrice])
 
   def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
@@ -62,6 +69,30 @@ object Yahoo {
       val maxS = readIn.map{_.symPrice.map(_._2.ask).max}.max
       val minS = readIn.map{_.symPrice.map(_._2.ask).min}.min
       println("min max " + minS + " " + maxS)
+      println(s"num observations: ${readIn.size}")
+
+      val r2 = readIn.map{q => Observe2(q.time, q.symPrice.map{
+        case (x,y) => SymbolPrice(x,y)
+      })}
+
+      val lastSeen = mutable.Map[String, (Double, Int)]()
+
+      r2.foreach{
+        case Observe2(time, symprice) =>
+          symprice.foreach{
+            case SymbolPrice(s, p) =>
+              val lastPrice = lastSeen.getOrElseUpdate(s, (p.ask, 0))
+              if (lastPrice._1 != p.ask) lastSeen(s) = (p.ask, lastPrice._2 + 1)
+          }
+      }
+
+      val changers = lastSeen.map{case (x, (y,z)) => x -> z }.toSeq
+        .sortBy{_._2}.reverse
+
+      changers.slice(0, 30).foreach{println}
+
+    //  println(s"num delta per step: ${readIn.size}")
+
 
 
 //    runCrawl
@@ -69,11 +100,8 @@ object Yahoo {
 
   def runCrawl: Unit = {
     val smp = getSamples.toList
-
     while (true) {
-
       smp.map { case (syms, url) =>
-
         val rr = doRequest(url, syms)
 
         val obs = rr.map {
@@ -86,7 +114,6 @@ object Yahoo {
               }
           }
         }
-
         obs.onComplete {
           case Success(x) =>
             val t = intTime
@@ -106,9 +133,15 @@ object Yahoo {
     p.ask > 0 && p.bid > 0
   }
 
-  def doRequest(u: String, syms: List[String]) = {
+  def doRequest(u: String, syms: List[String],
+                proxy: Option[ProxyDescr] = None) = {
     import dispatch._
     val r = url(u)
+    proxy.foreach { p =>
+      r.setProxyServer( // make implicit conv
+        new com.ning.http.client.ProxyServer(p.host, p.port, p.user, p.pass)
+      )
+    }
     val t: Req = r.GET
     val svc = r
     val country = Http(svc OK as.String)

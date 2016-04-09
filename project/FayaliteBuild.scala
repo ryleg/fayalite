@@ -44,6 +44,9 @@ object FayaliteBuild extends sbt.Build {
     "com.github.sarxos" % "webcam-capture" % "0.3.10" withSources() withJavadoc()
   )
 
+  val rx = "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc()
+
+
   val essential = Seq(
     "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
     "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
@@ -52,8 +55,8 @@ object FayaliteBuild extends sbt.Build {
   )
 
   val web = Seq(
+  //  "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
     "org.jsoup" % "jsoup" % "1.7.2"  withSources() withJavadoc(),
-    "org.scalacheck" %% "scalacheck" % "1.11.4" % "test" withSources() withJavadoc(),
     "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" withSources() withJavadoc(),
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
@@ -63,6 +66,24 @@ object FayaliteBuild extends sbt.Build {
     "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc()
   )
 
+  val allDeps = jsonStuff ++
+    essential ++
+    web ++
+    misc ++
+    Seq(
+      "org.scalacheck" %% "scalacheck" % "1.11.4" % "test" withSources() withJavadoc(),
+      "org.scalatest" % "scalatest_2.10" % "2.0.M5b",
+      "amplab" % "spark-indexedrdd" % "0.1",
+      "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
+      "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc(),
+      //    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
+      //       "com.googlecode.lanterna" % "lanterna" % "2.1.9",
+      //        "com.jcraft" % "jzlib" % "1.1.3",
+      //     "com.decodified" %% "scala-ssh" % "0.7.0",
+      //     "ch.qos.logback" % "logback-classic" % "1.1.2",
+      "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
+    )
+
   lazy val root = Project(
     id = "root",
     base = file(".")).settings(
@@ -70,28 +91,15 @@ object FayaliteBuild extends sbt.Build {
     organization := "fayalite",
     version := "0.0.3",
     scalaVersion := "2.10.5",
-    libraryDependencies :=
-      jsonStuff ++
-        essential ++
-        web ++
-        misc ++
-        Seq(
-          "org.scalatest" % "scalatest_2.10" % "2.0.M5b",
-          "amplab" % "spark-indexedrdd" % "0.1",
-          "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
-          "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc(),
-      //    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
-   //       "com.googlecode.lanterna" % "lanterna" % "2.1.9",
-  //        "com.jcraft" % "jzlib" % "1.1.3",
-     //     "com.decodified" %% "scala-ssh" % "0.7.0",
-     //     "ch.qos.logback" % "logback-classic" % "1.1.2",
-          "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
-        )
+    libraryDependencies := allDeps
+
   ).aggregate(gate, sjs)
 
   lazy val gate = Project(
     id = "gate",
-    base = file("gate")).settings()
+    base = file("./gate")).settings(
+    libraryDependencies := web ++ Seq(rx)
+  )
 
   gate.dependsOn(root)
 

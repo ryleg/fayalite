@@ -18,7 +18,10 @@ object ProxyManager {
                          hostPort: String,
                          user: String,
                          pass: String
-                       )
+                       ) {
+    def host = hostPort.split(":").head
+    def port = hostPort.split(":").last.toInt
+  }
 
   /**
     * This assumes you have a local text file filled with
