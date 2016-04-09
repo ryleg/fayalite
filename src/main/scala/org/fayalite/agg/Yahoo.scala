@@ -120,15 +120,21 @@ object Yahoo {
     Color.getHSBColor(H.toFloat, S.toFloat, B.toFloat)
   }
 
+  def dbgImg = {
+
+
+
+  }
+
   def main(args: Array[String]): Unit = {
     // processCrawl
 
     val gbf = gbtime.listFiles()
 
-    val r2 = gbf.map{
+    val r2 = gbf.map {
       q =>
         val f = q.getName
-        val qts = readLines(q).map{
+        val qts = readLines(q).map {
           q =>
             val a = q.split("\t")
             a(0) -> a(1).toDouble
@@ -136,76 +142,94 @@ object Yahoo {
         f -> qts
     }
 
-    val minV = r2.map{_._2.map{_._2}.min}.min
+    println(r2.size.toString + " r2 size")
+    val minV = r2.map {
+      _._2.map {
+        _._2
+      }.min
+    }.min
     println("MinV" + minV)
-    val maxV = r2.map{_._2.map{_._2}.max}.max
+    val maxV = r2.map {
+      _._2.map {
+        _._2
+      }.max
+    }.max
     println("Maxv " + maxV)
 
-    val uniqD = r2.map{_._1}.zipWithIndex.toMap
+    val uniqD = r2.map {
+      _._1
+    }.zipWithIndex.toMap
 
-    val ssy = r2.flatMap{_._2.keys}.toSet[String].toSeq.zipWithIndex.toMap
+    val ssy = r2.flatMap {
+      _._2.keys
+    }.toSet[String].toSeq.zipWithIndex.toMap
 
     println("Number unique sym " + ssy.size)
 
-    val i = createImage(uniqD.size, ssy.size)
-    //val db = i.getAllData
-
-    println(i.pixelLength.toString + " pixel length")
-
-
-    val r3 = r2.map{
-      case (x,y) =>
-        uniqD.get(x).get -> y.map{case (z,w) => ssy.get(z).get -> w}
+    val r3 = r2.map {
+      case (x, y) =>
+        uniqD.get(x).get -> y.map { case (z, w) => ssy.get(z).get -> w }
     }
 
-    r3.foreach{
-      case (dayIdent, colEntries) =>
-        colEntries.foreach{
-          case (companyIdent, dblVal) =>
-            val d: Double = dblVal - minV
-            i.setRGB(dayIdent, companyIdent, getColor( Math.log(d) / Math.log(maxV)).getRGB)
+
+    var r3p = runOp(r3.toSeq)
+
+    for (iter <- 1 to 10) {
+      println("Iteration " + iter)
+      r3p = runOp(r3p)
+
+      val i = createImage(uniqD.size, ssy.size)
+      val g = i.createGraphics()
+      g.setColor(Color.BLACK)
+      g.fillRect(0, 0, uniqD.size, ssy.size)
+
+      r3p.foreach {
+        case (dayIdent, colEntries) =>
+          colEntries.foreach {
+            case (companyIdent, dblVal) =>
+              val d: Double = dblVal - minV
+              i.setRGB(dayIdent, companyIdent, getColor(Math.log(d) / Math.log(maxV)).getRGB)
+          }
+      }
+
+      i.save(s".omg-$iter.png")
+    }
+  }
+
+  def runOp(r3: Seq[(Int, Map[Int, Double])]): Seq[(Int, Map[Int, Double])] = {
+    r3.grouped(3).withFilter {
+      _.size == 3
+    }.toSeq.flatMap {
+      case Seq(x, y, z) =>
+        val prefs = x._2.map {
+          case (k, v) =>
+            val c1 = y._2.get(k)
+            val c2 = z._2.get(k)
+            val xPrefersZ = if (c1.isEmpty) true
+            else {
+              if (c2.isEmpty) false
+              else {
+                val c1g = c1.get
+                val c2g = c2.get
+                val vCloserC2 = Math.abs(v - c2g) < Math.abs(v - c1g)
+                vCloserC2
+              }
+            }
+            xPrefersZ
+        }
+
+        val tp = prefs.size
+        val votes = prefs.count { q => q }
+        if (votes > tp / 2) {
+          val newZ = y._1 -> z._2
+          val newY = z._1 -> y._2
+          println("swap " + votes)
+          Seq(x, newY, newZ)
+        } else {
+          Seq(x, y, z)
         }
     }
-
-    i.save(".omg.png")
-
-
-
-    // println(getSamples.size)
-    //  parCrawl
-    //  println(s"num delta per step: ${readIn.size}")
-    // historicalRequest
-//    getHistoricalCSVs
-
-    /*
-
   }
-  qts.map{
-    case (t, o) =>
-      t -> (nm -> o)
-  }
-}.toList.gbk.toList.sortBy{_._1}.foreach{
-case (t, g) =>
-  println(t, g.length)
-}
-
-*/
-
-
-    //    runCrawl
-  }
-/*
-  def getOpens = {
-    getHistoricalCSVs.map {
-      case (nm, z) =>
-        // val df = new SimpleDateFormat("YYYY-MM-dd")
-        val ret = nm -> z.tail.map{q =>
-          //df.parse(q(0)).getTime
-          q(0) -> q(1).toFloat}
-        println("processed " + nm)
-        ret
-    }
-  }*/
 
   def processCrawl: Unit = {
     import fa._
