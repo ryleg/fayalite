@@ -46,9 +46,8 @@ object FayaliteBuild extends sbt.Build {
 
   val rx = "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc()
 
-
   val essential = Seq(
-    "com.lihaoyi" %% "scalarx" % "0.2.7" withSources() withJavadoc(),
+    rx,
     "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
     "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc(),
     "com.lihaoyi" % "ammonite-repl_2.10.5" % "0.5.5" withSources() withJavadoc()
@@ -99,9 +98,7 @@ object FayaliteBuild extends sbt.Build {
     id = "gate",
     base = file("./gate")).settings(
     libraryDependencies := web ++ Seq(rx)
-  )
-
-  gate.dependsOn(root)
+  ).dependsOn(root)
 
   lazy val sjs = Project(
     id = "sjs",

@@ -73,7 +73,7 @@ trait FileHelpUtilities {
 
   type KVC = Map[String, Array[String]]
 
-  implicit class ap(f: String)  {
+  implicit class FileAppendQuickener(f: String)  {
     def app(cnt: String) = scala.tools.nsc.io.File(
       f)
       .appendAll(cnt + "\n")

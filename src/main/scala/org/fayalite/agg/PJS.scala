@@ -103,7 +103,7 @@ object PJS {
                           numDrivers: Int = 5
                         ) = {
     import fa._
-    val pr = ProxyManager.proxies.slice(0, numDrivers)
+    val pr = ProxyManager.getProxies.slice(0, numDrivers)
     pr.map { p =>
       Future{
         val d = Try{mkProxyDriver(p)}.getOrElse(mkProxyDriver(p))

@@ -28,3 +28,4 @@ output*
 phantomjs.exe
 phantomjs
 *.log
+*.exe

@@ -29,7 +29,7 @@ object ProxyManager {
     *
     * @return Parsed usable proxies
     */
-  def proxies = readLines(".proxies").toSeq.map{
+  def getProxies = readLines(".proxies").toSeq.map{
     q =>
       q.split(":") match {
         case Array(x,y,z,w) =>
@@ -44,7 +44,7 @@ object ProxyManager {
 
   def main(args: Array[String]) {
 
-    val tes = proxies.head
+    val tes = getProxies.head
 
     println("Testing with proxy " + tes)
 

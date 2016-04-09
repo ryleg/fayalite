@@ -22,3 +22,4 @@ libraryDependencies ++= Seq(
 )
 
 */
+mainClass in (Compile, run) := Some("org.fayalite.sjs.App")
