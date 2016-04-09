@@ -79,6 +79,13 @@ trait FileHelpUtilities {
       .appendAll(cnt + "\n")
   }
 
+  implicit class JavaFileHelp(f: java.io.File) {
+    def read = scala.io.Source.fromFile(f)
+    def readI = read.getLines()
+    def readL = readI toList
+  }
+
+
   def readCSV(cv: String) = {
     import com.github.tototoshi.csv.CSVReader
     val c = CSVReader.open(new File(cv))

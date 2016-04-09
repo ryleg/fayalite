@@ -16,9 +16,13 @@ import scala.util.{Success, Failure, Try}
 trait CommonMonadExt {
 
 
+
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
   implicit class SeqExt[A](s: Seq[A]) {
+
+    def failMap[T](f: A => T) = s.flatMap{z => Try{f(z)}.toOption}
+
     def mapHead(f: (A => A)) = {
       s.headOption.map{f}.map{
         ho =>
