@@ -100,6 +100,11 @@ object FayaliteBuild extends sbt.Build {
       "xuggle" % "xuggle-xuggler" % "5.2"
     ) ++ aggRelated ++ testers ++ sparkExperimental
 
+
+  // Used for Scala.js, required to be
+  // kept separate from other dependencies due to java conflicts
+  // In theory SJS is supposed to be multi-module and handle this
+  // Don't trust it.
   lazy val root = Project(
     id = "root",
     base = file(".")).settings(
@@ -107,7 +112,16 @@ object FayaliteBuild extends sbt.Build {
     organization := "fayalite",
     version := "0.0.4",
     scalaVersion := "2.11.6"
+  ).aggregate(core, gate)
+
+  lazy val core = Project(
+    id = "core",
+    base = file("./core")).settings(
+    scalaVersion := "2.11.6",
+    libraryDependencies := allDeps
   )
+
+    core.dependsOn(root)
 
   lazy val gate = Project(
     id = "gate",
@@ -115,13 +129,7 @@ object FayaliteBuild extends sbt.Build {
     libraryDependencies := web ++ Seq(rx)
   )
 
-  lazy val core = Project(
-    id = "gate",
-    base = file("./gate")).settings(
-    libraryDependencies := allDeps
-  )
-
-  gate.dependsOn(core)
+    gate.dependsOn(core)
 
   ivyScala := ivyScala.value map {_.copy(overrideScalaVersion = true)}
 

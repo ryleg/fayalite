@@ -23,7 +23,8 @@ import fa._
   * Yahoo doesn't appreciate that and this is supposed
   * to be just for getting small! data samples
   */
-trait YahooFinanceRequestor extends SymbolLookupRegistry {
+trait YahooFinanceRequestor extends SymbolLookupRegistry
+ with YahooTestUtils {
 
   def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
@@ -32,6 +33,11 @@ trait YahooFinanceRequestor extends SymbolLookupRegistry {
       g -> sampleQuery(formatSymbols(g))
   }
 
+  val fToSave = ".yahoo1"
+  val hidDir = new File(".hidden")
+  val yahooSave = new File(hidDir, "yahoo")
+  val gbtime = new File(hidDir, "gbtime")
+
 }
 
 
@@ -39,65 +45,11 @@ trait YahooFinanceRequestor extends SymbolLookupRegistry {
   * Yahoo Finance Stock quote access crawling
   * convenience methods
   */
-object Yahoo extends YahooFinanceRequestor {
+object Yahoo extends YahooFinanceRequestor
+  {
 
+  import YahooResponseSchema._
 
-  case class BA(Bid: String, Ask: String)
-
-  case class Res(quote: Array[BA])
-
-  case class Qry(results: Res)
-
-  case class Response(query: Qry)
-
-  case class Price(ask: Double, bid: Double)
-
-  case class SymbolPrice(symbol: String, price: Price)
-
-  case class Observe(time: Int, symPrice: List[(String, Price)])
-
-  case class Observe2(time: Int, symPrice: List[SymbolPrice])
-
-
-  val fToSave = ".yahoo1"
-  val hidDir = new File(".hidden")
-  val yahooSave = new File(hidDir, "yahoo")
-  val gbtime = new File(hidDir, "gbtime")
-
-  import fa._
-
-
-  def getHistoricalCSVs = {
-    val storM = mutable.HashMap[String, mutable.HashMap[String, Float]]()
-    yahooSave.listFiles().par.foreach{f =>
-      val nm = f.getName
-      println("Reading csv " + f.getCanonicalPath)
-      CSVReader.open(f).toStream().tail
-        .withFilter{_.nonEmpty}
-        .withFilter{_(0) != ""}
-        .foreach{
-          q =>
-            val time = q.head
-            Try {
-              val open = q(1).toFloat
-              synchronized {
-                if (storM.contains(time)) {
-                  storM(time)(nm) = open
-                } else {
-                  storM(time) = mutable.HashMap(nm -> open)
-                }
-              }
-            }
-        }
-    }
-    storM.par.foreach{
-      case (datetime, quotes) =>
-        val f = new File(gbtime, datetime.replaceAll("\\-", "_"))
-        writeToFile(f, quotes.toSeq.sortBy{_._1}.prettyTSVString)
-    }
-
-    //storM.map{_._2.size}.toSeq.sorted.reverse.slice(0,100).foreach{println}
-  }
 
 
   def main(args: Array[String]): Unit = {
