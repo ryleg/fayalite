@@ -40,6 +40,10 @@ object FayaliteBuild extends sbt.Build {
     "com.github.fge" % "jackson-coreutils" % "1.8" withSources()
   )
 
+  val auxParseLikeStuff = Seq(
+    "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
+  )
+
   val misc = Seq(
     //"com.healthmarketscience.jackcess" % "jackcess" % "2.1.2",
     "com.github.sarxos" % "webcam-capture" % "0.3.10" withSources() withJavadoc()
@@ -54,7 +58,7 @@ object FayaliteBuild extends sbt.Build {
   )
 
   val web = Seq(
-  //  "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
+    //  "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
     "org.jsoup" % "jsoup" % "1.7.2"  withSources() withJavadoc(),
     "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" withSources() withJavadoc(),
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
@@ -65,7 +69,7 @@ object FayaliteBuild extends sbt.Build {
   )
 
   val sparkExperimental =   Seq(
-  "amplab" % "spark-indexedrdd" % "0.1"
+    "amplab" % "spark-indexedrdd" % "0.1"
   )
 
   val testers = Seq(
@@ -75,19 +79,22 @@ object FayaliteBuild extends sbt.Build {
 
   val aggRelated = Seq(
     "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc(),
-  "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
+    "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
 
+  )
+
+  val opsLike = Seq(
+    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
+    "com.googlecode.lanterna" % "lanterna" % "2.1.9",
+    "com.jcraft" % "jzlib" % "1.1.3",
+    "com.decodified" %% "scala-ssh" % "0.7.0"
   )
 
   val allDeps = (jsonStuff ++
     essential ++
     web).++(misc) ++
-  Seq(
+    Seq(
       "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
-      //    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
-      //       "com.googlecode.lanterna" % "lanterna" % "2.1.9",
-      //        "com.jcraft" % "jzlib" % "1.1.3",
-      //     "com.decodified" %% "scala-ssh" % "0.7.0",
       //     "ch.qos.logback" % "logback-classic" % "1.1.2",
       "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc(),
       "xuggle" % "xuggle-xuggler" % "5.2"
@@ -98,10 +105,9 @@ object FayaliteBuild extends sbt.Build {
     base = file(".")).settings(
     name := "fayalite",
     organization := "fayalite",
-    version := "0.0.3",
-    scalaVersion := "2.11.6",
-    libraryDependencies := allDeps
-  ).aggregate(gate)
+    version := "0.0.4",
+    scalaVersion := "2.11.6"
+  )
 
   lazy val gate = Project(
     id = "gate",
@@ -109,9 +115,13 @@ object FayaliteBuild extends sbt.Build {
     libraryDependencies := web ++ Seq(rx)
   )
 
-  gate.dependsOn(root)
+  lazy val core = Project(
+    id = "gate",
+    base = file("./gate")).settings(
+    libraryDependencies := allDeps
+  )
 
-  mainClass in (Compile, run) := Some("org.fayalite.sjs.App")
+  gate.dependsOn(core)
 
   ivyScala := ivyScala.value map {_.copy(overrideScalaVersion = true)}
 
