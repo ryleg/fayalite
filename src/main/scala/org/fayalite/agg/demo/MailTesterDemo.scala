@@ -10,7 +10,7 @@ import org.fayalite.agg.MailTester.{Name, EmailGuessRequirements}
 import org.fayalite.agg.demo.EmailTester.{ProcessLine, EmailTestResults}
 import org.fayalite.agg._
 import org.openqa.selenium.phantomjs.PhantomJSDriver
-import rx.core.Var
+import rx.Var
 
 import scala.collection.{mutable, JavaConversions}
 import scala.concurrent.{ExecutionContext, Future}
@@ -100,7 +100,6 @@ val lqf = new QuickFile(
   }// :+ "ReportDebugString"
   */
   println("New headers " + newHeaders)
-  import rx.ops._
   val writ = CSVWriter.open(outputFnm, true)
   writ.writeRow(newHeaders)
 
@@ -136,7 +135,7 @@ val lqf = new QuickFile(
           pjm.processLineActual(sample.line, sample.emailGuessRequirements)
         }
         if (newLinse.isSuccess) {
-          synchronized{threadsToEmails(pjm.id) = pjm.numEmailsTested()}
+      //   synchronized{threadsToEmails(pjm.id) = pjm.numEmailsTested()}
           newLine = newLinse.get
           success = true
         }

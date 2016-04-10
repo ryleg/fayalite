@@ -6,7 +6,7 @@ import fa._
 import org.fayalite.agg.MailTester.EmailGuessRequirements
 import org.openqa.selenium.phantomjs.PhantomJSDriver
 import org.openqa.selenium.remote.RemoteWebDriver
-import rx.core.Var
+import rx.Var
 
 
 object PJSMailTester {
@@ -44,7 +44,7 @@ class PJSMailTester(
 
     //println("Testing first email " + firstEmailToTest)
     val (clr) = pjD.testEmail(firstEmailToTest)
-    numEmailsTested() += 1
+  //  numEmailsTested() += 1
     println("First " + firstEmailToTest + " " + clr)
 
     import MailTester._
@@ -68,7 +68,7 @@ class PJSMailTester(
             Thread.sleep(6000)
          //   println("Testing permutation email : " + q)
             val (cl) = pjD.testEmail(q)
-          numEmailsTested() += 1
+    //      numEmailsTested() += 1
           println(q + " " + cl)
        //     println("Waiting before testing next email 10s")
             Thread.sleep(6000)

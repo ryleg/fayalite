@@ -19,9 +19,10 @@ class JSONFileBack[T](fileBacking: String = ".jsonback")(
 {
   def getStore: T = readFromFile(fileBacking).json[T]
   val store : Var[T] = Var(getStore)
-  def writeStore() = writeToFile(fileBacking, store().json)
-  import rx.ops._
-  val storeChange = store.foreach{_ => writeStore()}
+  def writeStore() = writeToFile(fileBacking, store.now.json)
+ // import rx.ops._
+ // val storeChange = store.foreach{_ => writeStore()}
+
 }
 
 

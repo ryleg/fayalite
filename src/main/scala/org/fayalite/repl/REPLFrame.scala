@@ -3,7 +3,6 @@ package org.fayalite.repl
 import java.awt.Graphics
 import java.awt.event.{KeyEvent, KeyListener}
 
-import ammonite.repl.Storage
 import fa._
 import org.fayalite.ui.j2d.{FFrame, SymbolRegistry}
 
@@ -48,7 +47,7 @@ class REPLFrame {
 object REPLFrame {
 
   def main(args: Array[String]) {
-    val storage = Storage(ammonite.ops.home, None)
+ //   val storage = Storage(ammonite.ops.home, None)
     //   val r = new Repl(System.in, System.out, System.err, Ref(storage))
     //  r.run()
 

@@ -29,7 +29,9 @@ class WebSocketWorkerLike(
       val socketMsgStr = xq.utf8String // You're pretty much always
       // Just gonna be using the utf8String so unless that's an issue
       // just use this
-      mp.process()(socketMsgStr, sender())
+      val drfs = sender()
+      val prc = mp.process.now
+      prc(socketMsgStr, drfs)
     case x: FrameCommandFailed => //error(x)
     case x: HttpRequest => ()
     case x => ()
@@ -45,10 +47,13 @@ class WebSocketWorkerLike(
     *         like
     *         getFromFile("index.html") ~  // put your rest API here after this tilda
     */
-  def route(rf: ActorRefFactory) : routing.Route = mp.route()(rf)
+  def routeR(rf: ActorRefFactory) : routing.Route = {
+    val drf = mp.route.now
+    drf(rf)
+  }
 
   def businessLogicNoUpgrade: Receive = {
     implicit val refFactory: akka.actor.ActorRefFactory = context
-    runRoute { route(refFactory) }
+    runRoute { routeR(refFactory) }
   }
 }

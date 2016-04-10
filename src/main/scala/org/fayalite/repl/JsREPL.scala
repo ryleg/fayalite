@@ -5,7 +5,6 @@ import java.net.URL
 
 import ammonite.ops.ls
 //import org.fayalite.io.RemoteTerminalEmulator
-import rx.ops._
 import scala.concurrent.Future
 import scala.sys.process.ProcessIO
 import rx._
@@ -107,7 +106,7 @@ object JsREPL {
     Future{
       while (true) {
         val nl = readScreen()
-        if (line() != nl) line() = nl
+      //  if (line() != nl) line() = nl
         Thread.sleep(500)
      //   println("tailing line from scrlog.")
       }

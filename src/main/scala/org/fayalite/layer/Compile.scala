@@ -13,7 +13,7 @@ import scala.sys.process.Process
 object Compile {
 
   def main(args: Array[String]) {
-
+/*
     val rc = new WebsocketPipeClient()
 
     val stdOut = appDynamic()
@@ -24,12 +24,12 @@ object Compile {
         rc.sendFrame(ParseServer.evalUIFrame);
         println("reload")
       }
-    }
+    }*/
 
 
   }
 
-  def appDynamic() = {
+/*  def appDynamic() = {
 
     import rx._
 
@@ -69,6 +69,6 @@ object Compile {
 
     stdOut
     //Rx{stdOut().contains("success") && stdOut().contains("Total time")}
-  }
+  }*/
 
 }

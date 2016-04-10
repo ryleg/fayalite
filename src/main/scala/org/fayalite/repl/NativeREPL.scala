@@ -1,11 +1,10 @@
 package org.fayalite.repl
 
-import rx.core.Var
+import rx.Var
 
 import scala.reflect._
 import scala.tools.nsc.interpreter._
 import scala.tools.nsc.io
-import scala.tools.nsc.util.ScalaClassLoader._
 import scala.tools.reflect.StdRuntimeTags._
 
 import fa._
@@ -44,12 +43,12 @@ object NativeREPL {
 class NativeREPL {
 
   def interpret(s: String) = {
-    i.intp.interpret(s)
+  //  i.intp.interpret(s)
     rml.read()
   }
 
   val rml = new REPLManagerLike()
-  val i = new ILoop(Some(rml.iLoopBufferedReader), rml.iLoopOutputCatch) {
+ /* val i = new ILoop(Some(rml.iLoopBufferedReader), rml.iLoopOutputCatch) {
     settings = new CommandLine(List[String]("-usejavacp"), echo).settings
     def betterProcess = {
       savingContextLoader {
@@ -69,5 +68,5 @@ class NativeREPL {
       }
     }
     betterProcess // THIS STARTS EVERYTHING
-  }
+  }*/
 }

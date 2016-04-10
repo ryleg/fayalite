@@ -193,7 +193,7 @@ class SeleniumChrome(
     */
   def navigateToURL(tou: String) = {
     go to tou
-    numVisits() += 1
+   // numVisits() += 1
   }
 
   /**
