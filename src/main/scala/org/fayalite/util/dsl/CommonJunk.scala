@@ -11,6 +11,8 @@ import java.util.Calendar
   */
 trait CommonJunk {
 
+  def intTime = System.currentTimeMillis().toInt
+
   /**
     * Pretty obvious what it is, the operating system name.
     * Pattern match on stuff like contains 'Win' or 'Mac' if

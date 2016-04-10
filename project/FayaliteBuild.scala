@@ -23,7 +23,8 @@ object FayaliteBuild extends sbt.Build {
         "Rhinofly Internal Repository" at "http://maven-repository.rhinofly.net:8081/artifactory/libs-release-local",
         "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven",
         Resolver.jcenterRepo,
-        "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+        "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+        "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
       ),
       licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
     )
@@ -80,7 +81,8 @@ object FayaliteBuild extends sbt.Build {
       //        "com.jcraft" % "jzlib" % "1.1.3",
       //     "com.decodified" %% "scala-ssh" % "0.7.0",
       //     "ch.qos.logback" % "logback-classic" % "1.1.2",
-      "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
+      "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc(),
+      "xuggle" % "xuggle-xuggler" % "5.2"
     )
 
   lazy val root = Project(
@@ -92,7 +94,7 @@ object FayaliteBuild extends sbt.Build {
     scalaVersion := "2.10.5",
     libraryDependencies := allDeps
 
-  ).aggregate(gate, sjs)
+  )
 
   lazy val gate = Project(
     id = "gate",

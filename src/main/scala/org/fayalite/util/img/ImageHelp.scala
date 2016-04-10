@@ -10,6 +10,13 @@ import javax.imageio.ImageIO
   */
 trait ImageHelp {
 
+  def getHueColor(power: Double) = {
+    val H = power
+    val S = 0.9D
+    val B = 0.9D
+    Color.getHSBColor(H.toFloat, S.toFloat, B.toFloat)
+  }
+
   def readImg(f: String) = {
     val image = ImageIO.read(
       new File(f))

@@ -10,7 +10,6 @@ import rx._
 import spray.routing
 import spray.routing.{RoutingSettings, StandardRoute, HttpServiceActor}
 
-import scalatags.Text.all._
 
 /**
   * A disposable / changeable message processing
@@ -94,7 +93,7 @@ class SprayServer(
       b ! "Response"
     }
     }
-
+/*
     val dbg = // "<!DOCTYPE html>" +
       html(
         scalatags.Text.all.head(
@@ -110,6 +109,7 @@ class SprayServer(
             `type` := "text/javascript")
         )
       ).render
+*/
 
     /**
       * Testable route to serve a rendered page

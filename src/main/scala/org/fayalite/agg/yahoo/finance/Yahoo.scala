@@ -1,55 +1,46 @@
-package org.fayalite.agg
+package org.fayalite.agg.yahoo.finance
 
 import java.awt.Color
-import java.awt.image.DataBufferByte
 import java.io.File
-import java.text.SimpleDateFormat
 
 import com.github.tototoshi.csv.CSVReader
 import dispatch.{Http, as, url}
+import org.fayalite.agg.ProxyManager
 import org.fayalite.agg.ProxyManager.ProxyDescr
 
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-/**
-  * Yahoo Finance Stock quote access crawling
-  * convenience methods
-  */
-object Yahoo {
+import fa._
 
-  import fa._
+
+
+/**
+  * Allows wrapping requests with symbols to
+  * get sample data for experimental tests. DO NOT
+  * USE FOR BULK REQUESTS MORE FREQUENTLY THAN 30s
+  * Yahoo doesn't appreciate that and this is supposed
+  * to be just for getting small! data samples
+  */
+trait YahooFinanceRequestor extends SymbolLookupRegistry {
+
+  def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
   def getSamples = symbols.grouped(199).map {
     g =>
       g -> sampleQuery(formatSymbols(g))
   }
 
-  val symbols = getSymbols
+}
 
-  val symbolsI = getSymbols.zipWithIndex.toMap
 
-  def getSymbols: List[String] = {
-    readCSV("data\\companylist.csv").tail.map {
-      _ (0)
-    }.filter { q =>
-      !q.contains("""^""") && !q.contains(""".""") &&
-        q.length < 5 && !q.contains(" ")
-    }
-  }
+/**
+  * Yahoo Finance Stock quote access crawling
+  * convenience methods
+  */
+object Yahoo extends YahooFinanceRequestor {
 
-  def formatSymbols(s: Seq[String]) = {
-    "(" + s.map { q => "%22" + q + "%22" }.mkString("%2C") +
-      ")"
-  }
-
-  def formatNumber(b: String) =
-    Try {
-      b.replaceAll(""""""", "").toDouble
-    }.toOption.filter {
-      _ > 0
-    }
 
   case class BA(Bid: String, Ask: String)
 
@@ -67,15 +58,10 @@ object Yahoo {
 
   case class Observe2(time: Int, symPrice: List[SymbolPrice])
 
-  def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
   val fToSave = ".yahoo1"
-
-  def intTime = System.currentTimeMillis().toInt
-
   val hidDir = new File(".hidden")
   val yahooSave = new File(hidDir, "yahoo")
-
   val gbtime = new File(hidDir, "gbtime")
 
   import fa._
@@ -113,18 +99,6 @@ object Yahoo {
     //storM.map{_._2.size}.toSeq.sorted.reverse.slice(0,100).foreach{println}
   }
 
-  def getColor(power: Double) = {
-    val H = power
-    val S = 0.9D
-    val B = 0.9D
-    Color.getHSBColor(H.toFloat, S.toFloat, B.toFloat)
-  }
-
-  def dbgImg = {
-
-
-
-  }
 
   def main(args: Array[String]): Unit = {
     // processCrawl
@@ -171,8 +145,18 @@ object Yahoo {
         uniqD.get(x).get -> y.map { case (z, w) => ssy.get(z).get -> w }
     }
 
+    val r3t = r3.flatMap{
+      case (day, cmppr) =>
+        cmppr.map{
+          case (cmp, pr) =>
+            cmp -> (day -> pr)
+        }
+    }.groupBy{_._1}.map{
+      case (k, v) => k -> v.map{_._2}.toMap
+    } // cmp day pr
 
-    var r3p = runOp(r3.toSeq)
+
+    var r3p = runOp(r3t.toSeq)
 
     for (iter <- 1 to 10) {
       println("Iteration " + iter)
@@ -184,11 +168,11 @@ object Yahoo {
       g.fillRect(0, 0, uniqD.size, ssy.size)
 
       r3p.foreach {
-        case (dayIdent, colEntries) =>
+        case (cmpIdent, colEntries) =>
           colEntries.foreach {
-            case (companyIdent, dblVal) =>
+            case (dayIdent, dblVal) =>
               val d: Double = dblVal - minV
-              i.setRGB(dayIdent, companyIdent, getColor(Math.log(d) / Math.log(maxV)).getRGB)
+              i.setRGB(dayIdent, cmpIdent, getHueColor(Math.log(d) / Math.log(maxV)).getRGB)
           }
       }
 
@@ -386,8 +370,6 @@ object Yahoo {
         syms.zip(pp)
     }
   }
-
-  import scala.util.matching.Regex
 
 
   def getRequest(x: String)(implicit proxyD: Option[ProxyDescr] = None) = {
