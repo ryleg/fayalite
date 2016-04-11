@@ -58,7 +58,6 @@ object FayaliteBuild extends sbt.Build {
   )
 
   val web = Seq(
-    //  "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
     "org.jsoup" % "jsoup" % "1.7.2"  withSources() withJavadoc(),
     "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" withSources() withJavadoc(),
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
@@ -126,7 +125,10 @@ object FayaliteBuild extends sbt.Build {
   lazy val gate = Project(
     id = "gate",
     base = file("./gate")).settings(
-    libraryDependencies := web ++ Seq(rx)
+    libraryDependencies := web ++ Seq(
+      rx,
+      "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc()
+    )
   )
 
     gate.dependsOn(core)

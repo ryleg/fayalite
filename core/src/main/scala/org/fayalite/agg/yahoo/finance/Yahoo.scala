@@ -55,18 +55,7 @@ object Yahoo extends YahooFinanceRequestor
   def main(args: Array[String]): Unit = {
     // processCrawl
 
-    val gbf = gbtime.listFiles()
-
-    val r2 = gbf.map {
-      q =>
-        val f = q.getName
-        val qts = readLines(q).map {
-          q =>
-            val a = q.split("\t")
-            a(0) -> a(1).toDouble
-        }.toMap
-        f -> qts
-    }
+    val r2 = getGroupByTimeIndexed
 
     println(r2.size.toString + " r2 size")
     val minV = r2.map {

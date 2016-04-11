@@ -1,4 +1,4 @@
-/*
+
 package org.fayalite.sjs
 
 import org.scalajs.dom
@@ -17,6 +17,13 @@ trait SJSHelp {
   val commentGrey = "#808080"
   val ansiGrey = "#555555"
   val ansiDarkGrey = "#1F1F1F"
+
+
+  implicit class StringCommonExt(s: String) {
+    def element = createElement(s)
+  }
+
+  def createElement(s: String) = document.createElement(s)
 
   def jsonify[T](a: Seq[T]) = JSON.stringify(a)
 
@@ -37,27 +44,34 @@ trait SJSHelp {
       ht.onclick = f
       ht
     }
+
     def withClass(c: String) = {
       ht.className = c
-//      ht.setAttribute("class", c)
+      //      ht.setAttribute("class", c)
       ht
     }
-    def clickEach(f : => Unit) = withClick{ me: MouseEvent => f}
+
+    def clickEach(f: => Unit) = withClick { me: MouseEvent => f }
 
     def withAttr(a: String, v: String) = {
-      ht.setAttribute(a, v); ht
+      ht.setAttribute(a, v);
+      ht
     }
 
     def withText(s: String) = {
-      ht.textContent = s; ht
+      ht.textContent = s;
+      ht
     }
 
     def withChild(c: Element) = {
       c.appendChild(ht)
       c
     }
+
     def withChild(c: List[Element]) = {
-      c.foreach{ht.appendChild}
+      c.foreach {
+        ht.appendChild
+      }
       c
     }
 
@@ -75,8 +89,7 @@ trait SJSHelp {
     new Date().getTime()
   }
 
-
-
-
 }
-*/
+
+
+

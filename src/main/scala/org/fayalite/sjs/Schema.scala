@@ -1,7 +1,9 @@
-/*
+
 package org.fayalite.sjs
 
 import org.scalajs.dom
+import org.scalajs.dom.raw.CanvasRenderingContext2D
+import org.scalajs.dom.raw.HTMLCanvasElement
 
 /**
   * Created by aa on 3/17/2016.
@@ -35,5 +37,13 @@ object Schema {
                             globalAlpha: Double = 1D
                           )
 
+  case class CanvasContextInfo(
+                              canvas: HTMLCanvasElement,
+                              context: CanvasRenderingContext2D
+                              )
+
+  val bgGrayBlack = "#2B2B2B"
+
+
 }
-*/
+

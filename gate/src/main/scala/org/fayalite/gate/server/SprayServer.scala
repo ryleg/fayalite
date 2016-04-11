@@ -70,10 +70,10 @@ class SprayServer(
   val targetPath = {
     new File(currentPath, "target")
   }
-  val targetS210Path = new File(targetPath, "scala-2.10")
-  val sjsFastOpt = new File(targetS210Path, "fayalite-fastopt.js")
-  val sjsFastOptMap = new File(targetS210Path, "fayalite-fastopt.js.map")
-  val sjsFastOptDep = new File(targetS210Path, "fayalite-jsdeps.js")
+  val targetDir = new File(targetPath, "scala-2.11")
+  val sjsFastOpt = new File(targetDir, "fayalite-fastopt.js")
+  val sjsFastOptMap = new File(targetDir, "fayalite-fastopt.js.map")
+  val sjsFastOptDep = new File(targetDir, "fayalite-jsdeps.js")
 
   /**
     * Barebones actor system to get you started
@@ -93,8 +93,11 @@ class SprayServer(
       b ! "Response"
     }
     }
-/*
-    val dbg = // "<!DOCTYPE html>" +
+
+    val dbg = {
+      import scalatags.Text.all._
+
+      // "<!DOCTYPE html>" +
       html(
         scalatags.Text.all.head(
           scalatags.Text.tags2.title("fayalite"),
@@ -103,49 +106,27 @@ class SprayServer(
         ,
         body(
           script(
-            src := "./target/scala-2.10/fayalite-fastopt.js",
+            src := "fayalite-fastopt.js",
             `type` := "text/javascript"),
           script("org.fayalite.sjs.App().main()",
             `type` := "text/javascript")
         )
       ).render
-*/
+    }
 
     /**
       * Testable route to serve a rendered page
       * override or reassign for real-time change
       */
     val route = Var { (ctx: ActorRefFactory) => {
-/*      import scalatags.Text.all._
-      import fa._*/
       {
-
-        /*get {
-          completeWith(
-            s"""
-               |<!DOCTYPE html>
-               |<html>
-               |  <head>
-               |    <meta charset="UTF-8">
-               |    <title>fayalite</title>
-               |  </head>
-               |  <body>
-               |    <script type="text/javascript" src="fayalite-fastopt.js"></script>
-               |    <script type="text/javascript"> org.fayalite.sjs.App().main();</script>
-               |  </body>
-               |</html>
-            """.stripMargin
-          )
-        }*/
         implicit val refFactory = ctx
-        val defaultRoute = getFromFile("index.html")
+        val defaultRoute = completeWith(dbg) // getFromFile("index.html")
         pathPrefix("fayalite") {
-          println("Path prefix fayalaite")
           get {
-            println("fayget")
             unmatchedPath { path =>
               println("unmatched path " + path)
-              val f = new File(targetS210Path, "fayalite" + path.toString)
+              val f = new File(targetDir, "fayalite" + path.toString)
               println( " new file " + f.getCanonicalPath)
               getFromFile(f)
             }
