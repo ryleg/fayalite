@@ -2,22 +2,38 @@ package org.fayalite.util.dsl
 
 import java.io.FileWriter
 
-import akka.util.Timeout
-import org.fayalite.util.JSON
-import scala.collection.TraversableLike
+import fa._
+
 import scala.concurrent.duration._
 import scala.concurrent._
-import scala.reflect.ClassTag
-import scala.util.{Success, Failure, Try}
+import scala.util.{Failure, Success, Try}
 
 /**
  * For when you're shocked that futures aren't gettable.
  */
 trait CommonMonadExt {
 
-
-
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
+
+  implicit class SeqOpHelp[A](s: Seq[A]) {
+    def saveAsJson(f: String) = {
+      s.foreach{
+        q => f app q.json
+      }
+    }
+    // def reindex
+  }
+  implicit class SeqOpLoadHelp(s: String)  {
+    def jsonLines[T](implicit manifest: Manifest[T]) = readLines(s).map{
+      _.json[T]
+    }
+  }
+
+  implicit class ArrayOps[A](a: Array[A]) {
+    def copyTo(b: Array[A]) = {
+      System.arraycopy(a, 0, b, 0, a.length)
+    }
+  }
 
   implicit class SeqExt[A](s: Seq[A]) {
 

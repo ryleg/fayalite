@@ -57,6 +57,8 @@ trait FileHelpUtilities {
       .writeAll(cnt)
   }
 
+  def scalaFile(f: String) = scala.tools.nsc.io.File(f)
+
   def writeToFile(f: String, cnt: String) = {
     val fnm = f
     scala.tools.nsc.io.File(

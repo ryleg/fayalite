@@ -1,7 +1,7 @@
 package org.fayalite.util.img
 
 import java.awt.Color
-import java.awt.image.{BufferedImage, DataBufferByte, RenderedImage}
+import java.awt.image.{BufferedImage, DataBufferByte, DataBufferInt, RenderedImage}
 import java.io.File
 import javax.imageio.ImageIO
 
@@ -20,6 +20,7 @@ trait ImageHelp {
   def readImg(f: String) = {
     val image = ImageIO.read(
       new File(f))
+    image
   }
 
   /**
@@ -34,7 +35,21 @@ trait ImageHelp {
     image
   }
 
+
+
   implicit class BuffImageExt (bi: BufferedImage ) {
+
+    def sizeDuplicate = {
+      createImage(bi.getWidth, bi.getHeight)
+    }
+
+    def black = {
+      val g = bi.createGraphics()
+      g.setColor(Color.BLACK)
+      g.fillRect(0, 0, bi.getWidth, bi.getHeight)
+      g.dispose()
+      bi
+    }
 
     val hasAlphaChannel = bi.getAlphaRaster() != null
     val pixelLength = if (hasAlphaChannel) 4  else 3
@@ -44,6 +59,7 @@ trait ImageHelp {
       .getDataBuffer
       .asInstanceOf[DataBufferByte]
       .getData
+
 
     def save(path: String) = {
       val ri = bi.asInstanceOf[RenderedImage]

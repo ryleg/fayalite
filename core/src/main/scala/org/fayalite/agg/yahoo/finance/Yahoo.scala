@@ -1,7 +1,9 @@
 package org.fayalite.agg.yahoo.finance
 
 import java.awt.Color
+import java.awt.image.{DataBuffer, DataBufferInt, Raster}
 import java.io.File
+import java.nio.{ByteBuffer, ByteOrder, IntBuffer}
 
 import com.github.tototoshi.csv.CSVReader
 import dispatch.{Http, as, url}
@@ -11,34 +13,11 @@ import org.fayalite.agg.ProxyManager.ProxyDescr
 import scala.collection.mutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-
 import fa._
 
 
 
-/**
-  * Allows wrapping requests with symbols to
-  * get sample data for experimental tests. DO NOT
-  * USE FOR BULK REQUESTS MORE FREQUENTLY THAN 30s
-  * Yahoo doesn't appreciate that and this is supposed
-  * to be just for getting small! data samples
-  */
-trait YahooFinanceRequestor extends SymbolLookupRegistry
- with YahooTestUtils {
 
-  def sampleQuery(sym: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + sym + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
-
-  def getSamples = symbols.grouped(199).map {
-    g =>
-      g -> sampleQuery(formatSymbols(g))
-  }
-
-  val fToSave = ".yahoo1"
-  val hidDir = new File(".hidden")
-  val yahooSave = new File(hidDir, "yahoo")
-  val gbtime = new File(hidDir, "gbtime")
-
-}
 
 
 /**
@@ -48,12 +27,90 @@ trait YahooFinanceRequestor extends SymbolLookupRegistry
 object Yahoo extends YahooFinanceRequestor
   {
 
-  import YahooResponseSchema._
-
-
+  import YahooRelatedSchema._
 
   def main(args: Array[String]): Unit = {
-    // processCrawl
+    val img = readImg(".tesyahoo.png")
+    val data = img.getAllData // just for demonstrating conversion
+    // you can also just get the bytes from the file directly.
+
+    println("data length" + data.length)
+    val h = img.getHeight
+
+    /*
+    val img2 = img.sizeDuplicate
+    val data2 = img2.getAllData
+    data.copyTo(data2)
+    img2.save(".tesyahoo2.png")
+*/
+    //img.getRGB(0, 0, img.getWidth, 1)
+    //reIndex
+
+
+
+  }
+
+  def reIndex: Unit = {
+    val r2 = getGroupByTimeIndexed
+
+    val byTime = r2.map {
+      case (x, mz) =>
+        DayQuotes(Day(x), mz.toSeq.map { case (q, z) => CompanyPrice(q, z) })
+    }.toSeq
+
+    val timeIdx = byTime.map {
+      _.day
+    }.distinct.sortBy {
+      _.encoded
+    }
+      .zipWithIndex.toMap
+    val companyIdx = byTime.flatMap {
+      _.quotes.map {
+        _.company
+      }
+    }.distinct
+      .sorted.zipWithIndex.toMap
+    val priceIdx = byTime.flatMap {
+      _.quotes.map {
+        _.price
+      }
+    }
+      .distinct.sorted.zipWithIndex.toMap
+
+    println("Price Idx Length " + priceIdx)
+
+    val enc = byTime.map {
+      s =>
+        EncodedDayQuotes(timeIdx.get(s.day).get, s.quotes.map {
+          z =>
+            EncodedCompanyPrice(companyIdx.get(z.company).get,
+              priceIdx.get(z.price).get)
+        }
+        )
+    }
+
+    enc.saveAsJson(".testyahoo")
+  }
+
+  def recodeToImage: Boolean = {
+    val enc = ".testyahoo".jsonLines[EncodedDayQuotes]
+
+    val i = createImage(6000, 3000).black
+    enc.foreach {
+      q =>
+        val row = q.day
+        q.quotes.foreach {
+          t =>
+            val col = t.company
+            val color = t.price
+            i.setRGB(row, col, color)
+          // println(color)
+        }
+    }
+    i.save(".tesyahoo.png")
+  }
+
+  def dbg = {
 
     val r2 = getGroupByTimeIndexed
 
