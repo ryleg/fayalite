@@ -15,27 +15,14 @@ trait CommonMonadExt {
 
   implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
 
-  implicit class SeqOpHelp[A](s: Seq[A]) {
+  implicit class SeqExt[A](s: Seq[A]) {
+
     def saveAsJson(f: String) = {
       s.foreach{
         q => f app q.json
       }
     }
     // def reindex
-  }
-  implicit class SeqOpLoadHelp(s: String)  {
-    def jsonLines[T](implicit manifest: Manifest[T]) = readLines(s).map{
-      _.json[T]
-    }
-  }
-
-  implicit class ArrayOps[A](a: Array[A]) {
-    def copyTo(b: Array[A]) = {
-      System.arraycopy(a, 0, b, 0, a.length)
-    }
-  }
-
-  implicit class SeqExt[A](s: Seq[A]) {
 
     def failMap[T](f: A => T) = s.flatMap{z => Try{f(z)}.toOption}
 
@@ -52,6 +39,9 @@ trait CommonMonadExt {
       a match {
         case Array(x,y) => (x, y)
       }
+    }
+    def copyTo(b: Array[A]) = {
+      System.arraycopy(a, 0, b, 0, a.length)
     }
   }
 
@@ -82,6 +72,12 @@ trait CommonMonadExt {
 
   }
 
+  def randBytes(len: Int) = {
+    val vb = Array.fill(len)(0.toByte)
+    scala.util.Random.nextBytes(vb)
+    vb
+  }
+
   implicit class getAsFutureT[T](some: Future[T]) {
     def get = Await.result(some, 15.seconds).asInstanceOf[T]
     def getAsTry(timeout: Int = 3) = Try {
@@ -94,7 +90,7 @@ trait CommonMonadExt {
   }
 
   implicit class KVTupExt[K,V](kv: (K,V)) {
-    def tabDelim = kv._1 + "\t" +   kv._2
+    def tabDelim = kv._1.toString + "\t" + kv._2.toString
   }
 
 
@@ -109,6 +105,9 @@ trait CommonMonadExt {
   implicit def getFutureAsString(some: Future[Any]): String = some.getAs[String]
 
   implicit class StringExt(str: String) {
+    def jsonLines[T](implicit manifest: Manifest[T]) = readLines(str).map{
+      _.json[T]
+    }
     def append(toWrite: String) = {
       println("appending to " + str + "\n" + toWrite)
       val fw = new FileWriter(str, true)

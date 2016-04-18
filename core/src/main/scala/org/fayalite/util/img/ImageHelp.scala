@@ -1,6 +1,6 @@
 package org.fayalite.util.img
 
-import java.awt.Color
+import java.awt.{Color, Graphics}
 import java.awt.image.{BufferedImage, DataBufferByte, DataBufferInt, RenderedImage}
 import java.io.File
 import javax.imageio.ImageIO
@@ -38,7 +38,9 @@ trait ImageHelp {
 
 
   implicit class BuffImageExt (bi: BufferedImage ) {
-
+    def draw(g: Graphics, x: Int, y: Int) = {
+      g.drawImage(bi, x, y, bi.getWidth, bi.getHeight,null)
+    }
     def sizeDuplicate = {
       createImage(bi.getWidth, bi.getHeight)
     }

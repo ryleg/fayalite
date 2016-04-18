@@ -45,7 +45,7 @@ trait WebCamHelp {
 }
 
 
-object WebCamHelp {
+object WebCamTestHelp {
 
 
   def main(args: Array[String]) {

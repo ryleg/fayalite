@@ -21,5 +21,6 @@ object App extends JSApp {
   def main(): Unit = {
     println("SJS fayalite initialized")
   }
+
 }
 

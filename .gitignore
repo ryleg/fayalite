@@ -29,3 +29,4 @@ phantomjs.exe
 phantomjs
 *.log
 *.exe
+Thumbs.db

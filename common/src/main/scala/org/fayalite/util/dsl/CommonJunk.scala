@@ -41,22 +41,8 @@ trait CommonJunk {
     minuteFormat.format(today)
   }
 
+  def homeDir = System.getProperty("user.home")
 
-  implicit class BufferedImageHelp(bi: BufferedImage) {
-    def draw(g: Graphics, x: Int, y: Int) = {
-      g.drawImage(bi, x, y, bi.getWidth, bi.getHeight,null)
-    }
-  }
-
-  val ubuntuProjectHome = "/home/ubuntu/fayalite" //System.getProperty("user.home")
- // val SPARK_HOME = s"$ubuntuProjectHome"
   val currentDir = new java.io.File(".").getCanonicalPath + "/"
-
-  def randBytes(len: Int) = {
-    val vb: Array[Byte] = Array.fill(len)(0.toByte)
-    scala.util.Random.nextBytes(vb)
-    vb
-  }
-
 
 }

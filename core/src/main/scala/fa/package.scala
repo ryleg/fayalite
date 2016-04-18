@@ -37,3 +37,14 @@ with ImageHelp
   // they are here
 
 }
+
+trait FayaliteFull extends AkkaExt
+with JSONLikeHelpers
+with CommonMonadExt
+with MethodShorteners
+with HTMLParsingHelpers
+with StringFormatHelpers
+with FileHelpUtilities
+with CommonJunk
+with SeleniumHelp
+with ImageHelp

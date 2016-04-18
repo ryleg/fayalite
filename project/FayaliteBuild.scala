@@ -111,16 +111,38 @@ object FayaliteBuild extends sbt.Build {
     organization := "fayalite",
     version := "0.0.4",
     scalaVersion := "2.11.6"
-  ).aggregate(core, gate)
+  )
+
+  lazy val common = Project(
+    id = "common",
+    base = file("./common")).settings(
+    scalaVersion := "2.11.6",
+    libraryDependencies := Seq()
+  )
 
   lazy val core = Project(
     id = "core",
     base = file("./core")).settings(
     scalaVersion := "2.11.6",
     libraryDependencies := allDeps
-  )
+  ) dependsOn common
 
-    core.dependsOn(root)
+  lazy val ml = Project(
+      id = "ml",
+      base = file("./ml")).settings(
+      scalaVersion := "2.11.6",
+      libraryDependencies := Seq(
+  "com.twitter" % "algebird-core_2.11" % "0.12.0" withSources() withJavadoc()
+  )
+  ) dependsOn core
+
+  lazy val agg = Project(
+      id = "agg",
+      base = file("./agg")).settings(
+      scalaVersion := "2.11.6",
+      libraryDependencies := Seq()
+  ) dependsOn core
+
 
   lazy val gate = Project(
     id = "gate",

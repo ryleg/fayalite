@@ -1,23 +1,15 @@
 package org.fayalite.agg.yahoo.finance
 
 import java.awt.Color
-import java.awt.image.{DataBuffer, DataBufferInt, Raster}
 import java.io.File
-import java.nio.{ByteBuffer, ByteOrder, IntBuffer}
-
-import com.github.tototoshi.csv.CSVReader
 import dispatch.{Http, as, url}
 import org.fayalite.agg.ProxyManager
 import org.fayalite.agg.ProxyManager.ProxyDescr
 
 import scala.collection.mutable
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 import fa._
-
-
-
-
 
 
 /**
@@ -36,6 +28,13 @@ object Yahoo extends YahooFinanceRequestor
 
     println("data length" + data.length)
     val h = img.getHeight
+    println("h w " + h + " " + img.getWidth)
+
+    val m = data.grouped(4*img.getWidth).toArray
+
+
+
+
 
     /*
     val img2 = img.sizeDuplicate
