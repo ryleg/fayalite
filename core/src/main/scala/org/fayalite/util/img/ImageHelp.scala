@@ -38,6 +38,11 @@ trait ImageHelp {
 
 
   implicit class BuffImageExt (bi: BufferedImage ) {
+
+    def byteMatrix = {
+      getAllData.grouped(4*bi.getWidth).toArray
+    }
+
     def draw(g: Graphics, x: Int, y: Int) = {
       g.drawImage(bi, x, y, bi.getWidth, bi.getHeight,null)
     }

@@ -77,9 +77,7 @@ object FayaliteBuild extends sbt.Build {
   )
 
   val aggRelated = Seq(
-    "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc(),
-    "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
-
+    "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc()
   )
 
   val opsLike = Seq(
@@ -140,7 +138,9 @@ object FayaliteBuild extends sbt.Build {
       id = "agg",
       base = file("./agg")).settings(
       scalaVersion := "2.11.6",
-      libraryDependencies := Seq()
+      libraryDependencies := Seq(
+        "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
+      )
   ) dependsOn core
 
 

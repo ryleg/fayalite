@@ -9,13 +9,6 @@ import scala.concurrent.{Future, ExecutionContext}
 import scala.util.Try
 
 
-class PJS {
-
-
-
-}
-
-
 /**
   * PhantomJS utility stuff.
   */

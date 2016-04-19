@@ -5,28 +5,25 @@ import java.net.InetSocketAddress
 import akka.actor.ActorSystem
 import akka.io.IO
 import com.github.mkroli.dns4s.akka.Dns
-
 import fa._
 
 /**
-  * Created by aa on 3/10/2016.
+  * For querying websites DNS info easily /
+  * constructing packets
   */
 object DNS {
 
   val googleDNS: InetSocketAddress = new InetSocketAddress("8.8.8.8", 53)
 
-  def main(args: Array[String]) {
+  def queryName(host: String = "google.de") = {
 
     implicit val system = ActorSystem("DnsServer")
-    import system.dispatcher
     val d = IO(Dns)
-
-
     val packet = {
-      import com.github.mkroli.dns4s.dsl._
       import com.github.mkroli.dns4s.akka._
+      import com.github.mkroli.dns4s.dsl._
       Dns.DnsPacket(
-        Query ~ Questions(QName("google.de")),
+        Query ~ Questions(QName(host)),
         googleDNS
       )
     }
@@ -41,14 +38,6 @@ object DNS {
         }
     }(ecc)
 
-
   }
-
-
-/*
-
-
-    d.??
-*/
 
 }

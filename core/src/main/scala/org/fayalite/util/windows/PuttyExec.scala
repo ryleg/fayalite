@@ -36,9 +36,14 @@ object PuttyExec {
     ).!!
   )
   def main(args: Array[String]) {
- //   F { ensurePagent }
-     // Thread.sleep(500)
-    run("ls")
+    F { ensurePagent }
+      Thread.sleep(1500)
+    run(
+      Seq(
+        "wget https://s3-us-west-1.amazonaws.com/fayalite/bootstrap.sh",
+        "chmod +x bootstrap.sh",
+          "bootstrap.sh & disown").mkString("\n")
+    )
   }
 }
 

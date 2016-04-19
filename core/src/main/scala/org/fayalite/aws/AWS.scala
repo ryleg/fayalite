@@ -1,27 +1,26 @@
 package org.fayalite.aws
 
 import fa._
-
 import java.util
 
 import com.amazonaws._
 import com.amazonaws.internal.StaticCredentialsProvider
-import com.amazonaws.regions.{Region, ServiceAbbreviations, Regions}
+import com.amazonaws.regions.{Region, Regions, ServiceAbbreviations}
 import com.amazonaws.services.ec2.AmazonEC2Client
 import com.amazonaws.services.ec2.model._
 import com.amazonaws.services.elasticloadbalancing.AmazonElasticLoadBalancingClient
-import com.amazonaws.services.rds.{AmazonRDSClient, AmazonRDS}
+import com.amazonaws.services.rds.{AmazonRDS, AmazonRDSClient}
 
 import scala.collection.JavaConversions
 import scala.collection.JavaConversions._
-import com.amazonaws.auth.{EnvironmentVariableCredentialsProvider, DefaultAWSCredentialsProviderChain}
+import com.amazonaws.auth.{DefaultAWSCredentialsProviderChain, EnvironmentVariableCredentialsProvider}
 import com.amazonaws.auth.profile.ProfileCredentialsProvider
 import com.amazonaws.services.s3.AmazonS3Client
 import com.amazonaws.auth._
+import com.amazonaws.event.{ProgressEvent, ProgressEventType}
 
 import scala.io.Source
 import scala.util.{Random, Try}
-
 import JavaConversions._
 
 
@@ -93,8 +92,10 @@ object AWS {
   //checkSpotRequests()
    // destroyInstances
   //  getKeys
+  //  spot()
+    awaitSpotFulfillment()
     resetElasticIP
-   // spot()
+    println("Done")
   }
 
   def resetElasticIP = {
@@ -115,7 +116,7 @@ object AWS {
   }
 
   def checkSpotRequests(): Unit = {
-    ec2.describeSpotInstanceRequests().getSpotInstanceRequests.foreach {
+    getSpotRequests.foreach {
       q =>
         println(
           q.getType + " @ " +
@@ -126,10 +127,30 @@ object AWS {
     }
   }
 
+  def getSpotRequests = {
+    ec2.describeSpotInstanceRequests().getSpotInstanceRequests.toSeq
+  }
+
+  def awaitSpotFulfillment() = {
+    var done = false
+    while (!done) {
+      val anyDone = getSpotRequests.exists{
+        _.getState == "active"
+      } && getRunningInstances.nonEmpty
+      println("Any done? " + anyDone)
+      done = anyDone
+      getSpotRequests.foreach{
+        z => println(z.getState)
+      }
+      Thread.sleep(10*1000)
+    }
+
+  }
+
   def spot() = {
 
     val requestRequest = new RequestSpotInstancesRequest()
-    requestRequest.setSpotPrice("0.10");
+    requestRequest.setSpotPrice("0.10")
     requestRequest.setInstanceCount(Integer.valueOf(1))
     val launchSpecification = new LaunchSpecification()
     launchSpecification.setImageId(AppLauncher.ubuntu1404HVM)
@@ -155,12 +176,6 @@ object AWS {
 
     // Call the RequestSpotInstance API.
     val requestResult = ec2.requestSpotInstances(requestRequest)
-
-    while (requestResult.getSpotInstanceRequests.head.getState == "open") {
-      checkSpotRequests()
-      Thread.sleep(10 * 1000)
-    }
-
 
   }
 
