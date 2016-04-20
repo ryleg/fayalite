@@ -1,4 +1,4 @@
-package org.fayalite.util.email
+package org.fayalite.agg.email
 
 /**
   * Created by aa on 3/10/2016.

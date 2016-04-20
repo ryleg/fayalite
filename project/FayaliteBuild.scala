@@ -63,7 +63,6 @@ object FayaliteBuild extends sbt.Build {
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
     "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
-    "me.lessis" %% "courier" % "0.1.3" withSources() withJavadoc(),
     "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
   )
 
@@ -85,11 +84,9 @@ object FayaliteBuild extends sbt.Build {
     flair ++
     web) ++
     Seq(
-      "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
+      "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc()
       //     "ch.qos.logback" % "logback-classic" % "1.1.2",
-      "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc(),
-      "xuggle" % "xuggle-xuggler" % "5.2"
-    ) ++ aggRelated ++ testers ++ sparkExperimental
+    ) ++ aggRelated ++ testers ++ sparkExperimental ++ auxParseLikeStuff
 
 
   // For tests of BufferedImage at high speed
@@ -133,21 +130,23 @@ object FayaliteBuild extends sbt.Build {
   ) dependsOn common
 
   lazy val ml = Project(
-      id = "ml",
-      base = file("./ml")).settings(
-      scalaVersion := "2.11.6",
-      libraryDependencies := Seq(
-  "com.twitter" % "algebird-core_2.11" % "0.12.0" withSources() withJavadoc()
-  )
+    id = "ml",
+    base = file("./ml")).settings(
+    scalaVersion := "2.11.6",
+    libraryDependencies := Seq(
+      "xuggle" % "xuggle-xuggler" % "5.2", // For stitching images into video
+      "com.twitter" % "algebird-core_2.11" % "0.12.0" withSources() withJavadoc()
+    )
   ) dependsOn core
 
   lazy val agg = Project(
-      id = "agg",
-      base = file("./agg")).settings(
-      scalaVersion := "2.11.6",
-      libraryDependencies := Seq(
-        "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
-      )
+    id = "agg",
+    base = file("./agg")).settings(
+    scalaVersion := "2.11.6",
+    libraryDependencies := Seq(
+      "me.lessis" %% "courier" % "0.1.3" withSources() withJavadoc(),
+      "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
+    )
   ) dependsOn core
 
 
@@ -161,18 +160,18 @@ object FayaliteBuild extends sbt.Build {
   )
 
   lazy val spark = Project(
-      id = "spark",
-      base = file("./spark")).settings(
+    id = "spark",
+    base = file("./spark")).settings(
     scalaVersion := "2.11.8",
     libraryDependencies := Seq(
-  "SparkFlow" % "sparkflow_2.11" % "0.0.1"
-  )
+      "SparkFlow" % "sparkflow_2.11" % "0.0.1"
+    )
   )
 
 
   lazy val experimental = Project(
-      id = "experimental",
-      base = file("./experimental")).settings(
+    id = "experimental",
+    base = file("./experimental")).settings(
     scalaVersion := "2.11.6",
     libraryDependencies := Seq()
   ) dependsOn core

@@ -1,4 +1,4 @@
-package org.fayalite.util
+package org.fayalite
 
 import scala.sys.process._
 // TODO: Switch to ammonite-ops. Merge with remote server management code ala EMR/EC2
