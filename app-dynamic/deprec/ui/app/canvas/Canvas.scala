@@ -24,11 +24,6 @@ import org.fayalite.ui.app.canvas.Schema._
  */
 object Canvas {
 
-
-  var canvas : dom.raw.HTMLCanvasElement = _
-  var ctx : dom.CanvasRenderingContext2D = _
-  var width = 0
-  var height = 0
   val rect = Var(getRect)
 
   // change to lift

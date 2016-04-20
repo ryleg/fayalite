@@ -7,7 +7,6 @@ import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.raw.{CanvasRenderingContext2D, HTMLCanvasElement}
 
-import scala.collection.JavaConversions
 
 /**
   * Created by aa on 3/17/2016.

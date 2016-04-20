@@ -80,9 +80,9 @@ object FayaliteBuild extends sbt.Build {
   )
 
 
-  val allDeps = (jsonStuff ++
+  val allDeps = jsonStuff ++
     flair ++
-    web) ++
+    web ++
     Seq(
       "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc()
       //     "ch.qos.logback" % "logback-classic" % "1.1.2",
