@@ -108,13 +108,12 @@ class MagicSparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
 
 }
 
-
-object InitInterp {
+class SparkREPLManager extends REPLManagerLike {
 
   def start(
-           in: BufferedReader,
-           out: JPrintWriter,
-            namePrefix: String = "repl",
+             in: BufferedReader,
+             out: JPrintWriter,
+             namePrefix: String = "repl",
              args: Array[String],
              conf: SparkConf,
              settingsErrorHandler: (String => Unit)
@@ -135,6 +134,11 @@ object InitInterp {
     val settings = new GenericRunnerSettings(settingsErrorHandler)
     settings.processArguments(interpArguments, true)
 
+    val iLoop = new MagicSparkILoop(Some(iLoopBufferedReader),
+      iLoopOutputCatch)
+
+
   }
+
 
 }

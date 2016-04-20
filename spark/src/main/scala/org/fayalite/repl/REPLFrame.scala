@@ -4,7 +4,7 @@ package org.fayalite.repl
   * Direct draw frame builder
   */
 class REPLFrame {
-
+/*
   val cm = new SymbolRegistry()
 
   //val f = new FFrame()
@@ -12,7 +12,7 @@ class REPLFrame {
   val nr = new NativeREPL()
 
   val rs = F{ nr.interpret("val x = 1")}
-  rs.onComplete(q => println("Interpreter output " + q.get))
+  rs.onComplete(q => println("Interpreter output " + q.get))*/
 
 /*
   class Listen extends KeyListener {

@@ -26,6 +26,10 @@ class REPLManagerLike extends java.io.Serializable {
     println("REPL Readout: " + s)
   }
 
+  def write(line: String) = {
+    replInputSink.write({line + "\n"}.map{_.toByte}.toArray)
+  }
+
   def read() : String = {
     var output = ""
     var bytesRead = 0

@@ -65,7 +65,8 @@ with DOMHelp
       cvTx.canvas.height = tileYHeight
       cvTx.canvas.style.left = (tileXIndex * tileXWidth).toString
       cvTx.canvas.style.top = (tileYIndex * tileYHeight).toString
-      cvTx
+      cvTx.setBackground(ansiDarkGrey)
+      cvTx.setBorder(lightBlue, 1)
     }
 
     val skew = 3

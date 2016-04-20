@@ -44,9 +44,10 @@ trait CanvasHelp extends SJSHelp {
   }
 
   def color[T](f : => T)(implicit ctx: CanvasRenderingContext2D,
-                         fillStyle: String)
+                         fillStyle: String,
+                         alpha: Double = 1D)
   : T = {
-    style(f)(ctx, CanvasStyling(fillStyle = fillStyle))
+    style(f)(ctx, CanvasStyling(fillStyle = fillStyle, globalAlpha = alpha))
   }
 
   /**
@@ -102,10 +103,11 @@ trait CanvasHelp extends SJSHelp {
 
     implicit val ctxi = ctx.context
 
-    def fill(x: Double, y: Double, dx: Double, dy: Double, hexColor: String) = {
+    def fill(x: Double, y: Double, dx: Double, dy: Double, hexColor: String,
+             alpha: Double = 1D) = {
       color{
         ctx.context.fillRect(x,y,dx,dy)
-      }(ctxi, hexColor)
+      }(ctxi, hexColor, alpha)
     }
 
     /**
@@ -132,11 +134,11 @@ trait CanvasHelp extends SJSHelp {
       ctx.canvas.width.toDouble
     }
 
-    def setBorder(hexColor: String, numPixels: Int) = {
-      fill(0D, 0D, getWidth, numPixels.toDouble, hexColor) // top
-      fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor) // bottom
-      fill(0D, 0D, numPixels.toDouble, getHeight, hexColor) // left
-      fill(getWidth, 0D, -1*numPixels.toDouble, getHeight, hexColor) // right
+    def setBorder(hexColor: String, numPixels: Int, alpha: Double = .17D) = {
+      fill(0D, 0D, getWidth, numPixels.toDouble, hexColor, alpha) // top
+      fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor, alpha) // bottom
+      fill(0D, 0D, numPixels.toDouble, getHeight, hexColor, alpha) // left
+      fill(getWidth, 0D, -1*numPixels.toDouble, getHeight, hexColor, alpha) // right
     }
 
   }
