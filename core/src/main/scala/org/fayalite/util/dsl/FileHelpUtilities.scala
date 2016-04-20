@@ -66,6 +66,13 @@ trait FileHelpUtilities {
       .writeAll(cnt)
   }
 
+  def writeLines(f: String, cnt: Seq[String]) = {
+    val fnm = f
+    scala.tools.nsc.io.File(
+      fnm)
+      .writeAll(cnt.mkString("\n"))
+  }
+
   def writeToFile(f: File, cnt: String) = {
     scala.tools.nsc.io.File(
       f)

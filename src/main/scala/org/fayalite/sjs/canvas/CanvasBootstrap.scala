@@ -2,9 +2,6 @@ package org.fayalite.sjs.canvas
 
 import org.scalajs.dom._
 
-
-
-
 /**
   * Initialize / cleanup / manage canvas references
   * across compilation / execution rounds (For now, assume
@@ -13,6 +10,15 @@ import org.scalajs.dom._
 object CanvasBootstrap extends CanvasHelp
 with DOMHelp
 {
+
+  val tileXWidth = 300 //w / numDiv
+  val tileYHeight = 300// h / numDiv
+
+  def getTileOn(x: Double, y: Double) = {
+    val xIdx = (x/tileXWidth).toInt
+    val yIdx = (y/tileYHeight).toInt
+    xIdx -> yIdx
+  }
 
   /**
     * Start by populating the DOM dynamically with tiled canvases
@@ -24,7 +30,6 @@ with DOMHelp
 
     println("Adjusted client width " + w)
     println("Adjusted client height " + h)
-
     println("Initializing canvas tiles")
 
     document.body.style.overflow = "hidden"
@@ -55,9 +60,6 @@ with DOMHelp
   def buildTileMatrix() = {
     val numDiv = 9
 
-    val tileXWidth = w / numDiv
-    val tileYHeight = h / numDiv
-
     val canvasBuilder = (zIndex: Int, tileXIndex: Int, tileYIndex: Int) => {
       val cvTx = createCanvas(zIndex)
       appendBody(cvTx.canvas)
@@ -67,11 +69,12 @@ with DOMHelp
       cvTx.canvas.style.top = (tileYIndex * tileYHeight).toString
       cvTx.setBackground(ansiDarkGrey)
       cvTx.setBorder(lightBlue, 1)
+      cvTx.grid(5)
     }
 
-    val skew = 3
+    val skew = 1
 
-    val tileCount: Int = numDiv * skew
+    val tileCount: Int = 5 //numDiv * skew
 
     val cvs = for (
       x <- 0 until tileCount;

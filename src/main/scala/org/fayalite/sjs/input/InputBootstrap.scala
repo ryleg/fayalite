@@ -1,5 +1,6 @@
 package org.fayalite.sjs.input
 
+import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.scalajs.dom._
 import org.scalajs.dom.ext.KeyCode
 
@@ -21,12 +22,22 @@ object InputBootstrap {
   }
 
   def init() : Unit = {
-    disableRightClick()
+    //disableRightClick()
+    println("Input bootstrap")
 
     window.onkeydown = (ke: KeyboardEvent) => {
 
     }
     window.onkeyup = (ke: KeyboardEvent) => {
+    }
+
+    import CanvasBootstrap._
+    val dbgCnv = createCanvasWithPosition(50, 50)
+    dbgCnv.setBackground(burntGold)
+
+    window.onmousemove = (me: MouseEvent) => {
+      //println("ON Mouse move")
+      dbgCnv.move(me.clientX.toInt, me.clientY.toInt)
 
     }
 

@@ -115,15 +115,12 @@ class SparkREPLManager extends REPLManagerLike {
              out: JPrintWriter,
              namePrefix: String = "repl",
              args: Array[String],
-             conf: SparkConf,
+             rootDir: String = ".",
+             jars: String,
              settingsErrorHandler: (String => Unit)
            ) = {
 
-    val outputDir = UtilsAux.createTempDir(conf, namePrefix)
-
-    val jars = conf.getOption("spark.jars")
-      .map(_.replace(",", File.pathSeparator))
-      .getOrElse("")
+    val outputDir = UtilsAux.createTempDir(rootDir, namePrefix)
 
     val interpArguments = List(
       "-Yrepl-class-based",

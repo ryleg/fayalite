@@ -134,6 +134,32 @@ trait CanvasHelp extends SJSHelp {
       ctx.canvas.width.toDouble
     }
 
+    def hLine(y: Double) = {
+      fill(0D, y, getWidth, 1, lightBlue, 0.17D) // top
+    }
+
+    def vLine(x: Double) = {
+      fill(x, 0D, 1, getHeight, lightBlue, 0.17D) // top
+    }
+
+    def grid(numDivs: Int) = {
+      val ds = getWidth / numDivs
+      for (x <- 0 until numDivs) {
+        vLine(x*ds)
+      }
+      for (y <- 0 until numDivs) {
+        hLine(y*ds)
+      }
+    }
+
+    def cStyle = ctx.canvas.style
+
+    def move(x: Int, y: Int) = {
+      cStyle.left = x.toString
+      cStyle.top = y.toString
+      ctx
+    }
+
     def setBorder(hexColor: String, numPixels: Int, alpha: Double = .17D) = {
       fill(0D, 0D, getWidth, numPixels.toDouble, hexColor, alpha) // top
       fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor, alpha) // bottom
@@ -148,14 +174,28 @@ trait CanvasHelp extends SJSHelp {
     * @param zIndex : For layering canvas
     * @return Pre-allocated context / canvas
     */
-  def createCanvas(zIndex: Int = 2) = {
+  def createCanvas(zIndex: Int = 2): CanvasContextInfo = {
     val obj = "canvas".element.asInstanceOf[dom.raw.HTMLCanvasElement]
-    obj.style.backgroundColor = bgGrey
     obj.style.position = "absolute"
     obj.style.left = "0"
     obj.style.top = "0"
     obj.style.zIndex = zIndex.toString
     CanvasContextInfo(obj, obj.ctx)
+  }
+
+  def createCanvasWithPosition(left: Int = 0,
+                               top: Int = 0,
+                               width: Int = 30,
+                               height: Int = 30,
+                               zIndex: Int = 3
+                  ): CanvasContextInfo = {
+    val cv = createCanvas(zIndex)
+    cv.canvas.width = width
+    cv.canvas.height = height
+    cv.canvas.style.left = left.toString
+    cv.canvas.style.top = top.toString
+    appendBody(cv.canvas)
+    cv
   }
 
 

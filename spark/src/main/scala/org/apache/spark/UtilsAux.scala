@@ -7,16 +7,12 @@ import org.apache.spark.util.Utils
   */
 object UtilsAux {
 
-  def createTempDir(conf: SparkConf, namePrefix: String = "repl") = {
-    val rootDir = conf
-      .getOption("spark.repl.classdir")
-      .getOrElse(Utils.getLocalDir(conf))
-
-    val outputDir = Utils.createTempDir(
+  def createTempDir(
+                     rootDir: String,
+                     namePrefix: String = "repl"
+                   ) = Utils.createTempDir(
       root = rootDir,
       namePrefix = namePrefix
     )
-    outputDir
-  }
 
 }
