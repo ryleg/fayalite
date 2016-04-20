@@ -7,6 +7,7 @@ import sbt.dsl._
 object FayaliteBuild extends sbt.Build {
 
   addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.2")
+  bintray.BintrayKeys.bintrayVcsUrl := Some("git@github.com:ryleg/fayalite.git")
 
   override lazy val settings = super.settings ++
     Seq(
@@ -24,7 +25,8 @@ object FayaliteBuild extends sbt.Build {
         "Spark Packages Repo" at "http://dl.bintray.com/spark-packages/maven",
         Resolver.jcenterRepo,
         "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
-        "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/"
+        "xuggle repo" at "http://xuggle.googlecode.com/svn/trunk/repo/share/java/",
+        Resolver.bintrayRepo("ryleg", "maven")
       ),
       licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
     )
@@ -153,7 +155,15 @@ object FayaliteBuild extends sbt.Build {
     )
   )
 
-    gate.dependsOn(core)
+  lazy val spark = Project(
+      id = "spark",
+      base = file("./spark")).settings(
+    scalaVersion := "2.11.8",
+    libraryDependencies := Seq(
+  "SparkFlow" % "sparkflow_2.11" % "0.0.1"
+  )
+  )
+
 
   ivyScala := ivyScala.value map {_.copy(overrideScalaVersion = true)}
 

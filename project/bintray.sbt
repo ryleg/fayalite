@@ -4,3 +4,5 @@ resolvers += Resolver.url(
     Resolver.ivyStylePatterns)
 
 addSbtPlugin("me.lessis" % "bintray-sbt" % "0.3.0")
+
+// bintrayVcsUrl := Some("git@github.com:ryleg/fayalite.git")
