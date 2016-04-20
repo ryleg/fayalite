@@ -42,18 +42,16 @@ object FayaliteBuild extends sbt.Build {
     "com.github.fge" % "jackson-coreutils" % "1.8" withSources()
   )
 
+  //Unused // Should be for agg / parsers
+  val msAccessDbParsing = "com.healthmarketscience.jackcess" % "jackcess" % "2.1.2"
+
   val auxParseLikeStuff = Seq(
     "com.github.tototoshi" %% "scala-csv" % "1.2.1" withSources() withJavadoc()
   )
 
-  val misc = Seq(
-    //"com.healthmarketscience.jackcess" % "jackcess" % "2.1.2",
-    "com.github.sarxos" % "webcam-capture" % "0.3.10" withSources() withJavadoc()
-  )
-
   val rx = "com.lihaoyi" %% "scalarx" % "0.3.1" withSources() withJavadoc()
 
-  val essential = Seq(
+  val flair = Seq(
     rx,
     "com.lihaoyi" %% "ammonite-ops" % "0.2.7" withSources() withJavadoc(),
     "org.scalaz" %% "scalaz-core" % "7.1.1" withSources() withJavadoc()
@@ -82,16 +80,10 @@ object FayaliteBuild extends sbt.Build {
     "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" withSources() withJavadoc()
   )
 
-  val opsLike = Seq(
-    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
-    "com.googlecode.lanterna" % "lanterna" % "2.1.9",
-    "com.jcraft" % "jzlib" % "1.1.3",
-    "com.decodified" %% "scala-ssh" % "0.7.0"
-  )
 
   val allDeps = (jsonStuff ++
-    essential ++
-    web).++(misc) ++
+    flair ++
+    web) ++
     Seq(
       "com.typesafe.akka" %% "akka-actor" % "2.3.14" withSources() withJavadoc(),
       //     "ch.qos.logback" % "logback-classic" % "1.1.2",
@@ -99,6 +91,19 @@ object FayaliteBuild extends sbt.Build {
       "xuggle" % "xuggle-xuggler" % "5.2"
     ) ++ aggRelated ++ testers ++ sparkExperimental
 
+
+  // For tests of BufferedImage at high speed
+  val misc = Seq(
+    "com.github.sarxos" % "webcam-capture" % "0.3.10" withSources() withJavadoc()
+  )
+
+  // Not used for primary codebase
+  val opsLike = Seq(
+    "com.beachape.filemanagement" %% "schwatcher" % "0.1.7"  withSources() withJavadoc(),
+    "com.googlecode.lanterna" % "lanterna" % "2.1.9",
+    "com.jcraft" % "jzlib" % "1.1.3",
+    "com.decodified" %% "scala-ssh" % "0.7.0"
+  )
 
   // Used for Scala.js, required to be
   // kept separate from other dependencies due to java conflicts
@@ -163,6 +168,14 @@ object FayaliteBuild extends sbt.Build {
   "SparkFlow" % "sparkflow_2.11" % "0.0.1"
   )
   )
+
+
+  lazy val experimental = Project(
+      id = "experimental",
+      base = file("./experimental")).settings(
+    scalaVersion := "2.11.6",
+    libraryDependencies := Seq()
+  ) dependsOn core
 
 
   ivyScala := ivyScala.value map {_.copy(overrideScalaVersion = true)}

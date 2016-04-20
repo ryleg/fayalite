@@ -1,4 +1,3 @@
-
 #Motivation
 
 The goal of this library is to make large data transforms in Spark quick
@@ -68,15 +67,7 @@ machine learning debugging and development. It's use as a conventional
 REPL is not primarily intended, but due to the lack of existing alternatives
 is encouraged.
 
-Some of these README commentaries will eventually be pulled into
-the git wiki for simplification, for now the project is experimental enough
-that README revisions should be sufficiently adequate.
-
-
 #Notes
-
-It is intended to update spark-dynamic to Spark 1.4.0 as soon as possible,
-but the current blocking development factor is the standardization of the UI
 
 Intended integration with ibm spark-kernel comms api eventually.
 
@@ -84,7 +75,10 @@ This all should switch to play (maybe?) but there are dependency conflicts that 
 resolved the way that spark-notebook resolved them. Did not want to modify
 build.sbt yet so I'm using spray.
 
-Etymology - Fayalite is a mineral form of iron silicate used in processed form for
+
+#Etymology
+
+Fayalite is a mineral form of iron silicate used in processed form for
 high voltage high frequency transformers. The analogy with large-scale data
 transformations should be completely natural. The pipeline / DAG approach
 takes inspiration from https://github.com/ucb-bar/chisel/ and hopes to extend

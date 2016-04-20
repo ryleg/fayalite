@@ -1,7 +1,6 @@
 package org.fayalite.util.dsl
 
-import fa.Schema
-import Schema.FixedPhrase
+import fa.Schema.FixedPhrase
 
 /**
   * Created by aa on 2/18/2016.

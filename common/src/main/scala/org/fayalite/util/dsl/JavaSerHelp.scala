@@ -1,4 +1,4 @@
-package org.fayalite.util
+package org.fayalite.util.dsl
 
 import java.io._
 

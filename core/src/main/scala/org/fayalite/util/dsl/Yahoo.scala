@@ -14,49 +14,6 @@ object Yahoo {
     breeze.linalg.csvwrite(new File("text.txt"), dm, separator = ' ')
 */
 
-  val testSymbols = Array( "AAPL", "GOOG", "MSFT","YHOO")
-
-  val yahooFinanceExamplePull = "data\\fnc"
-
-  def parseResponse(r: String) = scala.xml.XML.loadString(r)
-      .map {
-        pollExtract
-      }
-
-  def pollExtract: (scala.xml.Node) => Seq[(String, Double, Double)] = {
-    q =>
-      (q \\ "results").head.child.flatMap {
-        c =>
-          val ask = (c \\ "Ask").text
-          val bid = (c \\ "Bid").text
-          val sym = c.attribute("symbol").get.text
-          val badRead = Try {
-            ask.toDouble
-          }.isFailure ||
-            Try {
-              bid.toDouble
-            }.isFailure
-          if (badRead) None
-          else Some {
-            (sym, ask.toDouble, bid.toDouble)
-          }
-      }
-  }
-
-  case class Poll(sym: String, ask: Double, bid: Double, time: Int)
-
-  case class Price(ask: Double, bid: Double)
-
-
-  def getPolls = {
-    asLines(yahooFinanceExamplePull)
-      .withFilter(q => q != "null" && q.stripLineEnd.nonEmpty) // junk from aggregation
-      .grouped(3)
-      .map {_.mkString}
-      .flatMap {parseResponse}
-      .zipWithIndex
-  }
-
   def main(args: Array[String]) {
 
 

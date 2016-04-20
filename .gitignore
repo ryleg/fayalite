@@ -8,7 +8,6 @@
 target
 /dist
 /tmp
-/lib
 /logs
 /project/project
 /project/target
@@ -30,3 +29,4 @@ phantomjs
 *.log
 *.exe
 Thumbs.db
+lib

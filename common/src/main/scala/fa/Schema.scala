@@ -1,7 +1,5 @@
 package fa
 
-import org.jsoup.nodes.Document
-
 /**
   * For all message passing case classes and other
   * inter-application communication protocols.
@@ -52,10 +50,6 @@ object Schema {
     * @param contents : String file contents as if ripped from .mkString on file
     */
   case class CodeUpdate(path: String, contents: String)
-
-
-
-  case class ParsedExtr(url: String, soup: Document)
 
   case class Extr(page: String, extr: Option[String])
 
