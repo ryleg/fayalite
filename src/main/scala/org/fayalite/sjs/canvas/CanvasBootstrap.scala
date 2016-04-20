@@ -3,37 +3,7 @@ package org.fayalite.sjs.canvas
 import org.scalajs.dom._
 
 
-/**
-  * For accessing quick DOM info relevant to
-  * canvas parameters / positioning /
-  * client info
-  */
-trait DOMHelp {
 
-  /**
-    * Get the viewscreen for the client with measurements for
-    * determining screen height to determine canvas tiling
-    * requirements
-    * @return : Rect for inspection of client viewscreen parameters
-    */
-  def getRect = document.body.getBoundingClientRect()
-
-  /**
-    * Adjusted width with a clip to prevent scroll bar appearing
-    * Hack for getting to display properly in desktop browser,
-    * untested elsewhere
-    * @return : Clip adjusted pixel width of viewport
-    */
-  def w = document.documentElement.clientWidth - 18 // wtf? it makes a scroll bar without this offset
-
-  /**
-    * Adjusted height with clip margin for preventing scrollbars
-    * WARNING: Complete hacks here
-    * @return : Adjusted pixel height
-    */
-  def h = document.documentElement.clientHeight - 50
-
-}
 
 /**
   * Initialize / cleanup / manage canvas references
@@ -59,6 +29,30 @@ with DOMHelp
 
     document.body.style.overflow = "hidden"
 
+    val tm = buildTileMatrix()
+
+
+
+  }
+
+
+  /**
+    * Canvas is optimized to render on small tiles,
+    * we choose a magic number of 9 divs and split up
+    * the screen into a bunch of tiles based on initial client
+    * height with a factor of 3 times as many tiles in each direction
+    * as the size of the clients screen. The extra tiles are not
+    * rendered and can be used as spares for moving on / offscreen
+    * or for jumping up / down in z-Index and overlapping
+    * other tiles
+    *
+    * This is pretty much intended for ignoring window resizing
+    * although if you feel like redrawing for every event like that
+    * be my guest -- there can always be a check later to populate
+    * additional tiles on extreme events. This is a pretty basic
+    * initial populator
+    */
+  def buildTileMatrix() = {
     val numDiv = 9
 
     val tileXWidth = w / numDiv
@@ -76,15 +70,22 @@ with DOMHelp
 
     val skew = 3
 
-    for (
-      x <- 0 until numDiv*skew;
-      y <- 0 until numDiv*skew
-    ) {
+    val tileCount: Int = numDiv * skew
+
+    val cvs = for (
+      x <- 0 until tileCount;
+      y <- 0 until tileCount
+    ) yield {
       val cv = canvasBuilder(2, x, y)
-      cv.context.fillText("c: " + x + " " + y, 10, 10)
+      //cv.context.fillText("c: " + x + " " + y, 10, 10) // Debug turn on for
+      // visualizing tile layout
+      cv
     }
 
+    val tileMatrix = cvs.grouped(tileCount).map {
+      _.toArray
+    }.toArray
+
+    tileMatrix
   }
-
-
 }

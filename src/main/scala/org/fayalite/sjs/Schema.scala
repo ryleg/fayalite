@@ -8,7 +8,7 @@ import org.scalajs.dom.raw.HTMLCanvasElement
 /**
   * Created by aa on 3/17/2016.
   */
-object Schema {
+object Schema extends SJSHelp {
 
  // {
     import upickle._
@@ -33,7 +33,7 @@ object Schema {
     */
   case class CanvasStyling(
                             font: String = "14pt monospace",
-                            fillStyle: String =  "#A9B7C6",
+                            fillStyle: String =  lightBlue,
                             globalAlpha: Double = 1D
                           )
 
@@ -41,8 +41,6 @@ object Schema {
                               canvas: HTMLCanvasElement,
                               context: CanvasRenderingContext2D
                               )
-
-  val bgGrayBlack = "#2B2B2B"
 
 
 }

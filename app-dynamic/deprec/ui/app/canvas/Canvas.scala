@@ -1,27 +1,6 @@
 package org.fayalite.ui.app.canvas
 
 
-import PositionHelpers.LatCoordD
-import org.fayalite.ui.app.manager.Editor
-import org.fayalite.ui.app.state.Input
-import org.scalajs.dom
-import org.scalajs.dom._
-import rx._
-
-import scala.scalajs.js
-import scala.scalajs.js.Dynamic.{global => g}
-import scala.scalajs.js.annotation.JSExport
-import scala.scalajs.js.{JSON, JSApp}
-import scala.util.{Failure, Try}
-
-import org.fayalite.ui.app.canvas.Schema._
-
-/**
- * We're only using a single canvas / context
- * to start with for simplicity, this will eventually become
- * the 'background' canvas when we move to multiple contexts.
- * For now this is the sole bottleneck to all canvas interactions.
- */
 object Canvas {
 
   val rect = Var(getRect)
@@ -36,37 +15,11 @@ object Canvas {
 
   window.onkeydown = (ke: KeyboardEvent) => {onKeyDown() = ke}
   window.onkeyup = (ke: KeyboardEvent) => onKeyUp() = ke
-  window.oncontextmenu = (me: MouseEvent) => {
-    me.preventDefault()
-    rightClick() = me
-  }
+
   window.onclick = (me: MouseEvent) => {
     onclick() = me
   }
 
-  // NO
-  val ctrlKey = Var(false)
-  Obs(onKeyDown, skipInitial = true) {
-    if (onKeyDown().ctrlKey) ctrlKey() = true
-  }
-  Obs(onKeyUp, skipInitial = true) {
-    if (onKeyUp().ctrlKey) ctrlKey() = false
-  }
-  Obs(onresize, skipInitial = true) {
-    widthR() = canvas.width
-    heightR() = canvas.height
-    rect() = getRect
-  }
-
-  def getRect = document.body.getBoundingClientRect()
-  def w = document.documentElement.clientWidth - 18 // wtf? it makes a scroll bar without this offset
-  def h = document.documentElement.clientHeight - 50
-
-  val canvasR = Var(null.asInstanceOf[dom.raw.HTMLCanvasElement])
-  val ctxR = Var(null.asInstanceOf[dom.CanvasRenderingContext2D])
-
-  val heightR = Var(0D)
-  val widthR = Var(0D)
   val area = Rx { LatCoordD(widthR(), heightR())}
 
   Obs(canvasR, skipInitial = true) {
@@ -76,68 +29,5 @@ object Canvas {
     }
   }
 
-  def createCanvas() = {
-    val stylingb = "background-color:#2B2B2B"
-    val styling = "position:absolute;left:" +
-      "0;top:0:z-index:2;"
-    document.body.setAttribute("style", stylingb)
-    val elem = document.body.getElementsByTagName("canvas")
-    canvas = {if (elem.length != 0) elem(0) else {
-      val obj = dom.document.createElement("canvas")
-      val sa = obj.setAttribute("style", stylingb)
-      document.body.appendChild(obj)
-      obj
-    }}.asInstanceOf[dom.raw.HTMLCanvasElement]
-    ctx = canvas.getContext("2d").asInstanceOf[dom.CanvasRenderingContext2D]
-  }
-
-  var cnvbg : dom.raw.HTMLCanvasElement = _
-  var ctxbg : dom.CanvasRenderingContext2D = _
-
-  def createCanvasBG() = {
-    val styling = "position:absolute;left:" +
-      "0;top:0;z-index:1;" // background-color:#2B2B2B; "
-  //  document.body.setAttribute("style", styling)
-    cnvbg = {
-      val obj = dom.document.createElement("canvas")
-      val sa = obj.setAttribute("style", styling)
-      document.body.appendChild(obj)
-      obj
-    }.asInstanceOf[dom.raw.HTMLCanvasElement]
-
-    ctxbg = cnvbg.getContext("2d").asInstanceOf[
-      dom.CanvasRenderingContext2D]
-  }
-
-
-
-
-  // TODO : Change to reactive.
-  @deprecated
-  def initCanvas() = {
-    createCanvas()
-    canvas.width = w
-    canvas.height = h
-/*    createCanvasBG()
-    cnvbg.width = w
-    cnvbg.height = h*/
-    canvasR() = canvas
-    ctxR() = ctx
-    width = canvas.width
-    height = canvas.height
-    window.onresize = (uie: UIEvent) => {
-      canvas.width = w
-      canvas.height = h
-/*      cnvbg.width = w
-      cnvbg.height = h*/
-      ctxR() = ctx
-      width = canvas.width
-      height = canvas.height
-
-      //      println(s"resize canvas width: $width height: $height")
-      onresize() = uie
-      rect() = getRect // lol
-    }
-  }
 
 }

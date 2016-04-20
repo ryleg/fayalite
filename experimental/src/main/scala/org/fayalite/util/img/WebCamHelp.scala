@@ -3,12 +3,13 @@ package org.fayalite.util.img
 import java.awt.{Color, Graphics, GraphicsEnvironment}
 import java.io.File
 import javax.imageio.ImageIO
-import javax.swing.JFrame
 
 import com.github.sarxos.webcam.{Webcam, WebcamEvent, WebcamListener}
-
 import scala.collection.JavaConversions._
 
+/**
+  * Created by aa on 4/19/2016.
+  */
 trait WebCamHelp {
 
   implicit class WebCamOps(wc: Webcam) {
@@ -43,27 +44,3 @@ trait WebCamHelp {
   def devices = { graphics getScreenDevices }.toList
 
 }
-
-
-object WebCamTestHelp {
-
-
-  def main(args: Array[String]) {
-
-
-    val webcam = Webcam.getDefault();
-    webcam.open();
-
-    val img = webcam.getImage
-    val byt = webcam.getImageBytes
-    /*
-    webcam.getWebcamListeners map {
-      _.webcamImageObtained()
-    }*/
-    Webcam.getWebcams
-    ImageIO.write(
-
-      webcam.getImage(), "PNG", new File("hello-world.png"));
-
-    Thread.sleep(Long.MaxValue)
-  }}

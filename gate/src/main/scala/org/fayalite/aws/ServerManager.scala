@@ -1,7 +1,7 @@
 package org.fayalite.aws
 
 import com.amazonaws.services.ec2.model.Tag
-import org.fayalite.aws.AWS._
+import AWS._
 
 import scala.collection.JavaConversions._
 
@@ -16,6 +16,7 @@ object ServerManager {
   /**
     * Prints out some standard stuff, mostly
     * for establishing cnnection and authentication.
+    *
     * @return : Names of active ec2 machines.
     */
   def requestServerInfo() = {
@@ -40,6 +41,7 @@ object ServerManager {
   /**
     * Return every instance containing a tag exactly matching
     * supplied parameter
+    *
     * @param t : Tag of instance by name or value.
     * @return matching instances
     */

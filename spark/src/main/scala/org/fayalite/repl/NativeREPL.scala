@@ -1,14 +1,5 @@
 package org.fayalite.repl
 
-import rx.Var
-
-import scala.reflect._
-import scala.tools.nsc.interpreter._
-import scala.tools.nsc.io
-import scala.tools.reflect.StdRuntimeTags._
-
-import fa._
-
 object NativeREPL {
 
   def main(args: Array[String]) {
@@ -16,9 +7,8 @@ object NativeREPL {
   }
 
   def breakInREPL() = {
-    import scala.tools.nsc.interpreter.ILoop
-    import scala.tools.nsc.interpreter.SimpleReader
     import scala.tools.nsc.Settings
+    import scala.tools.nsc.interpreter.{ILoop, SimpleReader}
 
     val repl = new ILoop
     repl.settings = new Settings

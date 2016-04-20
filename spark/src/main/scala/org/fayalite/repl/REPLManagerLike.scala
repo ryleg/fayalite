@@ -1,7 +1,6 @@
 package org.fayalite.repl
 
-
-import java.io.{InputStreamReader, BufferedReader, PipedOutputStream, PipedInputStream}
+import java.io.{BufferedReader, InputStreamReader, PipedInputStream, PipedOutputStream}
 
 import scala.tools.nsc.interpreter.JPrintWriter
 

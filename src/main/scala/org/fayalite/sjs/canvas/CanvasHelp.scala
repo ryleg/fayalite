@@ -43,6 +43,12 @@ trait CanvasHelp extends SJSHelp {
     ret
   }
 
+  def color[T](f : => T)(implicit ctx: CanvasRenderingContext2D,
+                         fillStyle: String)
+  : T = {
+    style(f)(ctx, CanvasStyling(fillStyle = fillStyle))
+  }
+
   /**
     * Canvas optimizations require many small patch work
     * like layers of canvas, and storing elements off-screen
@@ -92,8 +98,51 @@ trait CanvasHelp extends SJSHelp {
       .asInstanceOf[dom.CanvasRenderingContext2D]
   }
 
+  implicit class ContextExtensions(ctx: CanvasContextInfo) {
+
+    implicit val ctxi = ctx.context
+
+    def fill(x: Double, y: Double, dx: Double, dy: Double, hexColor: String) = {
+      color{
+        ctx.context.fillRect(x,y,dx,dy)
+      }(ctxi, hexColor)
+    }
+
+    /**
+      * Color the entire canvas with a single
+      * pixel color type
+      *
+      * @param hexColor : HTML color code as in SJSHelp
+      */
+    def setBackground(hexColor: String) = {
+      fill(
+        0D,
+        0D,
+        getWidth,
+        getHeight,
+        hexColor
+      )
+    }
+
+    def getHeight: Double = {
+      ctx.canvas.height.toDouble
+    }
+
+    def getWidth: Double = {
+      ctx.canvas.width.toDouble
+    }
+
+    def setBorder(hexColor: String, numPixels: Int) = {
+      fill(0D, 0D, getWidth, numPixels.toDouble, hexColor) // top
+      fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor) // bottom
+      fill(0D, 0D, numPixels.toDouble, getHeight, hexColor) // left
+      fill(getWidth, 0D, -1*numPixels.toDouble, getHeight, hexColor) // right
+    }
+
+  }
+
   /**
-    * Make a simple canvas that'll cover the screen body.
+    * Make a simple canvas
     * @param zIndex : For layering canvas
     * @return Pre-allocated context / canvas
     */

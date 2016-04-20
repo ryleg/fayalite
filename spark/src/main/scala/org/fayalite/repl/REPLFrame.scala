@@ -1,11 +1,5 @@
 package org.fayalite.repl
 
-import java.awt.Graphics
-import java.awt.event.{KeyEvent, KeyListener}
-
-import fa._
-import org.fayalite.ui.j2d.{FFrame, SymbolRegistry}
-
 /**
   * Direct draw frame builder
   */

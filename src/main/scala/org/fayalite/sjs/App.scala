@@ -21,6 +21,7 @@ object App extends JSApp {
   def main(): Unit = {
     println("SJS fayalite initialized")
     canvas.CanvasBootstrap.init()
+    input.InputBootstrap.init()
   }
 
 }

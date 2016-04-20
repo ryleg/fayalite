@@ -62,8 +62,7 @@ object FayaliteBuild extends sbt.Build {
     "org.seleniumhq.selenium" % "selenium-java" % "2.25.0" withSources() withJavadoc(),
     "org.scala-lang.modules" %% "scala-async" % "0.9.2",
     "net.databinder.dispatch" %% "dispatch-core" % "0.11.2",
-    "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc(),
-    "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
+    "com.wandoulabs.akka" %% "spray-websocket" % "0.1.4" withSources() withJavadoc()
   )
 
   val sparkExperimental =   Seq(
@@ -153,18 +152,20 @@ object FayaliteBuild extends sbt.Build {
   lazy val gate = Project(
     id = "gate",
     base = file("./gate")).settings(
+    scalaVersion := "2.11.6",
     libraryDependencies := web ++ Seq(
       rx,
-      "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc()
+      "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
+      "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
     )
   )
 
   lazy val spark = Project(
     id = "spark",
     base = file("./spark")).settings(
-    scalaVersion := "2.11.8",
+    scalaVersion := "2.11.6",
     libraryDependencies := Seq(
-      "SparkFlow" % "sparkflow_2.11" % "0.0.1"
+     // "SparkFlow" % "sparkflow_2.11" % "0.0.1"
     )
   )
 
@@ -173,7 +174,7 @@ object FayaliteBuild extends sbt.Build {
     id = "experimental",
     base = file("./experimental")).settings(
     scalaVersion := "2.11.6",
-    libraryDependencies := Seq()
+    libraryDependencies := Seq() ++ misc
   ) dependsOn core
 
 

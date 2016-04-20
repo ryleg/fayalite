@@ -3,7 +3,6 @@ package org.fayalite.aws
 import com.amazonaws.regions.Regions
 import com.amazonaws.services.ec2.model.RunInstancesRequest
 import com.amazonaws.services.elasticloadbalancing.model.{Listener, CreateLoadBalancerRequest}
-import com.amazonaws.services.opsworks.model.ElasticLoadBalancer
 
 import scala.collection.JavaConversions
 import JavaConversions._

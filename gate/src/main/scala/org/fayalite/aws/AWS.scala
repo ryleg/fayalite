@@ -1,6 +1,5 @@
 package org.fayalite.aws
 
-import fa._
 import java.util
 
 import com.amazonaws._
@@ -93,6 +92,11 @@ object AWS {
    // destroyInstances
   //  getKeys
   //  spot()
+    //launchTestServer
+    destroyInstances
+  }
+
+  def launchTestServer: Unit = {
     awaitSpotFulfillment()
     resetElasticIP
     println("Done")
