@@ -2,7 +2,7 @@
 package org.fayalite.sjs.canvas
 
 import org.fayalite.sjs.SJSHelp
-import org.fayalite.sjs.Schema.{CanvasContextInfo, CanvasStyling}
+import org.fayalite.sjs.Schema.{CanvasContextInfo, CanvasStyling, LatCoord}
 import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.raw.{CanvasRenderingContext2D, HTMLCanvasElement}
@@ -55,6 +55,7 @@ trait CanvasHelp extends SJSHelp {
     * like layers of canvas, and storing elements off-screen
     * for buffering in memory, etc. you should expect
     * to deal with a large num of canvas elements on the order of 5-20
+    *
     * @return : Elements matching tag canvas
     */
   def getAllCanvasTaggedElements = {
@@ -67,6 +68,7 @@ trait CanvasHelp extends SJSHelp {
     * or an error in providing a non-generated html page that
     * has pre-existing canvas tags. ONLY generate canvas through
     * this interface ideally unless you know what you're doing
+    *
     * @return : Whether or not the body has any canvas tags left
     *         over from some previous op.
     */
@@ -78,6 +80,7 @@ trait CanvasHelp extends SJSHelp {
     * Quick helpers for grabbing context for instance
     * and / or canvas manipulations that are not
     * native like already.
+    *
     * @param hte : The scala representation of the DOM Node
     *            holding the canvas
     */
@@ -92,6 +95,7 @@ trait CanvasHelp extends SJSHelp {
       * OpenGL like declarations (i.e. you need to set styling before a
       * call and it must respect thread locks properly to prevent
       * two draw calls using different styles accidently.)
+      *
       * @return Object for manipulating canvas pixel information.
       */
     def ctx = hte
@@ -116,15 +120,32 @@ trait CanvasHelp extends SJSHelp {
       *
       * @param hexColor : HTML color code as in SJSHelp
       */
-    def setBackground(hexColor: String) = {
+    def setBackground(hexColor: String, alpha: Double = 1D) = {
       fill(
         0D,
         0D,
         getWidth,
         getHeight,
-        hexColor
+        hexColor,
+        alpha
       )
     }
+
+    val canv = ctx.canvas
+
+    def onOff() : Unit = {
+      if (isOff()) {
+        turnOn()
+      } else turnOff()
+    }
+
+    def changeZ(z: Int): Unit = cStyle.zIndex = z.toString
+    def dropZ() = changeZ(-1)
+    def upZ() = changeZ(5)
+    def zIndex = cStyle.zIndex.toInt
+    def turnOn(): Unit = upZ //cStyle.visibility = "visible"
+    def turnOff(): Unit = dropZ //cStyle.visibility = "hidden"
+    def isOff() = zIndex == -1 // cStyle.visibility == "hidden"
 
     def getHeight: Double = {
       ctx.canvas.height.toDouble
@@ -154,10 +175,20 @@ trait CanvasHelp extends SJSHelp {
 
     def cStyle = ctx.canvas.style
 
-    def move(x: Int, y: Int) = {
+    def move(x: Int, y: Int): CanvasContextInfo = {
       cStyle.left = x.toString
       cStyle.top = y.toString
       ctx
+    }
+    def move(lc: LatCoord): CanvasContextInfo = {
+      move(lc.x, lc.y)
+    }
+
+    def left = cStyle.left.replaceAll("px", "").toInt
+    def top = cStyle.top.replaceAll("px", "").toInt
+
+    def moveTo(other: CanvasContextInfo) = {
+      move(other.left, other.top)
     }
 
     def setBorder(hexColor: String, numPixels: Int, alpha: Double = .17D) = {
@@ -171,6 +202,7 @@ trait CanvasHelp extends SJSHelp {
 
   /**
     * Make a simple canvas
+    *
     * @param zIndex : For layering canvas
     * @return Pre-allocated context / canvas
     */
@@ -196,6 +228,14 @@ trait CanvasHelp extends SJSHelp {
     cv.canvas.style.top = top.toString
     appendBody(cv.canvas)
     cv
+  }
+
+  def createCanvasZeroSquare(ds: Int = 60,
+                             hexColor: String = burntGold,
+                             alpha: Double = 1D) = {
+    val x = createCanvasWithPosition(0,0,ds,ds)
+    x.setBackground(hexColor, alpha)
+    x
   }
 
 

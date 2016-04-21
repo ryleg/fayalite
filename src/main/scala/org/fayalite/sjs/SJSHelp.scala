@@ -17,7 +17,11 @@ trait SJSHelp {
   val commentGrey = "#808080"
   val ansiGrey = "#555555"
   val ansiDarkGrey = "#1F1F1F"
-
+  val commentGreen = "#629755"
+  val superRed = "#FF0000"
+  val xmlOrange = "#E8BF6A"
+  val mediumBlue = "#6897BB"
+  val annotationYellow = "#BBB529"
 
   implicit class StringCommonExt(s: String) {
     def element = createElement(s)

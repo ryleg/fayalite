@@ -1,5 +1,6 @@
 package org.fayalite.sjs.canvas
 
+import org.fayalite.sjs.input.InputBootstrap
 import org.scalajs.dom._
 
 /**
@@ -36,6 +37,8 @@ with DOMHelp
 
     val tm = buildTileMatrix()
 
+    InputBootstrap.processTileMatrix(tm)
+
 
 
   }
@@ -70,20 +73,23 @@ with DOMHelp
       cvTx.setBackground(ansiDarkGrey)
       cvTx.setBorder(lightBlue, 1)
       cvTx.grid(5)
+      cvTx
     }
 
     val skew = 1
 
-    val tileCount: Int = 5 //numDiv * skew
+    val tileCount: Int = 10 //numDiv * skew
 
-    val cvs = for (
-      x <- 0 until tileCount;
-      y <- 0 until tileCount
-    ) yield {
-      val cv = canvasBuilder(2, x, y)
-      //cv.context.fillText("c: " + x + " " + y, 10, 10) // Debug turn on for
-      // visualizing tile layout
-      cv
+    val cvs = {
+      for (
+        x <- 0 until tileCount ;
+        y <- 0 until tileCount
+      ) yield {
+        val cv = canvasBuilder(2, x, y)
+        //cv.context.fillText("c: " + x + " " + y, 10, 10) // Debug turn on for
+        // visualizing tile layout
+        cv
+      }
     }
 
     val tileMatrix = cvs.grouped(tileCount).map {
