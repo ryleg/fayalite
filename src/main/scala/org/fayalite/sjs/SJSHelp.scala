@@ -11,8 +11,9 @@ import scala.scalajs.js.JSON
 trait SJSHelp {
 
   val methodGold = "#FFC66D"
-  val burntGold = "#CC7832"
+  val keywordOrange = "#CC7832"
   val bgGrey = "#2B2B2B"
+  val valPurple = "#9876AA"
   val lightBlue = "#A9B7C6"
   val commentGrey = "#808080"
   val ansiGrey = "#555555"

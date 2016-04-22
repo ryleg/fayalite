@@ -7,6 +7,8 @@ import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.raw.{CanvasRenderingContext2D, HTMLCanvasElement}
 
+import scala.concurrent.Future
+
 
 /**
   * Created by aa on 3/17/2016.
@@ -137,7 +139,10 @@ trait CanvasHelp extends SJSHelp {
     def onOff() : Unit = {
       if (isOff()) {
         turnOn()
-      } else turnOff()
+      } else {
+          turnOff()
+          dom.window.setTimeout(() => turnOn(), 200)
+      }
     }
 
     def changeZ(z: Int): Unit = cStyle.zIndex = z.toString
@@ -207,6 +212,7 @@ trait CanvasHelp extends SJSHelp {
     }
 
     def shiftRight() = move(left + ctx.tileSize, top)
+    def shiftHorizontal(tiles: Int) = move(left + tiles*ctx.tileSize, top)
     def shiftUp() = move(left, top - ctx.tileSize)
     def shiftDown() = move(left, top + ctx.tileSize)
 
@@ -228,6 +234,10 @@ trait CanvasHelp extends SJSHelp {
 
     def absoluteCoords = {
       LatCoord(left, top)
+    }
+
+    def absoluteCoordOp(f: LatCoord => LatCoord) = {
+
     }
 
 
@@ -290,7 +300,7 @@ trait CanvasHelp extends SJSHelp {
   }
 
   def createCanvasZeroSquare(ds: Int = CanvasBootstrap.minSize,
-                             hexColor: String = burntGold,
+                             hexColor: String = keywordOrange,
                              alpha: Double = 1D,
                              zIndex: Int = 3
                             ) = {

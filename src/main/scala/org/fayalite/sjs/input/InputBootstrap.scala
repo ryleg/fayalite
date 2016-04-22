@@ -1,11 +1,9 @@
 package org.fayalite.sjs.input
 
 import org.fayalite.sjs.Schema.{CanvasContextInfo, LatCoord}
-import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.fayalite.sjs.canvas.CanvasBootstrap._
 import org.scalajs.dom._
 import org.scalajs.dom.ext.KeyCode
-import rx.core.Obs
 import rx.ops.{DomScheduler, Timer}
 
 import scala.collection.mutable
@@ -38,9 +36,10 @@ object InputBootstrap extends InputHelp {
 
   implicit val scheduler = new DomScheduler()
 
-  val heartBeat = Timer(600.millis)
+  val heartBeat = Timer(1400.millis)
 
   val tileMap = mutable.Map[LatCoord, CanvasContextInfo]()
+  val latMap = mutable.Map[LatCoord, CanvasContextInfo]()
 
   val spareTiles = mutable.Queue[CanvasContextInfo]()
 
@@ -60,17 +59,39 @@ object InputBootstrap extends InputHelp {
       createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
 
     val bHover =
-      createCanvasZeroSquare(bulkSize, burntGold, 0.03D)
+      createCanvasZeroSquare(bulkSize, keywordOrange, 0.03D)
 
     val mHover =
       createCanvasZeroSquare(minSize, methodGold, .1D)
 
     def mkMinTile(c: String) = {
-      val t = createCanvasZeroSquare(minSize, alpha=0D, zIndex=10)
+      val t = createCanvasZeroSquare(
+        minSize, alpha=0D, zIndex=10
+      ).copy(text = Some(c))
       t.moveTo(mLast)
       println("Made tile ", t.absoluteCoords)
       tileMap(t.absoluteCoords) = t
+      latMap(t.latCoords) = t
       Try{t.drawText(c)}
+
+      if (c == "l" &&
+        latMap.get(t.latCoords.left)
+          .exists{_.text.exists{_ == "a"}} &&
+        latMap.get(t.latCoords.left.left)
+          .exists{_.text.exists{_ == "v"}} &&
+      latMap.get(t.latCoords.left.left.left).isEmpty
+      ) {
+        Seq(
+          t,
+        latMap.get(t.latCoords.left).get,
+        latMap.get(t.latCoords.left.left).get
+        ).foreach{
+          z =>
+            z.context.clearRect(0D, 0D, z.tileSize, z.tileSize)
+           z.drawText(z.text.get, keywordOrange)
+        }
+      }
+
       t
     }
 
@@ -81,6 +102,7 @@ object InputBootstrap extends InputHelp {
         q =>
           println("found tilemap ")
           tileMap.remove(k)
+          latMap.remove(mLast.latCoords)
           q.turnOff()
           spareTiles += q
       }
@@ -88,18 +110,24 @@ object InputBootstrap extends InputHelp {
     }
 
     document.onkeydown = (ke: KeyboardEvent) => {
+      val numShifts = if (ke.ctrlKey) {
+        if (ke.altKey) 3 else 2
+      } else 1
+
       ke.keyCode match {
         case KeyCode.backspace =>
           handleBackspace(ke)
         case KeyCode.left =>
-          mLast.shiftLeft()
+          (0 until numShifts).foreach{_ => mLast.shiftLeft()}
         case KeyCode.right =>
-          mLast.shiftRight()
+          (0 until numShifts).foreach{_ =>  mLast.shiftRight()}
         case KeyCode.up =>
-          mLast.shiftUp()
+          (0 until numShifts).foreach{_ =>   mLast.shiftUp()}
         case KeyCode.down =>
-          mLast.shiftDown()
-
+          (0 until numShifts).foreach{_ =>  mLast.shiftDown()}
+        case KeyCode.tab =>
+          ke.preventDefault()
+          mLast.shiftHorizontal(4)
         case _ =>
       }
     }

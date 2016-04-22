@@ -41,7 +41,8 @@ object Schema extends SJSHelp {
   case class CanvasContextInfo(
                               canvas: HTMLCanvasElement,
                               context: CanvasRenderingContext2D,
-                              tileSize: Int = CanvasBootstrap.minSize
+                              tileSize: Int = CanvasBootstrap.minSize,
+                              text: Option[String] = None
                               ) {
     var location = LatCoord(0, 0)
   }
