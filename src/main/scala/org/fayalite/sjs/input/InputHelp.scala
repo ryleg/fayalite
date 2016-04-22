@@ -1,7 +1,7 @@
 package org.fayalite.sjs.input
 
 import org.fayalite.sjs.Schema.LatCoord
-import org.scalajs.dom.raw.MouseEvent
+import org.scalajs.dom.raw.{KeyboardEvent, MouseEvent}
 
 /**
   * Created by aa on 4/20/2016.
@@ -17,5 +17,9 @@ trait InputHelp {
       LatCoord(x,y)
     }
 
+  }
+
+  implicit class KeyHelp(ke: KeyboardEvent) {
+    def keyString = ke.keyCode.toChar.toString
   }
 }

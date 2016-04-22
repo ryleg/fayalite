@@ -1,6 +1,7 @@
 
 package org.fayalite.sjs
 
+import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.scalajs.dom
 import org.scalajs.dom.raw.CanvasRenderingContext2D
 import org.scalajs.dom.raw.HTMLCanvasElement
@@ -39,10 +40,14 @@ object Schema extends SJSHelp {
 
   case class CanvasContextInfo(
                               canvas: HTMLCanvasElement,
-                              context: CanvasRenderingContext2D
-                              )
+                              context: CanvasRenderingContext2D,
+                              tileSize: Int = CanvasBootstrap.minSize
+                              ) {
+    var location = LatCoord(0, 0)
+  }
 
-  case class LatCoord(x: Int, y: Int) {
+  case class LatCoord(x: Int, y: Int)(implicit squareTileSize : Int =
+  CanvasBootstrap.minSize) {
     def *(o: Int) = {
       this.copy(x*o, y*o)
     }
@@ -58,6 +63,13 @@ object Schema extends SJSHelp {
     }
     def +(o: LatCoord) = this.copy(o.x+x, o.y+y)
     def str = s"x:$x,y:$y"
+    def toAbsolute = {
+      LatCoord(x*squareTileSize, y*squareTileSize)
+    }
+    def fromAbsolute = {
+      LatCoord(x/squareTileSize, y/squareTileSize)
+    }
+
   }
 
   case class LatCoordD(x: Double, y: Double) {

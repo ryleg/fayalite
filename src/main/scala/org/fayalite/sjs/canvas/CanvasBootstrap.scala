@@ -12,12 +12,12 @@ object CanvasBootstrap extends CanvasHelp
 with DOMHelp
 {
 
-  val tileXWidth = 300 //w / numDiv
-  val tileYHeight = 300// h / numDiv
+  val minSize = 27
+  val bulkSize = minSize*9
 
   def getTileOn(x: Double, y: Double) = {
-    val xIdx = (x/tileXWidth).toInt
-    val yIdx = (y/tileYHeight).toInt
+    val xIdx = (x/bulkSize).toInt
+    val yIdx = (y/bulkSize).toInt
     xIdx -> yIdx
   }
 
@@ -61,24 +61,23 @@ with DOMHelp
     * initial populator
     */
   def buildTileMatrix() = {
-    val numDiv = 9
 
     val canvasBuilder = (zIndex: Int, tileXIndex: Int, tileYIndex: Int) => {
       val cvTx = createCanvas(zIndex)
       appendBody(cvTx.canvas)
-      cvTx.canvas.width = tileXWidth
-      cvTx.canvas.height = tileYHeight
-      cvTx.canvas.style.left = (tileXIndex * tileXWidth).toString
-      cvTx.canvas.style.top = (tileYIndex * tileYHeight).toString
+      cvTx.canvas.width = bulkSize
+      cvTx.canvas.height = bulkSize
+      cvTx.canvas.style.left = (tileXIndex * bulkSize).toString
+      cvTx.canvas.style.top = (tileYIndex * bulkSize).toString
       cvTx.setBackground(ansiDarkGrey)
       cvTx.setBorder(lightBlue, 1)
-      cvTx.grid(5)
+      cvTx.grid(9)
       cvTx
     }
 
     val skew = 1
 
-    val tileCount: Int = 10 //numDiv * skew
+    val tileCount: Int = 9 //numDiv * skew
 
     val cvs = {
       for (

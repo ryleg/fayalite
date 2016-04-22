@@ -2,7 +2,7 @@
 package org.fayalite.sjs.canvas
 
 import org.fayalite.sjs.SJSHelp
-import org.fayalite.sjs.Schema.{CanvasContextInfo, CanvasStyling, LatCoord}
+import org.fayalite.sjs.Schema.{CanvasContextInfo, CanvasStyling, LatCoord, LatCoordD}
 import org.scalajs.dom
 import org.scalajs.dom._
 import org.scalajs.dom.raw.{CanvasRenderingContext2D, HTMLCanvasElement}
@@ -105,7 +105,8 @@ trait CanvasHelp extends SJSHelp {
 
   implicit class ContextExtensions(ctx: CanvasContextInfo) {
 
-    implicit val ctxi = ctx.context
+    def ctxi = ctx.context
+
 
     def fill(x: Double, y: Double, dx: Double, dy: Double, hexColor: String,
              alpha: Double = 1D) = {
@@ -131,7 +132,7 @@ trait CanvasHelp extends SJSHelp {
       )
     }
 
-    val canv = ctx.canvas
+    def canv = ctx.canvas
 
     def onOff() : Unit = {
       if (isOff()) {
@@ -174,15 +175,61 @@ trait CanvasHelp extends SJSHelp {
     }
 
     def cStyle = ctx.canvas.style
-
     def move(x: Int, y: Int): CanvasContextInfo = {
+      ctx.location = LatCoord(x,y)
       cStyle.left = x.toString
       cStyle.top = y.toString
       ctx
     }
+
     def move(lc: LatCoord): CanvasContextInfo = {
       move(lc.x, lc.y)
     }
+
+    def tileCoordinates(tileSize: Int) = {
+      val x = (left / tileSize).toInt * tileSize
+      val y = (top / tileSize).toInt * tileSize
+      LatCoord(x,y)
+    }
+
+    def squareCoordinates() = {
+      val tileSize = getWidth.toInt
+      val x = (left / tileSize).toInt * tileSize
+      val y = (top / tileSize).toInt * tileSize
+      LatCoord(x,y)
+    }
+
+    def squareIndexCoordinates() = {
+      val tileSize = getWidth.toInt
+      val x = (left / tileSize).toInt
+      val y = (top / tileSize).toInt
+      LatCoord(x,y)
+    }
+
+    def shiftRight() = move(left + ctx.tileSize, top)
+    def shiftUp() = move(left, top - ctx.tileSize)
+    def shiftDown() = move(left, top + ctx.tileSize)
+
+    def shiftLeftCarriage() = if (left > -1*ctx.tileSize) {
+      move(left - ctx.tileSize, top)
+    } else {
+      move(left, top + ctx.tileSize)
+    }
+
+    def onScreen = left > -1*ctx.tileSize
+
+    def latCoords = absoluteCoords.fromAbsolute
+
+    def shiftLeft(): Unit = {
+      if (onScreen)  move(left - ctx.tileSize, top)
+    }
+
+    def shiftDownLeftZero(tileSize: Int) = move(-tileSize, top + tileSize)
+
+    def absoluteCoords = {
+      LatCoord(left, top)
+    }
+
 
     def left = cStyle.left.replaceAll("px", "").toInt
     def top = cStyle.top.replaceAll("px", "").toInt
@@ -196,6 +243,18 @@ trait CanvasHelp extends SJSHelp {
       fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor, alpha) // bottom
       fill(0D, 0D, numPixels.toDouble, getHeight, hexColor, alpha) // left
       fill(getWidth, 0D, -1*numPixels.toDouble, getHeight, hexColor, alpha) // right
+    }
+
+    def drawText(
+                  text: String,
+                  hexColor: String = methodGold,
+                  alpha: Double = 1D,
+                  x: Double = 8D,
+                  y: Double = 20D
+                ) = {
+      color{
+        ctxi.fillText(text, x, y)
+      }(ctxi, hexColor, alpha)
     }
 
   }
@@ -230,10 +289,12 @@ trait CanvasHelp extends SJSHelp {
     cv
   }
 
-  def createCanvasZeroSquare(ds: Int = 60,
+  def createCanvasZeroSquare(ds: Int = CanvasBootstrap.minSize,
                              hexColor: String = burntGold,
-                             alpha: Double = 1D) = {
-    val x = createCanvasWithPosition(0,0,ds,ds)
+                             alpha: Double = 1D,
+                             zIndex: Int = 3
+                            ) = {
+    val x = createCanvasWithPosition(0,0,ds,ds, zIndex)
     x.setBackground(hexColor, alpha)
     x
   }

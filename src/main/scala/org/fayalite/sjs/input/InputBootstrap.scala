@@ -1,12 +1,15 @@
 package org.fayalite.sjs.input
 
-import org.fayalite.sjs.Schema.CanvasContextInfo
+import org.fayalite.sjs.Schema.{CanvasContextInfo, LatCoord}
 import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.fayalite.sjs.canvas.CanvasBootstrap._
 import org.scalajs.dom._
 import org.scalajs.dom.ext.KeyCode
 import rx.core.Obs
 import rx.ops.{DomScheduler, Timer}
+
+import scala.collection.mutable
+import scala.util.Try
 
 /**
   * Setup listeners for inputs from client
@@ -30,7 +33,6 @@ object InputBootstrap extends InputHelp {
     }
   }
 
-
   import scala.concurrent.ExecutionContext.Implicits.global
   import scala.concurrent.duration._
 
@@ -38,49 +40,99 @@ object InputBootstrap extends InputHelp {
 
   val heartBeat = Timer(600.millis)
 
+  val tileMap = mutable.Map[LatCoord, CanvasContextInfo]()
+
+  val spareTiles = mutable.Queue[CanvasContextInfo]()
 
   def init() : Unit = {
     //disableRightClick()
     println("Input bootstrap")
+    //mkMinTile("AD")
 
-    window.onkeydown = (ke: KeyboardEvent) => {
-
-    }
     window.onkeyup = (ke: KeyboardEvent) => {
 
     }
 
+    val mLast =
+      createCanvasZeroSquare(minSize, commentGreen, 0.1D)
 
-    val minTileWidth = tileXWidth / 5
+    val bLast =
+      createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
 
-    val minTileLastClickElement =
-      createCanvasZeroSquare(60, commentGreen, 0.1D)
+    val bHover =
+      createCanvasZeroSquare(bulkSize, burntGold, 0.03D)
 
-    val bulkTileLastClickElement =
-      createCanvasZeroSquare(300, annotationYellow, 0.03D)
+    val mHover =
+      createCanvasZeroSquare(minSize, methodGold, .1D)
 
-    val bulkTileHoverElement =
-      createCanvasZeroSquare(300, burntGold, 0.03D)
+    def mkMinTile(c: String) = {
+      val t = createCanvasZeroSquare(minSize, alpha=0D, zIndex=10)
+      t.moveTo(mLast)
+      println("Made tile ", t.absoluteCoords)
+      tileMap(t.absoluteCoords) = t
+      Try{t.drawText(c)}
+      t
+    }
 
-    val minTileHoverElement =
-      createCanvasZeroSquare(60, methodGold, .1D)
+    def handleBackspace(ke: KeyboardEvent) = {
+      ke.preventDefault()
+      val k = mLast.absoluteCoords.fromAbsolute.left.toAbsolute
+      tileMap.get(k).foreach{
+        q =>
+          println("found tilemap ")
+          tileMap.remove(k)
+          q.turnOff()
+          spareTiles += q
+      }
+      mLast.shiftLeftCarriage()
+    }
 
+    document.onkeydown = (ke: KeyboardEvent) => {
+      ke.keyCode match {
+        case KeyCode.backspace =>
+          handleBackspace(ke)
+        case KeyCode.left =>
+          mLast.shiftLeft()
+        case KeyCode.right =>
+          mLast.shiftRight()
+        case KeyCode.up =>
+          mLast.shiftUp()
+        case KeyCode.down =>
+          mLast.shiftDown()
+
+        case _ =>
+      }
+    }
+
+    document.onkeypress = (ke: KeyboardEvent) => {
+      val chr = ke.keyString
+      println("Key down " + chr)
+      ke.keyCode match {
+        case KeyCode.enter =>
+          mLast.shiftDownLeftZero(minSize)
+        case KeyCode.backspace =>
+          handleBackspace(ke)
+        case kc =>
+      }
+      mkMinTile(chr)
+      mLast.shiftRight()
+    }
     heartBeat.foreach{
       _ =>
-        minTileLastClickElement.onOff()
+        mLast.onOff()
     }
 
     window.onmousedown = (me: MouseEvent) => {
-      val minXY = me.tileCoordinates(60)
-      val bulXY = me.tileCoordinates(300)
-      minTileLastClickElement.move(minXY)
-      bulkTileLastClickElement.move(bulXY)
+      val minXY = me.tileCoordinates(minSize)
+      val bulXY = me.tileCoordinates(bulkSize)
+      mLast.move(minXY)
+      bLast.move(bulXY)
     }
 
     window.onmousemove = (me: MouseEvent) => {
       //println("ON Mouse move")
-        minTileHoverElement.move(me.tileCoordinates(60))
-        bulkTileHoverElement.move(me.tileCoordinates(300))
+        mHover.move(me.tileCoordinates(minSize))
+        bHover.move(me.tileCoordinates(bulkSize))
       }
     }
 }
