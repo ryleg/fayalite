@@ -1,9 +1,12 @@
 package org.fayalite.agg.email
 
 /**
-  * Created by aa on 3/10/2016.
+  * Example code for being able to construct smpt packets
+  * Intended use is for integration with REPL as a streaming
+  * data source. RX/TX
   */
 object Email {
+
   import courier._, Defaults._
   val mailer = Mailer("smtp.gmail.com", 587)
     .auth(true)

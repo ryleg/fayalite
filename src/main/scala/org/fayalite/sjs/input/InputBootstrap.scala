@@ -6,42 +6,51 @@ import org.scalajs.dom._
 import org.scalajs.dom.ext.KeyCode
 import rx.ops.{DomScheduler, Timer}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
+
 import scala.collection.mutable
 import scala.util.Try
+
+
+trait TileCoordinator {
+
+  val absoluteLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
+
+  val indexLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
+
+  val spareTiles = mutable.Queue[CanvasContextInfo]()
+
+  val mLast =
+    createCanvasZeroSquare(minSize, commentGreen, 0.1D)
+
+  val bLast =
+    createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
+
+  val bHover =
+    createCanvasZeroSquare(bulkSize, keywordOrange, 0.03D)
+
+  val mHover =
+    createCanvasZeroSquare(minSize, methodGold, .1D)
+
+
+}
 
 /**
   * Setup listeners for inputs from client
   * in terms of mouse / key actions
   */
-object InputBootstrap extends InputHelp {
+object InputBootstrap extends InputHelp
+with TileCoordinator {
 
-  def processTileMatrix(tm: Array[Array[CanvasContextInfo]]) = {
-
-  }
-
-
-  /**
-    * Prevents browser specific right click context
-    * menu popup. For custom rendering by canvas
-    * of right click handles
-    */
-  def disableRightClick(): Unit = {
-    window.oncontextmenu = (me: MouseEvent) => {
-      me.preventDefault()
-    }
-  }
-
-  import scala.concurrent.ExecutionContext.Implicits.global
-  import scala.concurrent.duration._
-
+  // For any future / thread related stuff use this
   implicit val scheduler = new DomScheduler()
 
+  //Unused temporarily
+  def processTileMatrix(tm: Array[Array[CanvasContextInfo]]) = {}
+
+  // Primary flash rate for the cursor
   val heartBeat = Timer(1400.millis)
-
-  val tileMap = mutable.Map[LatCoord, CanvasContextInfo]()
-  val latMap = mutable.Map[LatCoord, CanvasContextInfo]()
-
-  val spareTiles = mutable.Queue[CanvasContextInfo]()
 
   def init() : Unit = {
     //disableRightClick()
@@ -52,39 +61,27 @@ object InputBootstrap extends InputHelp {
 
     }
 
-    val mLast =
-      createCanvasZeroSquare(minSize, commentGreen, 0.1D)
-
-    val bLast =
-      createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
-
-    val bHover =
-      createCanvasZeroSquare(bulkSize, keywordOrange, 0.03D)
-
-    val mHover =
-      createCanvasZeroSquare(minSize, methodGold, .1D)
-
     def mkMinTile(c: String) = {
       val t = createCanvasZeroSquare(
         minSize, alpha=0D, zIndex=10
       ).copy(text = Some(c))
       t.moveTo(mLast)
       println("Made tile ", t.absoluteCoords)
-      tileMap(t.absoluteCoords) = t
-      latMap(t.latCoords) = t
+      absoluteLatResolve(t.absoluteCoords) = t
+      indexLatResolve(t.latCoords) = t
       Try{t.drawText(c)}
 
       if (c == "l" &&
-        latMap.get(t.latCoords.left)
+        indexLatResolve.get(t.latCoords.left)
           .exists{_.text.exists{_ == "a"}} &&
-        latMap.get(t.latCoords.left.left)
+        indexLatResolve.get(t.latCoords.left.left)
           .exists{_.text.exists{_ == "v"}} &&
-      latMap.get(t.latCoords.left.left.left).isEmpty
+      indexLatResolve.get(t.latCoords.left.left.left).isEmpty
       ) {
         Seq(
           t,
-        latMap.get(t.latCoords.left).get,
-        latMap.get(t.latCoords.left.left).get
+        indexLatResolve.get(t.latCoords.left).get,
+        indexLatResolve.get(t.latCoords.left.left).get
         ).foreach{
           z =>
             z.context.clearRect(0D, 0D, z.tileSize, z.tileSize)
@@ -98,11 +95,11 @@ object InputBootstrap extends InputHelp {
     def handleBackspace(ke: KeyboardEvent) = {
       ke.preventDefault()
       val k = mLast.absoluteCoords.fromAbsolute.left.toAbsolute
-      tileMap.get(k).foreach{
+      absoluteLatResolve.get(k).foreach{
         q =>
           println("found tilemap ")
-          tileMap.remove(k)
-          latMap.remove(mLast.latCoords)
+          absoluteLatResolve.remove(k)
+          indexLatResolve.remove(mLast.latCoords)
           q.turnOff()
           spareTiles += q
       }

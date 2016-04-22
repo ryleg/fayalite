@@ -4,13 +4,10 @@ import org.fayalite.sjs.input.InputBootstrap
 import org.scalajs.dom._
 
 /**
-  * Initialize / cleanup / manage canvas references
-  * across compilation / execution rounds (For now, assume
-  * a single compilation round to prevent errors / ghost nodes)
+  * Accessories for canvas manipulation that
+  * don't belong directly to canvas objects.
   */
-object CanvasBootstrap extends CanvasHelp
-with DOMHelp
-{
+trait CanvasTileUtils extends DOMHelp {
 
   val minSize = 27
   val bulkSize = minSize*9
@@ -21,6 +18,23 @@ with DOMHelp
     xIdx -> yIdx
   }
 
+  def printDebugInfo(): Unit = {
+    println("Adjusted client width " + w)
+    println("Adjusted client height " + h)
+    println("Initializing canvas tiles")
+  }
+
+}
+
+/**
+  * Initialize / cleanup / manage canvas references
+  * across compilation / execution rounds (For now, assume
+  * a single compilation round to prevent errors / ghost nodes)
+  */
+object CanvasBootstrap extends CanvasHelp
+with CanvasTileUtils
+{
+
   /**
     * Start by populating the DOM dynamically with tiled canvases
     * and bg / offscreen ones for later usage. Allocates a fair
@@ -29,20 +43,20 @@ with DOMHelp
     */
   def init() : Unit = {
 
-    println("Adjusted client width " + w)
-    println("Adjusted client height " + h)
-    println("Initializing canvas tiles")
+    // Initialization checks
+    printDebugInfo()
 
+    // Disable scroll bar
     document.body.style.overflow = "hidden"
 
+    // Construct a bunch of canvas nodes each handling
+    // a portion of the screen laid out in a square matrix
     val tm = buildTileMatrix()
 
+    // Supply nodes to input processors for capture
     InputBootstrap.processTileMatrix(tm)
 
-
-
   }
-
 
   /**
     * Canvas is optimized to render on small tiles,

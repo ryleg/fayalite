@@ -10,6 +10,8 @@ import fa._
 /**
   * For querying websites DNS info easily /
   * constructing packets
+  *
+  * INCOMPLETE - To be revisited later
   */
 object DNS {
 
