@@ -1,6 +1,5 @@
 package org.fayalite.ui.app.comm
 
-import org.fayalite.ui.app.state.Input
 import org.scalajs.dom._
 import rx._
 import rx.core.Obs

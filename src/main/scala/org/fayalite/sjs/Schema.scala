@@ -5,6 +5,7 @@ import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.scalajs.dom
 import org.scalajs.dom.raw.CanvasRenderingContext2D
 import org.scalajs.dom.raw.HTMLCanvasElement
+import rx.core.{Rx, Var}
 
 /**
   * Created by aa on 3/17/2016.
@@ -94,6 +95,85 @@ object Schema extends SJSHelp {
     def str = s"x:$x,y:$y"
   }
 
+  case class ChiralCell(
+                         side: Either[LatCoord, LatCoord]
+                       ) {
+    val offset = side match {
+      case Left(lc) => lc
+      case Right(lc) => lc.copy(x=lc.x+1)
+    }
+  }
+
+
+  implicit def d2tolc(d2: (Double, Double)) : LatCoordD = {
+    LatCoordD(d2._1, d2._2)
+  }
+
+  implicit def i2tolc(d2: (Int, Int)) : LatCoordD = {
+    LatCoordD(d2._1, d2._2)
+  }
+
+  implicit def i2t2olc(d2: (Int, Int)) : LatCoord = {
+    LatCoord(d2._1, d2._2)
+  }
+
+  /*
+  // This kills rx.ops._ import carefully. Or make a nested class.
+    implicit class RxOps[T](rxx: Rx[T]) {
+      def reset(f: => T) = {
+        rxx.parents.map{q => Try{q.asInstanceOf[Var[T]]() = f}}
+      }
+    }
+  */
+
+  def xy(x: Double = 0D, y: Double = 0D): LatCoordD = LatCoordD(x,y)
+  def xyi(x: Int = 0, y: Int = 0): LatCoord = LatCoord(x,y)
+  def vl(x: Int = 0, y: Int = 0) = Var(xyi(x,y))
+  //def vl(x: Int = 0) = Var(xyi(x,x))
+
+  implicit class RxOpsExt[T](t: T) {
+    def v = Var(t)
+    def rx = Rx{t}
+  }
+
+  def lc0 = LatCoord(0, 0)
+  def lcd0 = LatCoordD(0D, 0D)
+  def l0 = Var{LatCoord(0, 0)}
+  def ld0 = Var{LatCoordD(0D, 0D)}
+  def l20 = Var{LatCoord2(LatCoord(0, 0),LatCoord(0, 0))}
+  def ld20 = Var{LatCoord2D(lcd0, lcd0)}
+
+  type LC = LatCoord
+  type LCD = LatCoordD
+  type LC2 = LatCoord2
+  type LC2D = LatCoord2D
+  type VL = Var[LatCoord]
+  type VLD = Var[LatCoordD]
+  type VL2 = Var[LatCoord2]
+  type VL2D = Var[LatCoord2D]
+
+  case class LatCoord2(xy: LatCoord, xy2: LatCoord) {
+    def str = xy.str + "|" + xy2.str
+  }
+
+  case class LatCoord2D(xy: LatCoordD, xy2: LatCoordD) {
+    def str = xy.str + "|" + xy2.str
+    def x = xy.x
+    def y = xy.y
+    def dx = xy2.x
+    def dy = xy2.y
+    def plus1(other: LCD) = {
+      this.copy(xy = other.+(this.xy))
+    }
+  }
+
+  case class XYI(x: Var[Int], y: Var[Int]) {
+    def plus(other: XYI) = {
+      this.copy(
+        x=Var(x() + other.x()), y=Var(y() + other.y())
+      )
+    }
+  }
 
 }
 

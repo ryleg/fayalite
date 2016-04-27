@@ -17,12 +17,23 @@ trait TileCoordinator {
 
   val absoluteLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
 
+  /**
+    *
+    */
   val indexLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
 
+  /**
+    * It's easier to just re-use tiles than modify the DOM
+    */
   val spareTiles = mutable.Queue[CanvasContextInfo]()
 
+  /**
+    * Last click element, a single canvas that moves around
+    * representing location of last clicked element
+    */
   val mLast =
     createCanvasZeroSquare(minSize, commentGreen, 0.1D)
+
 
   val bLast =
     createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
@@ -32,6 +43,34 @@ trait TileCoordinator {
 
   val mHover =
     createCanvasZeroSquare(minSize, methodGold, .1D)
+
+  def reactIsValModifier(c: String, t: CanvasContextInfo) = {
+    if (c == "l" &&
+      indexLatResolve.get(t.latCoords.left)
+        .exists {
+          _.text.exists {
+            _ == "a"
+          }
+        } &&
+      indexLatResolve.get(t.latCoords.left.left)
+        .exists {
+          _.text.exists {
+            _ == "v"
+          }
+        } &&
+      indexLatResolve.get(t.latCoords.left.left.left).isEmpty
+    ) {
+      Seq(
+        t,
+        indexLatResolve.get(t.latCoords.left).get,
+        indexLatResolve.get(t.latCoords.left.left).get
+      ).foreach {
+        z =>
+          z.context.clearRect(0D, 0D, z.tileSize, z.tileSize)
+          z.drawText(z.text.get, keywordOrange)
+      }
+    }
+  }
 
 
 }
@@ -71,23 +110,7 @@ with TileCoordinator {
       indexLatResolve(t.latCoords) = t
       Try{t.drawText(c)}
 
-      if (c == "l" &&
-        indexLatResolve.get(t.latCoords.left)
-          .exists{_.text.exists{_ == "a"}} &&
-        indexLatResolve.get(t.latCoords.left.left)
-          .exists{_.text.exists{_ == "v"}} &&
-      indexLatResolve.get(t.latCoords.left.left.left).isEmpty
-      ) {
-        Seq(
-          t,
-        indexLatResolve.get(t.latCoords.left).get,
-        indexLatResolve.get(t.latCoords.left.left).get
-        ).foreach{
-          z =>
-            z.context.clearRect(0D, 0D, z.tileSize, z.tileSize)
-           z.drawText(z.text.get, keywordOrange)
-        }
-      }
+      reactIsValModifier(c, t)
 
       t
     }

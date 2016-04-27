@@ -61,8 +61,7 @@ with CanvasTileUtils
   /**
     * Canvas is optimized to render on small tiles,
     * we choose a magic number of 9 divs and split up
-    * the screen into a bunch of tiles based on initial client
-    * height with a factor of 3 times as many tiles in each direction
+    * the screen into a bunch of tiles
     * as the size of the clients screen. The extra tiles are not
     * rendered and can be used as spares for moving on / offscreen
     * or for jumping up / down in z-Index and overlapping

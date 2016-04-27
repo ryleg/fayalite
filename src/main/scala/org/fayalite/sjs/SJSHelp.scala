@@ -134,6 +134,78 @@ trait SJSHelp extends HTMLHexColorSchemes
     new Date().getTime()
   }
 
+
+
+
+  implicit class nld(nl: NodeList){
+    def toList = (0 until nl.length).map{i => (nl.item(i))}
+    def map[B](f: Node => B) = {
+      (0 until nl.length).map{i => f(nl.item(i))}
+    }
+  }
+
+    /*
+    val files: dom.FileList = fi.asInstanceOf[dom.DataTransfer].files
+    log.childNodes.map{n => log.removeChild(n)}
+    if (files.length == 0 ) {
+      log ac mkText("Select a file; required for upload.")
+    } else {
+      //   println("numfiles " + files.length)
+      log ac mkText("Reading file into memory; ")
+      (0 until files.length) foreach {
+        it =>
+          val i: dom.File = files.item(it)
+          val tz = i.slice(0, i.size, "text/plain")
+          val tx = new dom.FileReader()
+          tx.readAsText(tz)
+          tx.onload = (_: Event) => {
+            log ac mkText("Loaded file into memory; uploading to server; ")
+            //       println(tx.result)
+            val s3: String = tx.result.asInstanceOf[String]
+            mkRequest("file" + i.name + "|" + s3)
+            log ac mkText("Finished upload")
+          }
+      }
+    }
+  }*/
+
+  implicit class hteee(h: HTMLElement) {
+    def withClick(f: MouseEvent => Unit) = {
+      h.onclick = f
+      h //how can we generalize this idea
+      // of returning the original object while
+      // still add a withClick handler for something else?
+      // its really a monad of any sort of edge on the original?
+    }
+    def withHover(
+                   f: MouseEvent => Unit, g: HTMLElement => Unit,
+                   ff: MouseEvent => Unit, gg: HTMLElement => Unit) = {
+      h.onmouseenter = (m : MouseEvent ) => {
+        f(m)
+        g(h)
+      }
+      h.onmouseleave = (m : MouseEvent ) => {
+        ff(m)
+        gg(h)
+      }
+      h
+    }
+    def childs = {
+      List.tabulate(h.childNodes.length){
+        h.childNodes.apply
+      }
+    }
+    def clearAll = {
+      h.childs.foreach {
+        c =>
+          c.parentNode.removeChild(c)
+      }
+      h
+    }
+  }
+
+
+
 }
 
 

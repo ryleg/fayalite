@@ -23,6 +23,7 @@ class MagicSparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
   // into repl dynamically
   override def initializeSpark() = {}
   override def printWelcome() = {}
+
   private var globalFuture: Future[Boolean] = _
 
 
@@ -111,13 +112,11 @@ class MagicSparkILoop(in0: Option[BufferedReader], out: JPrintWriter)
 class SparkREPLManager extends REPLManagerLike {
 
   def start(
-             in: BufferedReader,
-             out: JPrintWriter,
              namePrefix: String = "repl",
-             args: Array[String],
+             args: Array[String] = Array[String](),
              rootDir: String = ".",
-             jars: String,
-             settingsErrorHandler: (String => Unit)
+             jars: String = "",
+             settingsErrorHandler: (String => Unit) = println
            ) = {
 
     val outputDir = UtilsAux.createTempDir(rootDir, namePrefix)
@@ -134,8 +133,11 @@ class SparkREPLManager extends REPLManagerLike {
     val iLoop = new MagicSparkILoop(Some(iLoopBufferedReader),
       iLoopOutputCatch)
 
-
   }
+
+  start()
+
+
 
 
 }

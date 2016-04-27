@@ -1,4 +1,4 @@
-package org.fayalite.ui.app.state
+package org.fayalite.sjs
 
 import scala.scalajs.js
 import scala.scalajs.js._
@@ -8,7 +8,7 @@ import scala.scalajs.js._
  * Incomplete.
  */
 object Dynamo {
-  
+
   def eval(pm: Dynamic) = {
     js.eval(pm.code.toString)
     val curBridge = "dynamic-bridge"

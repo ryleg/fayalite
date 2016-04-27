@@ -3,8 +3,23 @@ package org.fayalite.ml.yahoo.finance
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+import fa._
 
 import com.github.tototoshi.csv.CSVReader
+
+/**
+  * Yahoo historical CSVs per company
+  */
+object YahooParse {
+  val hidden = new File(".hidden")
+  val yahooCompanyCSVs = new File(hidden, "yahoo")
+  def getRows = {
+   yahooCompanyCSVs.listFiles.map{
+     z => readLines()
+   }
+  }
+
+}
 
 /**
   * Created by aa on 4/20/2016.
@@ -13,7 +28,6 @@ object TensorBuild {
 
   case class TimeIdentifiedRow(date: Date, unparsedDat: Seq[Int])
 
-  import fa._
   val h = new File(".hidden")
 
   val hqp = new File(h, "yahoo2")

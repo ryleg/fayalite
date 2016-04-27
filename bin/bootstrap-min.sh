@@ -1,3 +1,6 @@
+
+#For building spark quick
+
 sudo apt-get update
 sudo apt-get install -y git openjdk-7-jdk
 git clone https://github.com/ryleg/fayalite
