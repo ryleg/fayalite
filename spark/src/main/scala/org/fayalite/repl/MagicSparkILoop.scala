@@ -138,6 +138,24 @@ class SparkREPLManager extends REPLManagerLike {
   start()
 
 
+}
 
 
+object SparkREPLManager {
+  def main(args: Array[String]) {
+
+    val srm = new SparkREPLManager()
+
+    Thread.sleep(5000)
+
+    srm.write("val x = 1")
+
+    Thread.sleep(Long.MaxValue)
+
+
+
+
+
+
+  }
 }

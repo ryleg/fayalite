@@ -3,7 +3,6 @@ package org.fayalite.agg
 import java.io.File
 
 import fa._
-import org.fayalite.util.JSON
 import rx._
 
 /**

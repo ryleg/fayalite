@@ -34,7 +34,6 @@ trait TileCoordinator {
   val mLast =
     createCanvasZeroSquare(minSize, commentGreen, 0.1D)
 
-
   val bLast =
     createCanvasZeroSquare(bulkSize, annotationYellow, 0.03D)
 
@@ -72,6 +71,32 @@ trait TileCoordinator {
     }
   }
 
+  def handleBackspace(ke: KeyboardEvent) = {
+    ke.preventDefault()
+    val k = mLast.absoluteCoords.fromAbsolute.left.toAbsolute
+    absoluteLatResolve.get(k).foreach{
+      q =>
+       // println("found tilemap ")
+        absoluteLatResolve.remove(k)
+        indexLatResolve.remove(mLast.latCoords)
+        q.turnOff()
+        spareTiles += q
+    }
+    mLast.shiftLeftCarriage()
+  }
+
+  def mkMinTile(c: String) = {
+    val t = createCanvasZeroSquare(
+      minSize, alpha=0D, zIndex=10
+    ).copy(text = Some(c))
+    t.moveTo(mLast)
+  //  println("Made tile ", t.absoluteCoords)
+    absoluteLatResolve(t.absoluteCoords) = t
+    indexLatResolve(t.latCoords) = t
+    Try{t.drawText(c)}
+    reactIsValModifier(c, t)
+    t
+  }
 
 }
 
@@ -91,42 +116,15 @@ with TileCoordinator {
   // Primary flash rate for the cursor
   val heartBeat = Timer(1400.millis)
 
+  var codeSample = ""
+
   def init() : Unit = {
-    //disableRightClick()
+    //disableRightClick() // TODO : Enable when scrolling is implemented
     println("Input bootstrap")
     //mkMinTile("AD")
 
     window.onkeyup = (ke: KeyboardEvent) => {
 
-    }
-
-    def mkMinTile(c: String) = {
-      val t = createCanvasZeroSquare(
-        minSize, alpha=0D, zIndex=10
-      ).copy(text = Some(c))
-      t.moveTo(mLast)
-      println("Made tile ", t.absoluteCoords)
-      absoluteLatResolve(t.absoluteCoords) = t
-      indexLatResolve(t.latCoords) = t
-      Try{t.drawText(c)}
-
-      reactIsValModifier(c, t)
-
-      t
-    }
-
-    def handleBackspace(ke: KeyboardEvent) = {
-      ke.preventDefault()
-      val k = mLast.absoluteCoords.fromAbsolute.left.toAbsolute
-      absoluteLatResolve.get(k).foreach{
-        q =>
-          println("found tilemap ")
-          absoluteLatResolve.remove(k)
-          indexLatResolve.remove(mLast.latCoords)
-          q.turnOff()
-          spareTiles += q
-      }
-      mLast.shiftLeftCarriage()
     }
 
     document.onkeydown = (ke: KeyboardEvent) => {
@@ -135,16 +133,18 @@ with TileCoordinator {
       } else 1
 
       ke.keyCode match {
+        case KeyCode.a if ke.ctrlKey =>
+          println("Cell capture attempt ")
         case KeyCode.backspace =>
           handleBackspace(ke)
         case KeyCode.left =>
           (0 until numShifts).foreach{_ => mLast.shiftLeft()}
         case KeyCode.right =>
-          (0 until numShifts).foreach{_ =>  mLast.shiftRight()}
+          (0 until numShifts).foreach{_ => mLast.shiftRight()}
         case KeyCode.up =>
-          (0 until numShifts).foreach{_ =>   mLast.shiftUp()}
+          (0 until numShifts).foreach{_ => mLast.shiftUp()}
         case KeyCode.down =>
-          (0 until numShifts).foreach{_ =>  mLast.shiftDown()}
+          (0 until numShifts).foreach{_ => mLast.shiftDown()}
         case KeyCode.tab =>
           ke.preventDefault()
           mLast.shiftHorizontal(4)
@@ -154,10 +154,18 @@ with TileCoordinator {
 
     document.onkeypress = (ke: KeyboardEvent) => {
       val chr = ke.keyString
-      println("Key down " + chr)
+      codeSample += chr
+     // println("Key down " + chr)
       ke.keyCode match {
         case KeyCode.enter =>
           mLast.shiftDownLeftZero(minSize)
+          println("Code sample " + codeSample)
+
+          val xhr = new XMLHttpRequest()
+
+      //    xhr.open("GET")
+
+
         case KeyCode.backspace =>
           handleBackspace(ke)
         case kc =>
@@ -165,6 +173,7 @@ with TileCoordinator {
       mkMinTile(chr)
       mLast.shiftRight()
     }
+
     heartBeat.foreach{
       _ =>
         mLast.onOff()

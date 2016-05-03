@@ -1,17 +1,14 @@
 package org.fayalite.agg
 
-import java.awt.{Dimension, BorderLayout}
+import java.awt.BorderLayout
 import java.awt.event.{ActionEvent, ActionListener}
 import java.io.File
 import javax.swing._
 import javax.swing.event.{ListSelectionEvent, ListSelectionListener}
 
 import fa.Schema.Cookie
-import fa._
-import org.fayalite.agg.demo.{MailTesterDemo, LinkedInCrawlDemo}
-import org.fayalite.repl.REPLFrame
-import org.fayalite.ui.j2d.{ToyFrame, FButton}
-import rx._
+import org.fayalite.agg.demo.{LinkedInCrawlDemo, MailTesterDemo}
+import org.fayalite.ui.j2d.{FButton, ToyFrame}
 
 import scala.util.Try
 
@@ -28,15 +25,14 @@ object SelExample {
 
 }
 
-abstract class QuickPanel
-(title: String)
-(implicit parentPanel: JPanel,
- childToParentLayout: String
-) extends KVStore {
+abstract class QuickPanel(title: String)(implicit parentPanel: JPanel,
+ childToParentLayout: String) extends KVStore {
+
   val subPanel = new JPanel()
   val descr = new JLabel(title)
   subPanel.add(descr)
   parentPanel.add(subPanel, childToParentLayout)
+
   def button(s: String, t: => Unit) = {
     subPanel.add(new FButton(s, () => t).jButton)
   }
@@ -45,18 +41,17 @@ abstract class QuickPanel
     subPanel.add(jl)
     jl
   }
+
 }
 
 class QuickFile(title: String, val proc: File => Unit)
                (implicit parentPanel: JPanel)
- extends QuickPanel(title)(parentPanel, BorderLayout.CENTER) {
+  extends QuickPanel(title)(parentPanel, BorderLayout.CENTER) {
   val slf = new JLabel("no file selected")
   val fc = new JFileChooser()
 
   var lastSelectedFile : File = Try{
     new File(read[String]("lastSelectedFile" + title) )}.getOrElse(null)
-
-
 
 
   val but = new FButton("Select File",
@@ -71,9 +66,9 @@ class QuickFile(title: String, val proc: File => Unit)
     }
   })
   subPanel.add(slf)
- // subPanel.add(fc)
+  // subPanel.add(fc)
   subPanel.add(but)
-  }
+}
 
 
 class MicroList(
@@ -110,26 +105,26 @@ class SelExample extends KVStore {
 
   te.finish()
 
-/*
-  te.jp.add(new JLabel("Native Scala REPL"))
-  val tb = new JTextField("val x = 1")
-  val co = new JTextArea(10, 10)
-  co.setEditable(false)
-  val sp = new JScrollPane(co)
-  sp.setMaximumSize(  new Dimension(500, 500))
-  parPanel.add(sp)
-  parPanel.add(tb)
-  val rr = new REPLFrame()
-  tb.addActionListener(new ActionListener{
-    override def actionPerformed(e: ActionEvent): Unit = {
-      println("new action event " + e.getActionCommand)
-       val out = rr.nr.interpret(tb.getText)
-      co.setText(co.getText + "\n" + out)
-    }
-  })
+  /*
+    te.jp.add(new JLabel("Native Scala REPL"))
+    val tb = new JTextField("val x = 1")
+    val co = new JTextArea(10, 10)
+    co.setEditable(false)
+    val sp = new JScrollPane(co)
+    sp.setMaximumSize(  new Dimension(500, 500))
+    parPanel.add(sp)
+    parPanel.add(tb)
+    val rr = new REPLFrame()
+    tb.addActionListener(new ActionListener{
+      override def actionPerformed(e: ActionEvent): Unit = {
+        println("new action event " + e.getActionCommand)
+         val out = rr.nr.interpret(tb.getText)
+        co.setText(co.getText + "\n" + out)
+      }
+    })
 
 
-*/
+  */
 
 
 

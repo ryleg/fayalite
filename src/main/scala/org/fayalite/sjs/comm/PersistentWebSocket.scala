@@ -1,8 +1,5 @@
 package org.fayalite.ui.app.comm
 
-import org.fayalite.ui.app.canvas.Schema
-import org.fayalite.ui.app.state.StateSync.ParseRequest
-import org.fayalite.ui.app.state.Input
 import org.scalajs.dom.{Event, MessageEvent, WebSocket}
 import rx._
 import rx.core.Obs

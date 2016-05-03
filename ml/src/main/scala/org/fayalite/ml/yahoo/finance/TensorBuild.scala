@@ -3,36 +3,206 @@ package org.fayalite.ml.yahoo.finance
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
+
 import fa._
 
-import com.github.tototoshi.csv.CSVReader
+
 
 /**
   * Yahoo historical CSVs per company
   */
 object YahooParse {
+
   val hidden = new File(".hidden")
   val yahooCompanyCSVs = new File(hidden, "yahoo")
-  def getRows = {
+  val dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd")
+
+  /**
+    * Fixes parsing errors due to missing rows or an
+    * invalid header being processed
+    * @param row : Yahoo historical CSV row
+    * @return : Whether to discard
+    */
+  def rowExclusionCritera(row: Seq[String]) = {
+    if (row.nonEmpty) {
+      row.head != "" && row.head != "Date"
+    } else false
+  }
+
+  case class HistoricalObservation(
+                                  date: Date,
+                                  open: Double,
+                                  high: Double,
+                                  low: Double,
+                                  close: Double,
+                                  volume: Int,
+                                  adjustedClose: Double
+                                  )
+
+  def parseRow(row: Seq[String]) = {
+    val t = dateTimeFormat.parse(row.head)
+    val r = row.tail
+    HistoricalObservation(
+      t,
+      r(0).toDouble, r(1).toDouble, r(2).toDouble,
+      r(3).toDouble, r(4).toInt, r(5).toDouble
+    )
+  }
+
+  case class CompanyHistory(company: String, history: Seq[HistoricalObservation])
+
+  /**
+    * Return image of stock data organized by company
+    * and sequence of date observations (data is missing)
+    * @return Local collection of historical observations by company
+    */
+  def getHistory = {
    yahooCompanyCSVs.listFiles.map{
-     z => readLines()
+     z =>
+       val csv = readCSV(z.getAbsolutePath)
+       val parsed = csv
+         .tail
+         .filter{rowExclusionCritera}
+         .map{parseRow}
+       CompanyHistory(z.getName, parsed)
    }
   }
 
 }
 
-/**
-  * Created by aa on 4/20/2016.
-  */
 object TensorBuild {
 
-  case class TimeIdentifiedRow(date: Date, unparsedDat: Seq[Int])
+  import YahooParse._
+
+  val numSigFigPerDouble = 1e6
+
+  implicit class SeqOpTens[T](s: Seq[T]) {
+    def index[B](f: T => B)(implicit ordr: Ordering[B]) = {
+      s.map{f}.distinct.sorted.zipWithIndex.toMap
+    }
+    def flatIndex[B](f: T => Seq[B])(implicit ordr: Ordering[B]) = {
+      s.flatMap{f}.distinct.sorted.zipWithIndex.toMap
+    }
+  }
+
+  case class TimeDeltaActual(
+                             seqDiff: Seq[Int],
+                             deltaDays: Short,
+                             deltaVolume: Int
+                           )
+
+  case class TimeDeltaPrepForm(
+                                observesToTrackDeltaOn: Seq[Int],
+                                volume: Int,
+                                date: Date
+                      ) {
+    def compare(other: TimeDeltaPrepForm) = {
+      val dx = observesToTrackDeltaOn
+        .zip(other.observesToTrackDeltaOn)
+        .map{
+        case (x,y) => x - y
+      }
+      val dd = (date.getTime - other.date.getTime).toShort
+      val dv = volume - other.volume
+      TimeDeltaActual(dx, dd, dv)
+    }
+  }
+
+  case class DeltaEncodedRowObservation(
+                                         encodedCompany: Short,
+                                         originalRow: TimeDeltaPrepForm,
+                                         offsetDeltas: Seq[TimeDeltaActual]
+  )
+
+  case class PreDeltaFullEncodingCompanyObservation(
+                                                   decRowObs: DeltaEncodedRowObservation
+                                                   )
+
+  case class CompanyTradeWindows(companySymbol: String )
+
+  def buildTradeWindows(history: Seq[YahooParse.CompanyHistory]) = {
+
+    history.map{
+      q =>
+        q.company
+
+        q.history.map{
+          x => x
+        }
+
+
+    }
+
+
+  }
+
+  def recodeObservations() = {
+
+  }
+
+
+  def main(args: Array[String]) {
+
+    val h = YahooParse.getHistory.toSeq
+
+    val tradeWindows = buildTradeWindows(h)
+
+
+    val cIdx = h.index{_.company}.mv{_.toShort}.toMap
+
+    val deltaEncoded = h.map{
+      c =>
+
+        val cs = cIdx(c.company)
+
+        val seqOb = c.history.map{
+          ho =>
+            val dbls = Seq(ho.open, ho.close, ho.high, ho.low, ho.adjustedClose)
+            val intEncFeat = dbls.map{z => (z*numSigFigPerDouble).toInt}
+            TimeDeltaPrepForm(intEncFeat, ho.volume, ho.date)
+        }
+
+        // Here we are only keeping track of changes from the
+        // original row observation to reduce redundancy
+        val recodeDeltaNeighbor = seqOb.tail.zipWithIndex.map{
+          case (m, i) =>
+            val neighborPrevious = seqOb(i)
+            val deltaNeighbor = m.compare(neighborPrevious)
+            deltaNeighbor
+        }
+
+        val originalObserve = seqOb.head
+
+        DeltaEncodedRowObservation(cs, originalObserve, recodeDeltaNeighbor)
+    }
+
+    val offsetIdx = deltaEncoded.flatIndex{q =>
+      q.offsetDeltas.flatMap{_.seqDiff}
+    }
+
+/*
+    deltaEncoded.map{
+      d =>
+        d.offsetDeltas.map{_ offsetIdx.get}
+
+    }
+*/
+
+
+
+
+
+
+  }
+
+/*  case class TimeIdentifiedRow(date: Date, unparsedDat: Seq[Int])
 
   val h = new File(".hidden")
 
   val hqp = new File(h, "yahoo2")
   val hqp3 = new File(h, "yahoo3")
   hqp3.mkdir()
+
   def main(args: Array[String]): Unit = {
 
     val j = hqp.listFiles().map{
@@ -137,4 +307,6 @@ object TensorBuild {
        true
    }
   }
+  */
+
 }

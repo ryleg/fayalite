@@ -1,8 +1,8 @@
 package org.fayalite.agg
 
-import java.awt.event.KeyEvent
-import java.awt.{Toolkit, Robot}
 import java.awt.datatransfer.StringSelection
+import java.awt.event.KeyEvent
+import java.awt.{Robot, Toolkit}
 
 import fa.Schema._
 import fa._
@@ -13,7 +13,7 @@ import rx._
 
 import scala.collection.JavaConversions
 
-object SeleniumChrome {
+object SeleniumChrome extends SeleniumHelp {
 
   /**
     * This works for an authenticated proxy but it forces a

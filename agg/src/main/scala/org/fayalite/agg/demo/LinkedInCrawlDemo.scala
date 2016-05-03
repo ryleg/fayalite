@@ -15,12 +15,6 @@ import org.fayalite.agg.{QuickFile, QuickPanel, SeleniumChrome}
 class LinkedInCrawlDemo()(implicit parentPanel: JPanel)
   extends QuickPanel("LinkedIn Demo")(parentPanel, BorderLayout.NORTH) {
 
-  store("test", Map("yo" -> 1))
-
-  val back = read[Map[String, Int]]("test")
-
-  println(back)
-
   var cb : SeleniumChrome = null
 
   button("Open browser for cookie saving", {

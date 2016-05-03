@@ -2,20 +2,14 @@ package org.fayalite.agg.demo
 
 import java.awt.BorderLayout
 import java.io.File
-import java.util.concurrent.Executors
 import javax.swing.{JComboBox, JPanel}
 
 import com.github.tototoshi.csv.CSVWriter
 import org.fayalite.agg.MailTester.{Name, EmailGuessRequirements}
 import org.fayalite.agg.demo.EmailTester.{ProcessLine, EmailTestResults}
 import org.fayalite.agg._
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import rx.Var
-
 import scala.collection.{mutable, JavaConversions}
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success, Try}
-
+import scala.concurrent.{Future}
 import fa._
 
 object EmailTester {

@@ -95,6 +95,7 @@ object Schema extends SJSHelp {
     def str = s"x:$x,y:$y"
   }
 
+/*
   case class ChiralCell(
                          side: Either[LatCoord, LatCoord]
                        ) {
@@ -103,6 +104,7 @@ object Schema extends SJSHelp {
       case Right(lc) => lc.copy(x=lc.x+1)
     }
   }
+*/
 
 
   implicit def d2tolc(d2: (Double, Double)) : LatCoordD = {

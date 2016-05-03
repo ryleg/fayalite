@@ -1,6 +1,5 @@
 import java.util.concurrent.Executors
 
-import org.fayalite.agg.SeleniumHelp
 import org.fayalite.util.dsl._
 import org.fayalite.util.img.ImageHelp
 
@@ -24,7 +23,6 @@ with HTMLParsingHelpers
 with StringFormatHelpers
 with FileHelpUtilities
 with CommonJunk
-with SeleniumHelp
 with ImageHelp
 {
 
@@ -46,5 +44,4 @@ with HTMLParsingHelpers
 with StringFormatHelpers
 with FileHelpUtilities
 with CommonJunk
-with SeleniumHelp
 with ImageHelp

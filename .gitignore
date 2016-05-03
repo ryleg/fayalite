@@ -30,3 +30,6 @@ phantomjs
 *.exe
 Thumbs.db
 lib
+
+# For repl class directories
+repl-*

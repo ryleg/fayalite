@@ -16,22 +16,21 @@ import spray.routing.{RoutingSettings, StandardRoute, HttpServiceActor}
   * loop for deployed actors. Dead simple, no
   * side effects allowed. Process loop in a vacuum
   */
-trait MessageProcesser extends spray.routing.Directives {
-
-  // For making getFromFile work
+trait MessageProcesser
+  extends spray.routing.Directives // For making getFromFile work
+{
 
   /**
     * Reassign to this to fill out your server deployment
     * with some effect processed on Websocket UTF-8 msgs
     */
-  val process: Var[
-    ((String, ActorRef) =>
-      Unit)]
+  val process: Var[((String, ActorRef) => Unit)]
 
   /**
     * The route for REST requests to be processed
     */
   val route: Var[(akka.actor.ActorRefFactory => routing.Route)]
+
 
   /**
     * Allows use of ScalaTags to render HTML
@@ -48,6 +47,15 @@ trait MessageProcesser extends spray.routing.Directives {
       html
     }
   }
+
+  /**
+    * Same idea as above but allows spray to complete directly
+    * with JS string file contents
+    * @param js : File contents of a standard .js as a single string
+    * @return : Routing directive allowing that .js to be served
+    *         avoiding the use of getFromFile to allow .js to be served
+    *         out of a virtual file system / DB
+    */
   def completeWithJS(js: String): StandardRoute = {
     import spray.http.MediaTypes._
     respondWithMediaType(`application/javascript`) & complete {

@@ -1,18 +1,19 @@
 package org.fayalite.agg
 
 import java.util
+
 import org.fayalite.agg.ProxyManager.ProxyDescr
-import org.openqa.selenium.phantomjs.{PhantomJSDriverService, PhantomJSDriver}
+import org.openqa.selenium.phantomjs.{PhantomJSDriver, PhantomJSDriverService}
 import org.openqa.selenium.remote.DesiredCapabilities
 
-import scala.concurrent.{Future, ExecutionContext}
+import scala.concurrent.Future
 import scala.util.Try
 
 
 /**
   * PhantomJS utility stuff.
   */
-object PJS {
+object PJS extends SeleniumHelp {
 
   import scala.sys.process._
 
