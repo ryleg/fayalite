@@ -9,6 +9,15 @@ object FayaliteBuild extends sbt.Build {
   addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.2")
   bintray.BintrayKeys.bintrayVcsUrl := Some("git@github.com:ryleg/fayalite.git")
 
+  val scalaV = "2.11.6"
+  val fayaliteVersion = "0.0.5"
+
+  val scalaDeps = Seq(
+    "org.scala-lang"    %   "scala-compiler"      % scalaV withJavadoc() withSources(),
+    "org.scala-lang"    %   "scala-library"       % scalaV withJavadoc() withSources(),
+    "org.scala-lang"    %   "scala-reflect"       % scalaV withJavadoc() withSources()
+  )
+
   override lazy val settings = super.settings ++
     Seq(
       resolvers := Seq(
@@ -110,7 +119,7 @@ object FayaliteBuild extends sbt.Build {
     base = file(".")).settings(
     name := "fayalite",
     organization := "fayalite",
-    version := "0.0.4",
+    version := fayaliteVersion,
     scalaVersion := "2.11.6"
   )
 
@@ -118,14 +127,17 @@ object FayaliteBuild extends sbt.Build {
     id = "common",
     base = file("./common")).settings(
     scalaVersion := "2.11.6",
-    libraryDependencies := Seq()
+    organization := "fayalite",
+    version := fayaliteVersion
   )
 
   lazy val core = Project(
     id = "core",
     base = file("./core")).settings(
     scalaVersion := "2.11.6",
-    libraryDependencies := allDeps
+    organization := "fayalite",
+    version := fayaliteVersion,
+    libraryDependencies := allDeps ++ scalaDeps
   ) dependsOn common
 
   lazy val ml = Project(
@@ -142,10 +154,12 @@ object FayaliteBuild extends sbt.Build {
     id = "agg",
     base = file("./agg")).settings(
     scalaVersion := "2.11.6",
+    organization := "fayalite",
+    version := fayaliteVersion,
     libraryDependencies := Seq(
       "me.lessis" %% "courier" % "0.1.3" withSources() withJavadoc(),
       "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
-    )
+    ) ++ scalaDeps
   ) dependsOn core
 
 
