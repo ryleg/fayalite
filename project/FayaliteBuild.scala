@@ -21,7 +21,7 @@ object FayaliteBuild extends sbt.Build {
   override lazy val settings = super.settings ++
     Seq(
       resolvers := Seq(
-        "bintray" at "http://jcenter.bintray.com",
+        "bintray" at "http://jcenter.bintray.com", // For bintray plugin stuff
         "softprops-maven" at "http://dl.bintray.com/content/softprops/maven",
         "mvnrepository" at "http://mvnrepository.com/artifact/",
         "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",

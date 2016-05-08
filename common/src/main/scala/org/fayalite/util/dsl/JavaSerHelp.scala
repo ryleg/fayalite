@@ -78,5 +78,9 @@ trait JavaSerHelp {
       isWrapper.close()
     }
   }*/
-
+  /*  implicit def dataBytesToIntBuffer(db: Array[Byte]) = {
+      ByteBuffer.wrap(db)
+        .order(ByteOrder.nativeOrder())
+        .asIntBuffer()
+    }*/
 }

@@ -335,7 +335,7 @@ object Yahoo extends YahooFinanceRequestor
     s"/table.csv?s=$s" +
     "&d=3&e=9&f=2016&g=d&a=3&b=12&c=1996&ignore=.csv"
 
-  def historicalURLs = symbols.map { q => q -> formatHistoricalRequest(q) }
+  def historicalURLs = getSymbols.map { q => q -> formatHistoricalRequest(q) }
 
   def doRequest(u: String, syms: List[String],
                 proxy: Option[ProxyDescr] = None) = {
