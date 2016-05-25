@@ -145,7 +145,7 @@ object FayaliteBuild extends sbt.Build {
     base = file("./ml")).settings(
     scalaVersion := "2.11.6",
     libraryDependencies := Seq(
-      "xuggle" % "xuggle-xuggler" % "5.2", // For stitching images into video
+  //    "xuggle" % "xuggle-xuggler" % "5.2", // For stitching images into video
       "com.twitter" % "algebird-core_2.11" % "0.12.0" withSources() withJavadoc()
     )
   ) dependsOn core
@@ -172,7 +172,7 @@ object FayaliteBuild extends sbt.Build {
       "com.lihaoyi" %% "scalatags" % "0.5.4" withSources() withJavadoc(),
       "com.amazonaws" % "aws-java-sdk" % "1.8.9.1" withSources()
     )
-  )
+  ) dependsOn core
 
   lazy val spark = Project(
     id = "spark",

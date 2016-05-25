@@ -2,13 +2,14 @@ package org.fayalite.gate.server
 
 import java.io.File
 
-import akka.actor.{ActorRefFactory, ActorRef, Props, ActorSystem}
+import akka.actor.{ActorRef, ActorRefFactory, ActorSystem, Props}
 import akka.io.IO
+import org.fayalite.fs.FSCodePull
 import spray.can.server.UHttp
 import spray.can.Http
 import rx._
 import spray.routing
-import spray.routing.{RoutingSettings, StandardRoute, HttpServiceActor}
+import spray.routing.StandardRoute
 
 
 /**
@@ -48,6 +49,13 @@ trait MessageProcesser
     }
   }
 
+  def completeWithJSON(rendered: String): StandardRoute = {
+    import spray.http.MediaTypes._
+    respondWithMediaType(`application/json`) & complete {
+      rendered
+    }
+  }
+
   /**
     * Same idea as above but allows spray to complete directly
     * with JS string file contents
@@ -62,6 +70,26 @@ trait MessageProcesser
       js
     }
   }
+
+  val defaultIndexPage = {
+    import scalatags.Text.all._
+    // "<!DOCTYPE html>" + // ?Necessary?
+    html(
+      scalatags.Text.all.head(
+        scalatags.Text.tags2.title("fayalite"),
+        meta(charset := "UTF-8")
+      )
+      ,
+      body(
+        script(
+          src := "fayalite-fastopt.js",
+          `type` := "text/javascript"),
+        script("org.fayalite.sjs.App().main()",
+          `type` := "text/javascript")
+      )
+    ).render
+  }
+
 }
 
 /**
@@ -74,6 +102,12 @@ class SprayServer(
                    port: Int = 8080
                  ) {
 
+
+  // TODO : Fix all this junk, I was testing various ways to render
+  // the page and some of these things are relics of those tests.
+  // need to make sure everything works and simplify it back to using
+  // scala-tags & deal with the source mapping issue related to debugging
+  // when attempting to render the whole JS as a single return string.
   val currentPath = new File(".")
   val targetPath = {
     new File(currentPath, "target")
@@ -102,26 +136,6 @@ class SprayServer(
     }
     }
 
-    val dbg = {
-      import scalatags.Text.all._
-
-      // "<!DOCTYPE html>" +
-      html(
-        scalatags.Text.all.head(
-          scalatags.Text.tags2.title("fayalite"),
-          meta(charset := "UTF-8")
-        )
-        ,
-        body(
-          script(
-            src := "fayalite-fastopt.js",
-            `type` := "text/javascript"),
-          script("org.fayalite.sjs.App().main()",
-            `type` := "text/javascript")
-        )
-      ).render
-    }
-
     /**
       * Testable route to serve a rendered page
       * override or reassign for real-time change
@@ -129,7 +143,7 @@ class SprayServer(
     val route = Var { (ctx: ActorRefFactory) => {
       {
         implicit val refFactory = ctx
-        val defaultRoute = completeWith(dbg) // getFromFile("index.html")
+        val defaultRoute = completeWith(defaultIndexPage) // getFromFile("index.html")
         pathPrefix("fayalite") {
           get {
             unmatchedPath { path =>
@@ -139,7 +153,14 @@ class SprayServer(
               getFromFile(f)
             }
           }
-        } ~ defaultRoute
+        } ~
+          path("files") {
+            get {
+              import fa._
+              completeWithJSON(FSCodePull.getTopLevelFiles.map{_.getName}.json)
+            }
+          } ~
+          defaultRoute
 
       }
     }
