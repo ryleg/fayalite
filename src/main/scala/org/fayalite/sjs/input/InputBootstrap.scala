@@ -43,6 +43,7 @@ trait TileCoordinator {
   val mHover =
     createCanvasZeroSquare(minSize, methodGold, .1D)
 
+  // TODO : NOT THIS its just an example don't judge.
   def reactIsValModifier(c: String, t: CanvasContextInfo) = {
     if (c == "l" &&
       indexLatResolve.get(t.latCoords.left)
@@ -95,6 +96,16 @@ trait TileCoordinator {
     indexLatResolve(t.latCoords) = t
     Try{t.drawText(c)}
     reactIsValModifier(c, t)
+    t
+  }
+
+  def mkCharLikeSquareNode(charLike: String) = {
+    val t = createCanvasZeroSquare(
+      minSize, alpha=0D, zIndex=10
+    ).copy(text = Some(charLike))
+    absoluteLatResolve(t.absoluteCoords) = t
+    indexLatResolve(t.latCoords) = t
+    Try{t.drawText(charLike)}
     t
   }
 
@@ -160,10 +171,6 @@ with TileCoordinator {
         case KeyCode.enter =>
           mLast.shiftDownLeftZero(minSize)
           println("Code sample " + codeSample)
-
-          val xhr = new XMLHttpRequest()
-
-      //    xhr.open("GET")
 
 
         case KeyCode.backspace =>
