@@ -15,6 +15,7 @@ object App extends JSApp {
     println("SJS fayalite initialized")
     canvas.CanvasBootstrap.init()
     input.InputBootstrap.init()
+    meta.MetaBootstrap.init()
   }
 
 }

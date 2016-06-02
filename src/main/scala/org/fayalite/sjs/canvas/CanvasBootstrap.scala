@@ -47,32 +47,6 @@ with CanvasTileUtils
     // Just an example to be moved elsewhere into appropriate
     // package later
 
-    val xhr = new XMLHttpRequest()
-    xhr.onreadystatechange = (e: Event) => {
-      if (xhr.readyState == 4 && xhr.status == 200) {
-        val text = {
-          import upickle._
-          read[Array[String]](xhr.responseText)
-        }.toSeq
-        println("XHR response", text)
-      } // else println("XHR response failure")
-    }
-
-    xhr.open("GET", "files"); xhr.send()
-    /*
-    var xmlhttp = new XMLHttpRequest();
-var url = "myTutorials.txt";
-
-xmlhttp.onreadystatechange = function() {
-    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
-        var myArr = JSON.parse(xmlhttp.responseText);
-        myFunction(myArr);
-    }
-};
-xmlhttp.open("GET", url, true);
-xmlhttp.send();
-     */
-
     // Initialization checks
     printDebugInfo()
 

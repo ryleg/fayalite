@@ -103,10 +103,32 @@ trait TileCoordinator {
     val t = createCanvasZeroSquare(
       minSize, alpha=0D, zIndex=10
     ).copy(text = Some(charLike))
-    absoluteLatResolve(t.absoluteCoords) = t
-    indexLatResolve(t.latCoords) = t
     Try{t.drawText(charLike)}
     t
+  }
+
+  def updateCoords(t: CanvasContextInfo) = {
+    absoluteLatResolve(t.absoluteCoords) = t
+    indexLatResolve(t.latCoords) = t
+  }
+  def mkWord(word: String, origin: LatCoord) = {
+    val tempCnvRenders = word.map{_.toString}.map{mkCharLikeSquareNode}
+    tempCnvRenders.head.move(origin)
+    updateCoords(tempCnvRenders.head)
+
+    // Proper way to do this should look like this
+/*    tempCnvRenders.tail.foldRight(tempCnvRenders.head) {
+      case (nextElement, foldPrevEl) =>
+    }*/
+    // Heres the wrong way to do it:
+    tempCnvRenders.zipWithIndex.tail.foreach{
+      case (c, i) =>
+          c.moveTo(tempCnvRenders.head)
+        (0 until i).foreach { _ =>
+          c.shiftRight()
+        }
+        updateCoords(c)
+    }
   }
 
 }
