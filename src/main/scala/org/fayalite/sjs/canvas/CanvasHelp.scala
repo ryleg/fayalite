@@ -286,8 +286,8 @@ trait CanvasHelp extends SJSHelp {
 
   def createCanvasWithPosition(left: Int = 0,
                                top: Int = 0,
-                               width: Int = 30,
-                               height: Int = 30,
+                               width: Int = 27,
+                               height: Int = 27,
                                zIndex: Int = 3
                   ): CanvasContextInfo = {
     val cv = createCanvas(zIndex)

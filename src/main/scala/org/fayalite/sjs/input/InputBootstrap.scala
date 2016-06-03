@@ -111,24 +111,27 @@ trait TileCoordinator {
     absoluteLatResolve(t.absoluteCoords) = t
     indexLatResolve(t.latCoords) = t
   }
+
+  val wordResolve = mutable.HashMap[LatCoord, Array[CanvasContextInfo]]()
+
   def mkWord(word: String, origin: LatCoord) = {
     val tempCnvRenders = word.map{_.toString}.map{mkCharLikeSquareNode}
     tempCnvRenders.head.move(origin)
     updateCoords(tempCnvRenders.head)
-
     // Proper way to do this should look like this
-/*    tempCnvRenders.tail.foldRight(tempCnvRenders.head) {
-      case (nextElement, foldPrevEl) =>
-    }*/
+    /*    tempCnvRenders.tail.foldRight(tempCnvRenders.head) {
+          case (nextElement, foldPrevEl) =>
+        }*/
     // Heres the wrong way to do it:
     tempCnvRenders.zipWithIndex.tail.foreach{
       case (c, i) =>
-          c.moveTo(tempCnvRenders.head)
+        c.moveTo(tempCnvRenders.head)
         (0 until i).foreach { _ =>
           c.shiftRight()
         }
         updateCoords(c)
     }
+    wordResolve(origin) = tempCnvRenders.toArray
   }
 
 }
