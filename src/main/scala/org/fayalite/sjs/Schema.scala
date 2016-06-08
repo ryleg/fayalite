@@ -56,7 +56,7 @@ object Schema extends SJSHelp {
     def up0 = this.copy(y=0)
     def left0 = this.copy(x=0)
     def right = this.copy(x=x+1)
-    def right(n: Int) = this.copy(x=x+n)
+    def right(n: Int) = this.copy(x=x+n*squareTileSize)
     def left = this.copy(x=x-1)
     def up = this.copy(y=y-1)
     def down = this.copy(y=y+1)

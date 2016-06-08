@@ -131,6 +131,31 @@ trait TileCoordinator {
         }
         updateCoords(c)
     }
+    val len = word.length
+    val center = origin.right(len/2)
+
+    val x = origin.x
+    val y = origin.y
+    // Fix alpha calls to split background filler out, below is hack
+    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D)
+    val kappa = .5522848
+    val ox = (w / 2) * kappa // control point offset horizontal
+    val oy = (h / 2) * kappa // control point offset vertical
+    val xe = x + w           // x-end
+    val ye = y + h           // y-end
+    val xm = x + w / 2      // x-middle
+    val ym = y + h / 2   // y-middle
+    val ctx = bubbleCanvas.context
+    ctx.globalAlpha = 1D
+    ctx.lineWidth = 5D
+    ctx.moveTo(x, ym)
+    ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y)
+    ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym)
+    ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye)
+    ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym)
+    //ctx.closePath(); // not used correctly, see comments (use to close off open path)
+    ctx.stroke()
+
     wordResolve(origin) = tempCnvRenders.toArray
   }
 
