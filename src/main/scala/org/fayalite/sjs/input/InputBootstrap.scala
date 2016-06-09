@@ -134,20 +134,26 @@ trait TileCoordinator {
     val len = word.length
     val center = origin.right(len/2)
 
-    val x = origin.x
-    val y = origin.y
+    val offsetLeft = 1
+    val offsetTop =  .5D
+    val x = origin.x - (offsetLeft*minSize)
+    val y = origin.y - offsetTop*minSize
     // Fix alpha calls to split background filler out, below is hack
     val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D)
     val kappa = .5522848
-    val ox = (w / 2) * kappa // control point offset horizontal
-    val oy = (h / 2) * kappa // control point offset vertical
-    val xe = x + w           // x-end
-    val ye = y + h           // y-end
-    val xm = x + w / 2      // x-middle
-    val ym = y + h / 2   // y-middle
+    val width = (len+2)*minSize
+    val height = minSize*2
+    val ox = (width / 2) * kappa // control point offset horizontal
+    val oy = (height / 2) * kappa // control point offset vertical
+    val xe = x + width           // x-end
+    val ye = y + height           // y-end
+    val xm = x + width / 2      // x-middle
+    val ym = y + height / 2   // y-middle
     val ctx = bubbleCanvas.context
-    ctx.globalAlpha = 1D
-    ctx.lineWidth = 5D
+    ctx.fillStyle = methodGold
+    ctx.strokeStyle = methodGold
+    ctx.globalAlpha = .41D
+    ctx.lineWidth = 2D
     ctx.moveTo(x, ym)
     ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y)
     ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym)
