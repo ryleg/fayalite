@@ -15,12 +15,12 @@ import scala.util.Try
 
 trait TileCoordinator {
 
-  val absoluteLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
+  val absoluteLatResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
 
   /**
     *
     */
-  val indexLatResolve = mutable.Map[LatCoord, CanvasContextInfo]()
+  val indexLatResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
 
   /**
     * It's easier to just re-use tiles than modify the DOM
@@ -260,6 +260,12 @@ with TileCoordinator {
       //println("ON Mouse move")
         mHover.move(me.tileCoordinates(minSize))
         bHover.move(me.tileCoordinates(bulkSize))
+
+        wordBubbleResolve.get(mHover.location).foreach{
+          q =>
+            //q.clear()
+            println("Hover over word")
+        }
       }
     }
 }

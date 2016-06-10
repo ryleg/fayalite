@@ -109,6 +109,9 @@ trait CanvasHelp extends SJSHelp {
 
     def ctxi = ctx.context
 
+    def clear() = {
+      ctxi.clearRect(0D, 0D, ctx.canvas.width, ctx.canvas.height)
+    }
 
     def fill(x: Double, y: Double, dx: Double, dy: Double, hexColor: String,
              alpha: Double = 1D) = {
