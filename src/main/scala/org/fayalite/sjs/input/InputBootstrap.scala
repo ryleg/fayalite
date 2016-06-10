@@ -113,35 +113,18 @@ trait TileCoordinator {
   }
 
   val wordResolve = mutable.HashMap[LatCoord, Array[CanvasContextInfo]]()
+  val wordBubbleResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
 
-  def mkWord(word: String, origin: LatCoord) = {
-    val tempCnvRenders = word.map{_.toString}.map{mkCharLikeSquareNode}
-    tempCnvRenders.head.move(origin)
-    updateCoords(tempCnvRenders.head)
-    // Proper way to do this should look like this
-    /*    tempCnvRenders.tail.foldRight(tempCnvRenders.head) {
-          case (nextElement, foldPrevEl) =>
-        }*/
-    // Heres the wrong way to do it:
-    tempCnvRenders.zipWithIndex.tail.foreach{
-      case (c, i) =>
-        c.moveTo(tempCnvRenders.head)
-        (0 until i).foreach { _ =>
-          c.shiftRight()
-        }
-        updateCoords(c)
-    }
-    val len = word.length
-    val center = origin.right(len/2)
-
+  def drawEllipse(
+                   wordLen: Int, origin: LatCoord, bubbleCanvas: CanvasContextInfo
+                 ) = {
     val offsetLeft = 1
     val offsetTop =  .5D
     val x = origin.x - (offsetLeft*minSize)
     val y = origin.y - offsetTop*minSize
     // Fix alpha calls to split background filler out, below is hack
-    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D)
     val kappa = .5522848
-    val width = (len+2)*minSize
+    val width = (wordLen+2)*minSize
     val height = minSize*2
     val ox = (width / 2) * kappa // control point offset horizontal
     val oy = (height / 2) * kappa // control point offset vertical
@@ -162,7 +145,31 @@ trait TileCoordinator {
     //ctx.closePath(); // not used correctly, see comments (use to close off open path)
     ctx.stroke()
 
+  }
+
+  def mkWord(word: String, origin: LatCoord) = {
+    val tempCnvRenders = word.map{_.toString}.map{mkCharLikeSquareNode}
+    tempCnvRenders.head.move(origin)
+    updateCoords(tempCnvRenders.head)
+    // Proper way to do this should look like this
+    /*    tempCnvRenders.tail.foldRight(tempCnvRenders.head) {
+          case (nextElement, foldPrevEl) =>
+        }*/
+    // Heres the wrong way to do it:
+    tempCnvRenders.zipWithIndex.tail.foreach{
+      case (c, i) =>
+        c.moveTo(tempCnvRenders.head)
+        (0 until i).foreach { _ =>
+          c.shiftRight()
+        }
+        updateCoords(c)
+    }
+    val len = word.length
+    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D)
+    drawEllipse(len, origin, bubbleCanvas)
+
     wordResolve(origin) = tempCnvRenders.toArray
+    wordBubbleResolve(origin) = bubbleCanvas
   }
 
 }
