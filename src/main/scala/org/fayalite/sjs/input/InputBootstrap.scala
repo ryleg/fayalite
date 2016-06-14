@@ -165,7 +165,9 @@ trait TileCoordinator {
         updateCoords(c)
     }
     val len = word.length
-    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D)
+    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D).copy(
+      text = Some(word)
+    )
     drawEllipse(len, origin, bubbleCanvas)
 
     wordResolve(origin) = tempCnvRenders.toArray
@@ -263,7 +265,7 @@ with TileCoordinator {
 
         wordBubbleResolve.get(mHover.location).foreach{
           q =>
-            //q.clear()
+          //  q.clear()
             println("Hover over word")
         }
       }
