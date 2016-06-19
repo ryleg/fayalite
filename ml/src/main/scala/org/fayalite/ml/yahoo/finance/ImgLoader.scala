@@ -3,7 +3,7 @@ package org.fayalite.ml.yahoo.finance
 import java.io.File
 
 import com.sksamuel.scrimage.Image
-import fa._
+import fa.{homeDir, readCSV}
 
 object ImgLoader {
 
@@ -17,12 +17,16 @@ object ImgLoader {
     val fMask = masks.head(2).split(" ").grouped(2).toSeq.map{
       case Array(pIdx, runLen) =>
         pIdx.toInt -> runLen.toInt
-    }
+    }.toMap
+
+    println(fMask.size, fMask.toSeq.slice(0, 20).toList)
 
     val first = new File(train, "1_1.tif")
 
     val img = Image.fromFile(first)
     val imgi = img.pixels.map{_.argb}.zipWithIndex
+    println(imgi.size)
+
 
   }
 

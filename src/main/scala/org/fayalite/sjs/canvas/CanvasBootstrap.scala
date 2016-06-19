@@ -9,9 +9,26 @@ import org.scalajs.dom._
   */
 trait CanvasTileUtils extends DOMHelp {
 
+  // Magic numbers due to canvas rendering performance concerns.
+
+  /**
+    * Ideal representation of a drawable window in HTML5 Canvas
+    * is a subgrid (or many subgrids generically) of canvas node
+    * elements where the rendering is split between different
+    * elements to ensure update speed. Ideally including
+    * pre-rendered canvas' pushed offscreen containing pre-rendered
+    * character sequences for re-use.
+    */
+
   val minSize = 27
   val bulkSize = minSize*9
 
+  /**
+    * Used for the background optimized render subgrids.
+    * @param x : Screen loc pixel loc
+    * @param y : Same
+    * @return : Lattice indices of sub-grid
+    */
   def getTileOn(x: Double, y: Double) = {
     val xIdx = (x/bulkSize).toInt
     val yIdx = (y/bulkSize).toInt
