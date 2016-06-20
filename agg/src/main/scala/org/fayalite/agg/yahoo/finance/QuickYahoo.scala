@@ -73,7 +73,7 @@ object QuickYahoo {
         new com.ning.http.client.ProxyServer(p.host, p.port, p.user, p.pass)
       )
     }
-    Http(rq OK as.String)
+    Http(rq OK as.String)(scala.concurrent.ExecutionContext.Implicits.global)
   }
 
 

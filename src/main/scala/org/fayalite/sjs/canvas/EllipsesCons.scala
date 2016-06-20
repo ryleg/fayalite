@@ -46,7 +46,9 @@ object EllipsesCons extends CanvasTileUtils with CanvasHelp {
     // When drawing a word:
     drawEllipse(len, origin, bubbleCanvas)
     wordBubbleResolve(origin) = bubbleCanvas
-
+    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D).copy(
+      text = Some(word)
+    )
     // When dealing with bubble input.
             wordBubbleResolve.get(mHover.location).foreach{
           q =>

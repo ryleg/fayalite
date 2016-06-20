@@ -45,4 +45,8 @@ trait CommonJunk {
 
   val currentDir = new java.io.File(".").getCanonicalPath + "/"
 
+  implicit class AnyDump(a: Any) {
+    def p = println(a)
+  }
+
 }

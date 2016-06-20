@@ -16,7 +16,7 @@ import fa._
 trait YahooTestUtils {
 
   val yahooSave : java.io.File
-  val gbtime : java.io.File
+  val gbtime : java.io.File = null
 
   def convertHistoricalCSVsToGroupByTimeTempIndex = {
     val storM = mutable.HashMap[String, scala.collection.mutable.HashMap[String, Float]]()

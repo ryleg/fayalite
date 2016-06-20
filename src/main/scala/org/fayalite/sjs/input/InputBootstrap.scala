@@ -133,9 +133,7 @@ trait TileCoordinator {
         updateCoords(c)
     }
     val len = word.length
-    val bubbleCanvas = createCanvasZeroSquare(bulkSize*2, zIndex = 2, alpha = 0D).copy(
-      text = Some(word)
-    )
+
 
     wordResolve(origin) = tempCnvRenders.toArray
   }
