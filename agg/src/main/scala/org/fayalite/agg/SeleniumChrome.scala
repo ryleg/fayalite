@@ -136,6 +136,16 @@ object SeleniumChrome extends SeleniumHelp {
       new ChromeDriver(opts)
     }*/
 
+  def saveCookies(args: Array[String]) = {
+    val selc = new SeleniumChrome(Some(args(0)))
+    Thread.sleep(30*1000)
+    selc.extractCookies.jsonSave(".cookies")
+  }
+
+  def main(args: Array[String]): Unit = {
+    val selc = new SeleniumChrome(Some(args(0)))
+  }
+
 }
 
 /**

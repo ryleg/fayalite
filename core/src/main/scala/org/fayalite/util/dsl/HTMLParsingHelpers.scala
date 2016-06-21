@@ -5,6 +5,7 @@ import Schema.Cookie
 import org.fayalite.util.JSON
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
+import org.jsoup.select.Elements
 
 import scala.collection.JavaConversions
 
@@ -36,6 +37,9 @@ trait HTMLParsingHelpers {
     def sel(sll: String) = e.select(sll).iterator.toList
     def fsel(sll: String) = e.select(sll).first()
     def textBy(sll: String) = e.select(sll).first().text
+  }
+  implicit class ElementsConverter(es: Elements) {
+    def toScala = es.toIterator.toSeq
   }
 
   implicit class DocOps(d: Document) {

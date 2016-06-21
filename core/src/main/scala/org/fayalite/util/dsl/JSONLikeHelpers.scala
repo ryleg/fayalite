@@ -38,6 +38,7 @@ trait JSONLikeHelpers {
     def json = JSON.caseClassToJson(jsonSerializable)
     def tryJson = Try{JSON.caseClassToJson(jsonSerializable)}
     def j = json
+    def jsonSave(f: String) = scala.tools.nsc.io.File(f).writeAll(json)
   }
 
   implicit class CaseJsonCSVCol(jl: List[Any]) {
