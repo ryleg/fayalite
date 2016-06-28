@@ -42,4 +42,7 @@ object DNS {
 
   }
 
+  def main(args: Array[String]) {
+
+  }
 }

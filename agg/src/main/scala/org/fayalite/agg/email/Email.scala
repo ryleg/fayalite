@@ -8,11 +8,40 @@ package org.fayalite.agg.email
 object Email {
 
   import courier._, Defaults._
-  val mailer = Mailer("smtp.gmail.com", 587)
-    .auth(true)
-    .as("you@gmail.com", "p@$$w3rd")
-    .startTtls(true)()
 
+  // Sends an email!
+  def sendEmail(
+               smptServer: String = "smtp.gmail.com",
+               smptPort: Int = 587,
+               user: String,
+               pass: String,
+               toUser: String,
+               toDomain: String,
+               fromUser: String,
+               fromDomain: String,
+               subject: String = "",
+               contentText: String = ""
+               ) = {
+    val mailer = Mailer(smptServer, smptPort)
+      .auth(true)
+      .as(user, pass)
+      .startTtls(true)()
+
+    mailer(Envelope.from(fromUser `@` fromDomain)
+      .to(toUser `@` toDomain)
+      .subject(subject)
+      .content(Text(contentText)))
+
+  }
+
+  def main(args: Array[String]) {
+    val user = args(0)
+    val pass = args(1)
+    //... etc
+    //mailer.
+
+  }
+/*
   mailer(Envelope.from("you" `@` "gmail.com")
     .to("mom" `@` "gmail.com")
     .cc("dad" `@` "gmail.com")
@@ -29,6 +58,6 @@ object Email {
       .html("<html><body><h1>IT'S IMPORTANT</h1></body></html>")))
     .onSuccess {
       case _ => println("delivered report")
-    }
+    }*/
 }
 

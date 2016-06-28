@@ -13,6 +13,8 @@ import scala.collection.mutable
 import scala.util.Try
 
 
+
+
 trait TileCoordinator {
 
   val absoluteLatResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
@@ -42,6 +44,12 @@ trait TileCoordinator {
 
   val mHover =
     createCanvasZeroSquare(minSize, methodGold, .1D)
+
+  val wordHover =
+    createCanvasZeroSquare(minSize, commentGreen, .5D)
+
+  val wordLast =
+    createCanvasZeroSquare(minSize, lightBlue, .01D)
 
   // TODO : NOT THIS its just an example don't judge.
   def reactIsValModifier(c: String, t: CanvasContextInfo) = {
@@ -113,6 +121,8 @@ trait TileCoordinator {
   }
 
   val wordResolve = mutable.HashMap[LatCoord, Array[CanvasContextInfo]]()
+  val wordResolveArea = mutable.HashMap[LatCoord, (LatCoord, Int)]()
+  val wordResolveStr = mutable.HashMap[LatCoord, String]()
 
 
   def mkWord(word: String, origin: LatCoord) = {
@@ -136,6 +146,10 @@ trait TileCoordinator {
 
 
     wordResolve(origin) = tempCnvRenders.toArray
+    (0 until len).foreach { i =>
+      wordResolveStr(origin.right(i)) = word
+      wordResolveArea(origin.right(i)) = origin -> len
+    }
   }
 
 }
@@ -220,11 +234,34 @@ with TileCoordinator {
       val bulXY = me.tileCoordinates(bulkSize)
       mLast.move(minXY)
       bLast.move(bulXY)
+      wordResolveArea.get(minXY).foreach {
+        case (o, l) =>
+          val w = wordResolveStr(minXY)
+          println("Clicked on w " + w)
+          wordLast.moveTo(wordHover)
+          wordLast.canvas.width = wordHover.canvas.width
+          wordLast.clear()
+          wordLast.fillAll(lightBlue, 0.25D)
+      }
     }
 
     window.onmousemove = (me: MouseEvent) => {
       //println("ON Mouse move")
-        mHover.move(me.tileCoordinates(minSize))
+      val coordH: LatCoord = me.tileCoordinates(minSize)
+      val getOptH = wordResolveArea.get(coordH)
+      getOptH.foreach{
+        case (origin, len) =>
+        //  println("Moving")
+          wordHover.move(origin)
+          wordHover.canvas.width = len*minSize
+          wordHover.clear()
+          wordHover.fillAll(commentGreen, 0.02D)
+      }
+      if (getOptH.isEmpty) {
+        wordHover.clear()
+      }
+
+      mHover.move(coordH)
         bHover.move(me.tileCoordinates(bulkSize))
 
 

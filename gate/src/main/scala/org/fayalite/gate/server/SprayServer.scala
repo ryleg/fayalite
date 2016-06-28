@@ -158,6 +158,17 @@ class SprayServer(
             get {
               import fa._
               completeWithJSON(FSCodePull.getTopLevelFiles.map{_.getName}.json)
+            } ~
+            post {
+              var txt = ""
+              val xt = extract {
+                j =>
+                  val q = j.request.entity.asString
+                  txt = q
+                  q
+              }
+              println("Txt extract " + txt, "direct ", xt)
+              completeWithJSON("yo" + txt)
             }
           } ~
           defaultRoute

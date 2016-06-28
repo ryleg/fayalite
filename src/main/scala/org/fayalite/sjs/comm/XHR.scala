@@ -30,4 +30,38 @@ object XHR {
     xhr.send()
   }
 
+  def post[W: upickle.Writer, R: upickle.Reader]
+  (
+    payload: W,
+    callback: R => Unit,
+    path: String
+  ) = {
+    val xhr = new XMLHttpRequest()
+    xhr.onreadystatechange = (e: Event) => {
+      if (xhr.readyState == 4 && xhr.status == 200) {
+        val text = {
+          import upickle._
+          read[R](xhr.responseText)
+        }
+        callback(text)
+      }
+    }
+    xhr.open("POST", path)
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    val out = {
+      import upickle._
+      write(payload)
+    }
+    xhr.send(out)
+  }
+
+
+  /*
+  var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+xmlhttp.open("POST", "/json-handler");
+xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+xmlhttp.send(JSON.stringify({name:"John Rambo", time:"2pm"}));
+   */
+
+
 }

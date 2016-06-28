@@ -120,6 +120,12 @@ trait CanvasHelp extends SJSHelp {
       }(ctxi, hexColor, alpha)
     }
 
+    def fillAll(hexColor: String, alpha: Double = 1D) = {
+      color{
+        ctx.context.fillRect(0D,0D,ctx.canvas.width,ctx.canvas.height)
+      }(ctxi, hexColor, alpha)
+    }
+
     /**
       * Color the entire canvas with a single
       * pixel color type
