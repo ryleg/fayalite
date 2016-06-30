@@ -92,6 +92,11 @@ trait MessageProcesser
 
 }
 
+object SpraySchema {
+  case class FileRequest(file: String)
+  case class FileResponse(files: Array[String])
+}
+
 /**
   * Simple box around Spray to get a quick
   * server up with WS / REST
@@ -160,15 +165,17 @@ class SprayServer(
               completeWithJSON(FSCodePull.getTopLevelFiles.map{_.getName}.json)
             } ~
             post {
-              var txt = ""
-              val xt = extract {
-                j =>
-                  val q = j.request.entity.asString
-                  txt = q
-                  q
+              def rawJson = extract { _.request.entity.asString}
+              rawJson { j =>
+                import fa._
+                val r = j.json[SpraySchema.FileRequest]
+                println("POST r", r)
+                FSCodePull.getTopLevelFiles.collectFirst{
+                  case x if x.getName == r.file =>
+                    x.listdir()
+                }
+                completeWithJSON("""{"files": ["a", "b"]}""")
               }
-              println("Txt extract " + txt, "direct ", xt)
-              completeWithJSON("yo" + txt)
             }
           } ~
           defaultRoute

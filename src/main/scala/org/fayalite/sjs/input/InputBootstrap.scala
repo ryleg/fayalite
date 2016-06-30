@@ -2,13 +2,13 @@ package org.fayalite.sjs.input
 
 import org.fayalite.sjs.Schema.{CanvasContextInfo, LatCoord}
 import org.fayalite.sjs.canvas.CanvasBootstrap._
+import org.fayalite.sjs.comm.XHR
 import org.scalajs.dom._
 import org.scalajs.dom.ext.KeyCode
 import rx.ops.{DomScheduler, Timer}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-
 import scala.collection.mutable
 import scala.util.Try
 
@@ -161,6 +161,10 @@ trait TileCoordinator {
 object InputBootstrap extends InputHelp
 with TileCoordinator {
 
+  case class FileResponse(files: Array[String])
+
+  case class FileRequest(file: String)
+
   // For any future / thread related stuff use this
   implicit val scheduler = new DomScheduler()
 
@@ -229,16 +233,25 @@ with TileCoordinator {
         mLast.onOff()
     }
 
+    var lastSelectedWord : LatCoord = LatCoord(0,0)
+
     window.onmousedown = (me: MouseEvent) => {
       val minXY = me.tileCoordinates(minSize)
       val bulXY = me.tileCoordinates(bulkSize)
       mLast.move(minXY)
       bLast.move(bulXY)
-      wordResolveArea.get(minXY).foreach {
+      val maybeTuple: Option[(LatCoord, Int)] = wordResolveArea.get(minXY)
+      if (maybeTuple.isEmpty) {
+        wordLast.clear()
+      }
+      maybeTuple.foreach {
         case (o, l) =>
           val w = wordResolveStr(minXY)
           println("Clicked on w " + w)
+          XHR.post[FileRequest,
+            FileResponse](FileRequest(w), println _, "files")
           wordLast.moveTo(wordHover)
+          lastSelectedWord = wordLast.location
           wordLast.canvas.width = wordHover.canvas.width
           wordLast.clear()
           wordLast.fillAll(lightBlue, 0.25D)
@@ -255,7 +268,7 @@ with TileCoordinator {
           wordHover.move(origin)
           wordHover.canvas.width = len*minSize
           wordHover.clear()
-          wordHover.fillAll(commentGreen, 0.02D)
+          wordHover.fillAll(commentGreen, 0.2D)
       }
       if (getOptH.isEmpty) {
         wordHover.clear()

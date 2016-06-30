@@ -23,6 +23,6 @@ object FSCodePull {
     * @return All top level files/folders
     */
   def getTopLevelFiles: Seq[File] = {
-    new File(".").listFiles().toSeq
+    new File(".").listFiles().toSeq.filterNot(_.getName == ".git")
   }
 }

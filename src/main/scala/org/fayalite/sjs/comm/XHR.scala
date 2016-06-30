@@ -41,17 +41,19 @@ object XHR {
       if (xhr.readyState == 4 && xhr.status == 200) {
         val text = {
           import upickle._
+          println("Response text", xhr.responseText)
           read[R](xhr.responseText)
         }
         callback(text)
       }
     }
     xhr.open("POST", path)
-    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8")
+    xhr.setRequestHeader("Content-Type", "application/json")
     val out = {
       import upickle._
       write(payload)
     }
+    println("POST", out)
     xhr.send(out)
   }
 
