@@ -18,6 +18,8 @@ object FayaliteBuild extends sbt.Build {
     "org.scala-lang"    %   "scala-reflect"       % scalaV withJavadoc() withSources()
   )
 
+  parallelExecution in Test := false
+
   override lazy val settings = super.settings ++
     Seq(
       resolvers := Seq(

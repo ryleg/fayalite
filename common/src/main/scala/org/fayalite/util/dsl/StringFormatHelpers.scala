@@ -7,6 +7,10 @@ import fa.Schema.FixedPhrase
   */
 trait StringFormatHelpers {
 
+  implicit class StringContentsHelp(s: String) {
+    def containsNot(j: String) = !s.contains(j)
+  }
+
   /**
     * For simple string modifications
     * that don't qualify as performance intensive
@@ -28,6 +32,8 @@ trait StringFormatHelpers {
     def withOut(out: List[String]) = {
         out.foldLeft(se) { case (x,y) => x.replaceAll(y, "") }
       }
+    def clear(a: String) = se.replaceAll(a, "")
+    def noSpaces = se.clear(" ")
   }
 
 
