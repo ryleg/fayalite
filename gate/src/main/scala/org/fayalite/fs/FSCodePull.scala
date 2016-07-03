@@ -12,6 +12,8 @@ object FSCodePull {
     }
   }
 
+  val commonExcludes = Seq(".git", ".idea")
+
   /**
     * Quick and dirty way to get top level files/folders
     * in the current project directory.
@@ -23,6 +25,7 @@ object FSCodePull {
     * @return All top level files/folders
     */
   def getTopLevelFiles: Seq[File] = {
-    new File(".").listFiles().toSeq.filterNot(_.getName == ".git")
+    new File(".").listFiles().toSeq.filterNot(
+      z => commonExcludes.contains{z.getName}).filter{_.isDirectory}
   }
 }

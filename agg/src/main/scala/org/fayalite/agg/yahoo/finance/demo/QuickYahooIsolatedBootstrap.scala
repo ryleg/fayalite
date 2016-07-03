@@ -1,10 +1,15 @@
-package org.fayalite.agg.yahoo.finance
+package org.fayalite.agg.yahoo.finance.demo
 
 import java.io.File
 
 import dispatch.{Http, as, url}
 
-object QuickYahoo {
+/**
+  * Dependency free (mostly) object if you want to pull this into
+  * some other project without relying on fayalite this is a pretty complete
+  * starting pack.
+  */
+object QuickYahooIsolatedBootstrap {
 
   // For complete list see
   // http://stackoverflow.com/questions/5246843/how-to-get-a-complete-list-of-ticker-symbols-from-yahoo-finance

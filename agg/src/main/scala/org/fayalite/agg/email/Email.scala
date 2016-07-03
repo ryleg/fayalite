@@ -3,7 +3,15 @@ package org.fayalite.agg.email
 /**
   * Example code for being able to construct smpt packets
   * Intended use is for integration with REPL as a streaming
-  * data source. RX/TX
+  * data source. RX/TX And/or for email discovery:
+  *
+  * See http://www.coderanch.com/t/547987/java/java/create-null-sender-javamail
+  *
+  * Courier is backed by javamail
+  *
+  * Telnet request may also work? Try using with DNS lookup on MX servers.
+  *
+  * UNFINISHED, this is just to integrate dependencies / make pre-example.
   */
 object Email {
 
@@ -42,14 +50,6 @@ object Email {
 
   }
 /*
-  mailer(Envelope.from("you" `@` "gmail.com")
-    .to("mom" `@` "gmail.com")
-    .cc("dad" `@` "gmail.com")
-    .subject("miss you")
-    .content(Text("hi mom"))).onSuccess {
-    case _ => println("message delivered")
-  }
-
   mailer(Envelope.from("you" `@` "work.com")
     .to("boss" `@` "work.com")
     .subject("tps report")

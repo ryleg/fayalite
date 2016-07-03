@@ -170,11 +170,11 @@ class SprayServer(
                 import fa._
                 val r = j.json[SpraySchema.FileRequest]
                 println("POST r", r)
-                FSCodePull.getTopLevelFiles.collectFirst{
+                val topFiles = FSCodePull.getTopLevelFiles.collectFirst{
                   case x if x.getName == r.file =>
-                    x.listdir()
-                }
-                completeWithJSON("""{"files": ["a", "b"]}""")
+                    x.listFiles().toSeq.map{_.getName}
+                }.getOrElse(Seq())
+                completeWithJSON(SpraySchema.FileResponse(topFiles.toArray))
               }
             }
           } ~

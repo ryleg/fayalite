@@ -22,6 +22,7 @@ trait SymbolLookupRegistry {
     */
   def mkYQLURL(htmlEncodedSymbols: String) = "https://query.yahooapis.com/v1/public/yql?q=select%20Ask%2C%20Bid%20from%20yahoo.finance.quotes%20where%20symbol%20in%20" + htmlEncodedSymbols + "%0A%09%09&format=json&diagnostics=false&env=http%3A%2F%2Fdatatables.org%2Falltables.env"
 
+  // TODO: Switch to URLEncode, quick and dirty for now since all symbols are letters
   /**
     * HTML encode a series of company stock symbols into the format
     * Yahoo's YQL expects
