@@ -17,6 +17,8 @@ object Schema extends SJSHelp {
     // json.read // json.write
  // }
 
+  case class A(b: String)
+
   case class ParseRequest (
                             code: String,
                             cookies: String,

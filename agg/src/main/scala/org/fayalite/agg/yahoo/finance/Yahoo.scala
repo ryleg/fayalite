@@ -251,6 +251,7 @@ object Yahoo extends YahooFinanceRequestor
       println
     }
   }
+/*
 
   def runCrawl: Unit = {
     val smp = getSamples.toList
@@ -275,6 +276,7 @@ object Yahoo extends YahooFinanceRequestor
     }
   }
 
+*/
 
   def stripGarbage(
                     rr: Future[List[(String, Option[Price])]]) = rr.map {
@@ -289,6 +291,7 @@ object Yahoo extends YahooFinanceRequestor
     }
   }
 
+/*
   def parCrawl = {
     getSamples.toList
       .zip(ProxyManager.getProxies)
@@ -305,6 +308,7 @@ object Yahoo extends YahooFinanceRequestor
       }
     Thread.sleep(Long.MaxValue)
   }
+*/
 
   def processResponse(o: Future[List[(String, Price)]]): Unit = {
     o.onComplete {

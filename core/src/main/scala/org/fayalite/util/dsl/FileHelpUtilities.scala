@@ -103,9 +103,16 @@ trait FileHelpUtilities {
   }
 
 
-  def readCSV(cv: String) = {
+  def readCSV(cv: String): Seq[Seq[String]] = {
     import com.github.tototoshi.csv.CSVReader
     val c = CSVReader.open(new File(cv))
+    val a = c.all
+    c.close()
+    a
+  }
+  def readCSVFromFile(cv: File): Seq[Seq[String]] = {
+    import com.github.tototoshi.csv.CSVReader
+    val c = CSVReader.open(cv)
     val a = c.all
     c.close()
     a

@@ -3,6 +3,8 @@ package org.fayalite.util.dsl
 import java.io._
 
 
+object JavaSerHelpExplicit extends JavaSerHelp
+
 /**
   * Created by aa on 3/15/2016.
   */

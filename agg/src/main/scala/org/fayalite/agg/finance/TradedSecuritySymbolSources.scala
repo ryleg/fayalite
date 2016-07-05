@@ -13,11 +13,12 @@ trait TradedSecuritySymbolSources {
   // http://www.nasdaq.com/screening/company-list.aspx
 
   val dataFolder = new File("data")
+  val historicalFolder = new File(dataFolder, "historical")
   val securitiesFolder = new File(dataFolder, "securities")
 
 
 
-  Try { securitiesFolder.mkdirs() }
+  Try { securitiesFolder.mkdirs(); historicalFolder.mkdirs() }
 
   object Sources {
     val NASDAQ = "NASDAQ"

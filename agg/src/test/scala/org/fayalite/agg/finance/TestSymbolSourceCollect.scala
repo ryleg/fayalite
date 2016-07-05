@@ -1,6 +1,7 @@
 package org.fayalite.agg.finance
 
 import java.io.File
+import java.net.URLEncoder
 
 import org.fayalite.agg.Dispatch
 import org.fayalite.agg.yahoo.finance.Yahoo
@@ -14,6 +15,10 @@ class TestSymbolSourceCollect
     with TradedSecuritySymbolSources {
   //  implicit val ec = scala.concurrent.ExecutionContext.Implicits.global
   import fa._
+
+  implicit class URLStringExt(s: String) {
+    def encoded = URLEncoder.encode(s, "UTF-8")
+  }
 
   ignore( // Uncomment on first run
     //test(
@@ -30,7 +35,7 @@ class TestSymbolSourceCollect
 
   println("Parsing from saved data")
 
-  test("Parse securities") {
+  ignore("Parse securities") {
 
     val symbols = getSymbolsFromLocal
     println("numSymbols", symbols.length)
@@ -45,8 +50,17 @@ class TestSymbolSourceCollect
 
   }
 
-  test("RequestHistoricalSecurities") {
-    Yahoo.historicalRequest
+  test("Request historical securities") {
+
+    getSymbolsFromLocal.map { s =>
+      val hr = Yahoo.formatHistoricalRequest(s.encoded)
+      T {
+        Dispatch.getRequest(hr).get
+      }.foreach{
+        z =>
+          writeToFile(new File(historicalFolder, s), z)
+      }
+    }
   }
 
 }

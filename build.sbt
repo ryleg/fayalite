@@ -26,7 +26,6 @@ libraryDependencies ++= Seq(
   "com.lihaoyi" %%% "scalatags" % "0.5.2" withSources() withJavadoc() //,
  // "be.doeraene" %%% "scalajs-jquery" % "0.8.0"
 )
-parallelExecution in ThisBuild := false
 
 /*
 jsDependencies += "org.webjars.bower" % "moment" % "2.10.6" / "moment.js"

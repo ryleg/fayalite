@@ -147,11 +147,15 @@ object FayaliteBuild extends sbt.Build {
     base = file("./ml")).settings(
     scalaVersion := "2.11.6",
     libraryDependencies := Seq(
-  //    "xuggle" % "xuggle-xuggler" % "5.2", // For stitching images into video
+      "xuggle" % "xuggle-xuggler" % "5.2", // For stitching images into video
       "com.twitter" % "algebird-core_2.11" % "0.12.0" withSources() withJavadoc(),
       "com.sksamuel.scrimage" %% "scrimage-core" % "2.1.0",
       "com.sksamuel.scrimage" %% "scrimage-io-extra" % "2.1.0",
-      "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.0"
+      "com.sksamuel.scrimage" %% "scrimage-filters" % "2.1.0",
+      "org.scalanlp" %% "breeze" % "0.12",
+      "org.scalanlp" %% "breeze-natives" % "0.12",
+      "org.scalanlp" %% "breeze-viz" % "0.12",
+      "org.apache.spark" %% "spark-core" % "1.6.1" withJavadoc() withSources()
     )
   ) dependsOn core
 

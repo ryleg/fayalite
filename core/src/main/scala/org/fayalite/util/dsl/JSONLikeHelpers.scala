@@ -25,7 +25,7 @@ trait JSONLikeHelpers {
     *         implicits this is where they would
     *         be enacted
     */
-  implicit def AnyJSON(any: Any) : String = any.json
+//  implicit def AnyJSON(any: Any) : String = any.json
 
   /**
     * Translators for any's to JSON to get around

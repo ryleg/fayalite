@@ -24,6 +24,7 @@ with StringFormatHelpers
 with FileHelpUtilities
 with CommonJunk
 with ImageHelp
+with JavaSerHelp
 {
 
   // WARNING : This could cause you problems on import, that's why
