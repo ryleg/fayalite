@@ -16,8 +16,6 @@ trait TradedSecuritySymbolSources {
   val historicalFolder = new File(dataFolder, "historical")
   val securitiesFolder = new File(dataFolder, "securities")
 
-
-
   Try { securitiesFolder.mkdirs(); historicalFolder.mkdirs() }
 
   object Sources {

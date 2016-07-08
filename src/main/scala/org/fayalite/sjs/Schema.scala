@@ -57,11 +57,12 @@ object Schema extends SJSHelp {
     }
     def up0 = this.copy(y=0)
     def left0 = this.copy(x=0)
-    def right = this.copy(x=x+1)
+    def right = this.copy(x=x+1*squareTileSize)
     def right(n: Int) = this.copy(x=x+n*squareTileSize)
     def left = this.copy(x=x-1)
     def up = this.copy(y=y-1)
-    def down = this.copy(y=y+1)
+    def down = this.copy(y=y+1*squareTileSize)
+    def down(n: Int) = this.copy(y=y+n*squareTileSize)
     def *(o: LatCoordD) = { // elementwise
       o.copy(x*o.x, y*o.y)
     }

@@ -248,10 +248,19 @@ with TileCoordinator {
         case (o, l) =>
           val w = wordResolveStr(minXY)
           println("Clicked on w " + w)
-          XHR.post[FileRequest,
-            FileResponse](FileRequest(w), println _, "files")
           wordLast.moveTo(wordHover)
           lastSelectedWord = wordLast.location
+          val selectAsOfPost = lastSelectedWord
+          val parentAsOfPost = w
+          XHR.post[FileRequest,
+          FileResponse](FileRequest(w), {
+            fileResponse =>
+              fileResponse.files.zipWithIndex.foreach{
+                case (f, fidx) =>
+                  val lc = lastSelectedWord.down(fidx+1).right
+                  mkWord(f, lc)
+              }
+          }, "files")
           wordLast.canvas.width = wordHover.canvas.width
           wordLast.clear()
           wordLast.fillAll(lightBlue, 0.25D)

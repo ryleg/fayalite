@@ -174,7 +174,8 @@ class SprayServer(
                   case x if x.getName == r.file =>
                     x.listFiles().toSeq.map{_.getName}
                 }.getOrElse(Seq())
-                completeWithJSON(SpraySchema.FileResponse(topFiles.toArray))
+                val jsonResponse: String = SpraySchema.FileResponse(topFiles.toArray).json
+                completeWithJSON(jsonResponse)
               }
             }
           } ~

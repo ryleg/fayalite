@@ -1,17 +1,9 @@
 package org.fayalite.agg.email
 
 /**
-  * Example code for being able to construct smpt packets
-  * Intended use is for integration with REPL as a streaming
-  * data source. RX/TX And/or for email discovery:
+  * TODO : Integrate with REPL
   *
-  * See http://www.coderanch.com/t/547987/java/java/create-null-sender-javamail
-  *
-  * Courier is backed by javamail
-  *
-  * Telnet request may also work? Try using with DNS lookup on MX servers.
-  *
-  * UNFINISHED, this is just to integrate dependencies / make pre-example.
+  * UNFINISHED. Just for dependencies resolution so far.
   */
 object Email {
 
