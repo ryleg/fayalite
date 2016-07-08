@@ -155,7 +155,7 @@ object FayaliteBuild extends sbt.Build {
       "org.scalanlp" %% "breeze" % "0.12",
       "org.scalanlp" %% "breeze-natives" % "0.12",
       "org.scalanlp" %% "breeze-viz" % "0.12",
-      "org.apache.spark" %% "spark-core" % "1.6.1" withJavadoc() withSources()
+      "org.apache.spark" %% "spark-core" % "1.6.2" withJavadoc() withSources()
     )
   ) dependsOn core
 
