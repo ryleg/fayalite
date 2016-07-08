@@ -129,9 +129,27 @@ object HistoryLoader {
       Thread.currentThread().getContextClassLoader
     )
 
-    val s = ray.length*ray.head.length
-    println(s)
 
+
+    def exportImg(fnm: String) = {
+      val img0 = createImage(ray.length, ray.head.length).black
+      ray.zipWithIndex.foreach { case (z, w) =>
+        z.zipWithIndex.foreach {
+          case (j, q) =>
+            val int: Int = Math.log(Math.pow(j, 2)).toInt
+            img0.setRGB(w, q, int)
+        }
+        if (w % 500 == 0) println(w)
+      }
+      println("Saving")
+      val ri = img0.asInstanceOf[RenderedImage]
+      println("render")
+      val fi = new java.io.File(fnm)
+      ImageIO.write(ri, "JPG", fi)
+    }
+
+    exportImg(".lp2.jpg")
+/*
 
     val m = ray.flatMap{_.distinct}.distinct.sorted.zipWithIndex.toMap
     val mx = 255*255*255
@@ -164,7 +182,7 @@ object HistoryLoader {
       val fi = new java.io.File(fnm)
       ImageIO.write(ri, "JPG", fi)
     }
-
+*/
    // import org.fayalite.util.dsl.JavaSerHelp.serialize
 
   //  serialize(tt).writeAllTo("tt")
