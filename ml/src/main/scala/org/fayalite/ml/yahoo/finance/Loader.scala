@@ -5,12 +5,15 @@ import java.awt.color.ColorSpace
 import java.awt.image.{BufferedImage, DataBufferByte, RenderedImage}
 import java.io.{File, StringReader}
 import java.text.SimpleDateFormat
-import java.util.Date
+import java.time.LocalDate
+import java.util.{Calendar, Date, GregorianCalendar}
 import javax.imageio.ImageIO
 
 import fa._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.fayalite.ml.yahoo.finance.HistoryLoader.{Observe, StockImage}
+
+import scala.util.Try
 
 /**
   * Created by aa on 7/7/2016.
@@ -21,6 +24,12 @@ object Loader {
       val ri = bi.asInstanceOf[RenderedImage]
       val fi = new java.io.File(path)
       ImageIO.write(ri, "JPG", fi)
+    }
+
+    def saveBMP(bi: BufferedImage)(path: String) = {
+      val ri = bi.asInstanceOf[RenderedImage]
+      val fi = new java.io.File(path)
+      ImageIO.write(ri, "BMP", fi)
     }
 
   implicit class SaveAsExt(sv: Seq[String]) {
@@ -75,6 +84,20 @@ object Loader {
 
   case class CompanyHistory(company: String, history: Seq[HistoricalObservation])
 
+  case class EncodedHistoricalObservation(
+                                         dayOffset: Int,
+                                         open: Double,
+                                         high: Double,
+                                         low: Double,
+                                         close: Double,
+                                         volume: Int,
+                                         adjustedClose: Double
+                                         )
+  case class EncodedCompanyHistory(
+                                  companyId: Int,
+                                  encodedHistory: Seq[EncodedHistoricalObservation]
+                                  )
+
   def load() = {
 
     val res = new File(new File("data"), "historical").listFiles()
@@ -99,48 +122,97 @@ object Loader {
           CompanyHistory(fnm.getName, observe)
       }
 
-
+  println("loaded")
 
     val dateCBV = res.flatMap{_.history.map{_.date}}.countByValue()
 
-    val validDates = dateCBV.filter{_._2 > 1500}.map{
-      _._1.getTime
-    }.toSeq
+    println("cbv")
 
-    validDates.map{_.toString}.saveAsTextFile(".validdates")
+    val validDates = dateCBV.filter{_._2 > 1500}.keySet
 
-    val mina = validDates.min
-    val min = validDates.min/100000L
-    val max = (validDates.max - min)/100000L
+    println("validnlen " + validDates.size )
+    println("reslen " + res.size )
 
-    val remaining = res.filter{_.history.forall{z =>
-      z.open < 254 && z.high < 254 && z.close < 254}}
-   // val raz = Array.fill(max.toInt)(Array.fill(remaining.length)(0D))
+    val day0 = validDates.minBy(_.getTime)
+    val day0m = validDates.maxBy(_.getTime)
+    val cl0 = new GregorianCalendar()
+    val cl0m = new GregorianCalendar()
+    cl0.setTime(day0)
+    cl0m.setTime(day0m)
 
-    val img = createImage(remaining.length, max.toInt).black
+    def daysBetween(d2: Date, d1: Date) = {
+      (d2.getTime - d1.getTime) / (1000 * 60 * 60 * 24)
+    }.toInt
+
+    val rng = daysBetween(cl0m.getTime, cl0.getTime)
+
+
+    println(rng + " rng")
+
+    val remaining = res.map{
+      z => z.copy(history = z.history.filter{h => validDates.contains(h.date)})
+    }
+
+   // println("remaining length " + remaining.length)
+
+ //   val img = createImage(remaining.length, rng + 1).black
 
 
     val cid = remaining.sortBy{_.history.mapMax{_.open}}.map{_.company}.zipMap
 
+
+    println("Cidsize " + cid.size)
+/*
     val volume = remaining.flatMap{_.history.map{_.volume}}
     val vmax = volume.max
     val vmin = volume.min
 
     println("Vminmx " + vmax + " " + vmin)
+*/
 
-    remaining.foreach{
+    import HistoryLoader.SerExt
+
+  val fn = remaining.map{
+      z =>
+        cid(z.company) -> z.history.map {
+          h =>
+            val clz = new GregorianCalendar()
+            clz.setTime(h.date)
+            val offset = daysBetween(clz.getTime, cl0.getTime)
+            offset -> h.open
+        }
+    }
+
+     fn.ser(".preimg")
+/*
+
+    remaining.foreachWithIndexPrinter{
      c =>
         c.history.foreach {
           h =>
-            val offset = (h.date.getTime/100000L - min).toInt
-            val rgb = new Color(h.open.toInt, h.high.toInt, h.close.toInt,
-              {{(h.volume - vmin).toDouble/vmax}*255}.toInt).getRGB
-            img.setRGB(cid(c.company), offset, rgb)
+            val clz = new GregorianCalendar()
+            clz.setTime(h.date)
+            val offset = daysBetween(clz.getTime, cl0.getTime)
+            val vlz = { {h.volume.toDouble/vmax}*254}.toInt
+/*            val rgb = new Color(
+              Math.log(h.open).toInt, Math.log(h.high).toInt, Math.log(
+                h.close).toInt,
+              Math.log(vlz).toInt).getRGB*/
+            val rgb = JetColor.jetColor(Math.log(Math.pow(h.open, 2)) / 30).getRGB
+          //  val rgb = Math.log(Math.pow(h.open, 2)).toInt
+            Try {
+              img.setRGB(cid(c.company), offset, rgb)
+            } match {
+              case scala.util.Failure(e) =>
+                println(offset, h.open, h.high, h.close, vlz)
+              case _ =>
+            }
         }
     }
 
     println("Saving")
-    img.save(".c243.png")
+    saveJPG(img)(".jca.jpg")
+*/
 
 /*
     println("numBadDates " + badDates)
@@ -151,8 +223,28 @@ object Loader {
 
 
   }
+
+  def loadAs[T](f: String) = {
+    import org.fayalite.util.dsl.JavaSerHelpExplicit.deserialize
+    import java.nio.file.{Files, Paths}
+    val byteArray = Files.readAllBytes(Paths.get(f))
+    deserialize[T](
+      byteArray,
+      Thread.currentThread().getContextClassLoader
+    )
+  }
+
+  def proc() = {
+    import HistoryLoader.SerExt
+
+    val dt = loadAs[Seq[(Int, Seq[(Int, Double)])]](".preimg")
+
+    println(dt.size)
+
+  }
   def main(args: Array[String]): Unit = {
-    load()
+   // load()
+    proc()
   }
 
 }

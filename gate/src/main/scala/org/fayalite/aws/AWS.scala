@@ -91,9 +91,9 @@ object AWS {
   //checkSpotRequests()
    // destroyInstances
   //  getKeys
-  //  spot()
-    //launchTestServer
-    destroyInstances
+    spot()
+    launchTestServer
+   // destroyInstances
   }
 
   def launchTestServer: Unit = {
