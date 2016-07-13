@@ -1,10 +1,10 @@
 package org.fayalite.util.img
-
-import org.fayalite.ui.WebsocketPipeClient
 import java.awt.image.{DataBufferByte, DataBufferInt, RenderedImage}
-import javax.imageio.ImageIO;
+import javax.imageio.ImageIO
+
 import akka.util.ByteString
 import rx._
+
 import scala.collection.Iterable
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
@@ -108,14 +108,6 @@ object ImageUtils {
     g.setColor(Color.white)
     g.drawString("yo " + scala.util.Random.nextString(10), 100, 100)
     image
-  }
-
-  //TBI
-  def createBinaryTestFrameRequestor() = {
-    val cli = new WebsocketPipeClient()
-    val img = createTestImage()
-    //val frame = BinaryFrame(bufferedImageToByteString(img))
-   // cli.sendFrame(frame)
   }
 
 }

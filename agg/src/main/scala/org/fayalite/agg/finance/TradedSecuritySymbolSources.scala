@@ -5,6 +5,27 @@ import java.io.File
 import scala.util.Try
 import fa._
 
+object Sources {
+
+  // Enums for nasdaq.com company requests.
+
+  val NASDAQ = "NASDAQ"
+  val NYSE = "NYSE"
+  val AMEX = "AMEX"
+
+  /**
+    * Gives URL to download CSV of sources from exchange supported above
+    * @param source : NASDAQ, NYSE, AMEX
+    * @return : CSV Link
+    */
+  def getSource(source: String) = {
+    s"http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=$source&render=download"
+  }
+
+}
+
+
+
 /**
   * For getting lists of company securities symbols
   * See : http://www.nasdaq.com/screening/company-list.aspx
@@ -23,16 +44,6 @@ trait TradedSecuritySymbolSources {
   val securitiesFolder = new File(dataFolder, "securities")
 
   Try { securitiesFolder.mkdirs(); historicalFolder.mkdirs() }
-
-  object Sources {
-    val NASDAQ = "NASDAQ"
-    val NYSE = "NYSE"
-    val AMEX = "AMEX"
-  }
-
-  def getSource(source: String) = {
-    s"http://www.nasdaq.com/screening/companies-by-industry.aspx?exchange=$source&render=download"
-  }
 
   import Sources._
 

@@ -41,8 +41,16 @@ trait CommonJunk {
     minuteFormat.format(today)
   }
 
+  /**
+    * Users sytem home directory as a string,
+    * does not guarantee slash order
+    * @return : String path of file set to user.home
+    */
   def homeDir = System.getProperty("user.home")
 
+  /**
+    * Assumes unix
+    */
   val currentDir = new java.io.File(".").getCanonicalPath + "/"
 
   implicit class AnyDump(a: Any) {

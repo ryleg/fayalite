@@ -1,10 +1,10 @@
 package org.fayalite.util.dsl
 
 import java.io.File
+
 import ammonite.ops.{Path, read, write}
 import com.github.tototoshi.csv.CSVWriter
 import fa._
-import org.fayalite.layer.MessageParser
 import Schema.CodeUpdate
 import org.fayalite.util.JSON
 
@@ -51,7 +51,7 @@ trait FileHelpUtilities {
 
 
   def writeToCSVFile(f: String, cnt: String) = {
-    val fnm = MessageParser.target.toString + "/" + f
+    val fnm = f
     scala.tools.nsc.io.File(
       fnm)
       .writeAll(cnt)

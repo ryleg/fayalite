@@ -33,10 +33,10 @@ class TestSymbolSourceCollect
       }
     }
 
-  println("Parsing from saved data")
 
   ignore("Parse securities") {
 
+    println("Parsing from saved data")
     val symbols = getSymbolsFromLocal
     println("numSymbols", symbols.length)
     assert(symbols.length > 5000)
@@ -50,9 +50,8 @@ class TestSymbolSourceCollect
 
   }
 
-  test("Request historical securities") {
-
-    getSymbolsFromLocal.map { s =>
+  ignore("Request historical securities") {
+    getSymbolsFromLocal.foreach { s =>
       val hr = Yahoo.formatHistoricalRequest(s.encoded)
       T {
         Dispatch.getRequest(hr).get
