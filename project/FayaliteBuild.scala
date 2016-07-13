@@ -165,10 +165,7 @@ object FayaliteBuild extends sbt.Build {
     scalaVersion := "2.11.6",
     organization := "fayalite",
     version := fayaliteVersion,
-    libraryDependencies := Seq(
-      "me.lessis" %% "courier" % "0.1.3" withSources() withJavadoc(),
-      "com.github.mkroli" %% "dns4s-akka" % "0.9" withSources() withJavadoc()
-    ) ++ scalaDeps
+    libraryDependencies ++= scalaDeps
   ) dependsOn core
 
 

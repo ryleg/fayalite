@@ -16,6 +16,8 @@ Remember when creating the VPC you must create a gateway and setup the routes.
  */
 object AppLauncher {
 
+  val fayaliteAMI = "ami-6c480e0c"
+
   val ubuntu1404HVM = "ami-06116566"
   val defaultRegion = Regions.US_WEST_1
   val pubNet = "subnet-ff295988"

@@ -7,10 +7,16 @@ import fa._
 
 /**
   * For getting lists of company securities symbols
+  * See : http://www.nasdaq.com/screening/company-list.aspx
+  *
+  * For complete list see:
+  * http://stackoverflow.com/questions/5246843/how-to-get-a-complete-list-of-ticker-symbols-from-yahoo-finance
+  // Stock research center
+  // https://biz.yahoo.com/r/
+
+  *
   */
 trait TradedSecuritySymbolSources {
-
-  // http://www.nasdaq.com/screening/company-list.aspx
 
   val dataFolder = new File("data")
   val historicalFolder = new File(dataFolder, "historical")

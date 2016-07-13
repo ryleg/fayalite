@@ -91,22 +91,17 @@ object AWS {
   //checkSpotRequests()
    // destroyInstances
   //  getKeys
-    spot()
-    launchTestServer
+    //spot()
+//    launchTestServer
    // destroyInstances
   }
 
-  def launchTestServer: Unit = {
-    awaitSpotFulfillment()
-    resetElasticIP
-    println("Done")
-  }
-
-  def resetElasticIP = {
-    val ar = new AssociateAddressRequest(
-      getRunningInstances.head.getInstanceId,"52.8.59.72")
-    ec2.associateAddress(ar)
-  }
+  /**
+    * Get all IP addresses associated with account in
+    * Scala friendly form
+    * @return : Addresses, i.e. an elastic IP
+    */
+  def getAddresses = ec2.describeAddresses().getAddresses.toSeq
 
   def getRunningInstances = {
     ec2.describeInstances()
@@ -119,84 +114,4 @@ object AWS {
       }.toList
   }
 
-  def checkSpotRequests(): Unit = {
-    getSpotRequests.foreach {
-      q =>
-        println(
-          q.getType + " @ " +
-          q.getSpotPrice + " " +
-          q.getState + " " +
-          q.getStatus.getMessage
-        )
-    }
-  }
-
-  def getSpotRequests = {
-    ec2.describeSpotInstanceRequests().getSpotInstanceRequests.toSeq
-  }
-
-  def awaitSpotFulfillment() = {
-    var done = false
-    while (!done) {
-      val anyDone = getSpotRequests.exists{
-        _.getState == "active"
-      } && getRunningInstances.nonEmpty
-      println("Any done? " + anyDone)
-      done = anyDone
-      getSpotRequests.foreach{
-        z => println(z.getState)
-      }
-      Thread.sleep(10*1000)
-    }
-
-  }
-
-  def spot() = {
-
-    val requestRequest = new RequestSpotInstancesRequest()
-    requestRequest.setSpotPrice("0.10")
-    requestRequest.setInstanceCount(Integer.valueOf(1))
-    val launchSpecification = new LaunchSpecification()
-    launchSpecification.setImageId(AppLauncher.ubuntu1404HVM)
-    launchSpecification.setInstanceType("c4.xlarge")
-    launchSpecification.setKeyName("fa")
-
-    // Add the security group to the request.
-    val securityGroups = new util.ArrayList[String]()
-
-    val vpc = ec2.describeVpcs().getVpcs.map{
-      q =>
-        q.getVpcId
-    }
-    println("VPC ids " + vpc.toList)
-
-    ensureSG
-
-    securityGroups.add("fayalite")
-    launchSpecification.setSecurityGroups(securityGroups)
-
-    // Add the launch specifications to the request.
-    requestRequest.setLaunchSpecification(launchSpecification)
-
-    // Call the RequestSpotInstance API.
-    val requestResult = ec2.requestSpotInstances(requestRequest)
-
-  }
-
-  def ensureSG: Unit = Try {
-    val sgs = ec2.describeSecurityGroups().getSecurityGroups
-    if (!sgs.contains("fayalite")) {
-      println("Creating security group")
-      val csg = new CreateSecurityGroupRequest(
-        "fayalite", "na")
-      csg.withVpcId("vpc-a9757ccb")
-      ec2.createSecurityGroup(csg)
-      val ipp = new IpPermission()
-      ipp.setFromPort(22)
-      ipp.setToPort(22)
-      ipp.setIpProtocol("TCP")
-      val ac = new AuthorizeSecurityGroupIngressRequest("fayalite", List(ipp))
-      ec2.authorizeSecurityGroupIngress(ac)
-    }
-  }
 }
