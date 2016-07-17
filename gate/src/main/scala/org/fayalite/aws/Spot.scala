@@ -44,19 +44,22 @@ object Spot {
     ec2.describeSpotInstanceRequests().getSpotInstanceRequests.toSeq
   }
 
-
   def launchTestServer() {
+    spot()
     awaitSpotFulfillment()
     resetElasticIP
     println("Done")
   }
 
   def main(args: Array[String]): Unit = {
+    launchTestServer()
   }
 
   def resetElasticIP = {
+    val firstAddress = AWS.getAddresses.head.getPublicIp
+    println("firstAddress " + firstAddress)
     val ar = new AssociateAddressRequest(
-      AWS.getRunningInstances.head.getInstanceId,"52.8.59.72")
+      AWS.getRunningInstances.head.getInstanceId,firstAddress)
     ec2.associateAddress(ar)
   }
 
@@ -100,7 +103,7 @@ object Spot {
     requestRequest.setSpotPrice("0.10")
     requestRequest.setInstanceCount(Integer.valueOf(1))
     val launchSpecification = new LaunchSpecification()
-    launchSpecification.setImageId(AppLauncher.ubuntu1404HVM)
+    launchSpecification.setImageId(AppLauncher.fayaliteAMI)
     launchSpecification.setInstanceType("c4.xlarge")
     launchSpecification.setKeyName("fa")
 
