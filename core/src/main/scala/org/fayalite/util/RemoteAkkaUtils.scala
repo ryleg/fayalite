@@ -2,7 +2,6 @@ package org.fayalite.util
 
 import akka.actor.{Props, Actor, ActorSystem}
 import com.typesafe.config.ConfigFactory
-import org.fayalite.repl.REPL._
 import akka.pattern.ask
 import scala.tools.nsc.interpreter
 import scala.util.{Failure, Success, Try}
@@ -107,6 +106,7 @@ object RemoteAkkaUtils  {
     implicit localActorSystem: ActorSystem,
     remoteActorPath: RemoteActorPath
     ) = {
+    import fa._
     val actorPath = s"akka.tcp://${
       remoteActorPath.remoteActorSystemName}" +
       s"@${remoteActorPath.host}:${remoteActorPath.port}/user/" +

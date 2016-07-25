@@ -13,8 +13,6 @@ import scala.collection.mutable
 import scala.util.Try
 
 
-
-
 trait TileCoordinator {
 
   val absoluteLatResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
@@ -51,35 +49,6 @@ trait TileCoordinator {
   val wordLast =
     createCanvasZeroSquare(minSize, lightBlue, .01D)
 
-  // TODO : NOT THIS its just an example don't judge.
-  def reactIsValModifier(c: String, t: CanvasContextInfo) = {
-    if (c == "l" &&
-      indexLatResolve.get(t.latCoords.left)
-        .exists {
-          _.text.exists {
-            _ == "a"
-          }
-        } &&
-      indexLatResolve.get(t.latCoords.left.left)
-        .exists {
-          _.text.exists {
-            _ == "v"
-          }
-        } &&
-      indexLatResolve.get(t.latCoords.left.left.left).isEmpty
-    ) {
-      Seq(
-        t,
-        indexLatResolve.get(t.latCoords.left).get,
-        indexLatResolve.get(t.latCoords.left.left).get
-      ).foreach {
-        z =>
-          z.context.clearRect(0D, 0D, z.tileSize, z.tileSize)
-          z.drawText(z.text.get, keywordOrange)
-      }
-    }
-  }
-
   def handleBackspace(ke: KeyboardEvent) = {
     ke.preventDefault()
     val k = mLast.absoluteCoords.fromAbsolute.left.toAbsolute
@@ -103,7 +72,7 @@ trait TileCoordinator {
     absoluteLatResolve(t.absoluteCoords) = t
     indexLatResolve(t.latCoords) = t
     Try{t.drawText(c)}
-    reactIsValModifier(c, t)
+    //reactIsValModifier(c, t)
     t
   }
 
