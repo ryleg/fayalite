@@ -9,8 +9,6 @@ import spray.can.server.UHttp
 import spray.can.Http
 import rx._
 import spray.routing
-import spray.routing.StandardRoute
-
 
 /**
   * A disposable / changeable message processing
@@ -18,7 +16,7 @@ import spray.routing.StandardRoute
   * side effects allowed. Process loop in a vacuum
   */
 trait MessageProcesser
-  extends spray.routing.Directives // For making getFromFile work
+  extends RoutingCompletions
 {
 
   /**
@@ -32,64 +30,6 @@ trait MessageProcesser
     */
   val route: Var[(akka.actor.ActorRefFactory => routing.Route)]
 
-
-  /**
-    * Allows use of ScalaTags to render HTML
-    * and complete a get request with a String of full html
-    * for the page render
-    *
-    * @param html : Full HTML of page to render as if you
-    *             read it from index.html
-    * @return : Route with response.
-    */
-  def completeWith(html: String): StandardRoute = {
-    import spray.http.MediaTypes._
-    respondWithMediaType(`text/html`) & complete {
-      html
-    }
-  }
-
-  def completeWithJSON(rendered: String): StandardRoute = {
-    import spray.http.MediaTypes._
-    respondWithMediaType(`application/json`) & complete {
-      rendered
-    }
-  }
-
-  /**
-    * Same idea as above but allows spray to complete directly
-    * with JS string file contents
-    * @param js : File contents of a standard .js as a single string
-    * @return : Routing directive allowing that .js to be served
-    *         avoiding the use of getFromFile to allow .js to be served
-    *         out of a virtual file system / DB
-    */
-  def completeWithJS(js: String): StandardRoute = {
-    import spray.http.MediaTypes._
-    respondWithMediaType(`application/javascript`) & complete {
-      js
-    }
-  }
-
-  val defaultIndexPage = {
-    import scalatags.Text.all._
-    // "<!DOCTYPE html>" + // ?Necessary?
-    html(
-      scalatags.Text.all.head(
-        scalatags.Text.tags2.title("fayalite"),
-        meta(charset := "UTF-8")
-      )
-      ,
-      body(
-        script(
-          src := "fayalite-fastopt.js",
-          `type` := "text/javascript"),
-        script("org.fayalite.sjs.App().main()",
-          `type` := "text/javascript")
-      )
-    ).render
-  }
-
 }
 
 object SpraySchema {
@@ -100,6 +40,13 @@ object SpraySchema {
 /**
   * Simple box around Spray to get a quick
   * server up with WS / REST
+  *
+  * NOTE: If you wish to serve .js files directly as responses
+  * (for executing different user's .js versions,) instead of
+  * attempting to compile project with different name -- look
+  * for //# sourceMappingURL=fayalite-fastopt.js.map at the bottom
+  * of the fastOptJS output and change to reflect where you are serving
+  * the map
   *
   * @param port : To bind on, assumes open host ip
   */
@@ -148,7 +95,7 @@ class SprayServer(
     val route = Var { (ctx: ActorRefFactory) => {
       {
         implicit val refFactory = ctx
-        val defaultRoute = completeWith(defaultIndexPage) // getFromFile("index.html")
+        val defaultRoute = completeWith(PageRender.defaultIndexPage) // getFromFile("index.html")
         pathPrefix("fayalite") {
           get {
             unmatchedPath { path =>
