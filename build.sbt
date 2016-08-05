@@ -28,6 +28,7 @@ libraryDependencies ++= Seq(
 )
 
 jsDependencies += "org.webjars" % "ace" % "1.2.3" / "src/ace.js"
+
 /*
 jsDependencies += "org.webjars.bower" % "moment" % "2.10.6" / "moment.js"
 

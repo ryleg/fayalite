@@ -9,7 +9,6 @@ import javax.imageio.ImageIO
 
 import breeze.linalg.{DenseMatrix, SparseVector}
 import com.sun.jna.platform.unix.X11.Colormap
-import com.xuggle.mediatool.{IMediaViewer, ToolFactory}
 import fa._
 import org.apache.spark.{SparkConf, SparkContext}
 import org.fayalite.util.dsl.{JavaSerHelp, JavaSerHelpExplicit}
@@ -77,11 +76,12 @@ object HistoryLoader {
   case class StockImage(company: Int, image: Seq[Observe])
   case class CompanyPrice(company: Int, price: Double)
 
-
+/*
 
   def brokenXuggleTest = {
     // default time is microseconds, 60~ fps is ~15000L microseconds
     var nextFrameTime = 0L
+    import com.xuggle.mediatool.{IMediaViewer, ToolFactory}
 
     val img = createImage(320, 200)
 
@@ -116,7 +116,8 @@ object HistoryLoader {
         vid(img)
     }
 
-  }
+  }*/
+
   def main(args: Array[String]): Unit = {
 
     import org.fayalite.util.dsl.JavaSerHelpExplicit.deserialize
