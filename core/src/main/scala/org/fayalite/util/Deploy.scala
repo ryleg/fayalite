@@ -1,3 +1,4 @@
+/*
 package org.fayalite.util
 
 import akka.actor.Actor
@@ -23,3 +24,4 @@ object Deploy {
   }
 
 }
+*/

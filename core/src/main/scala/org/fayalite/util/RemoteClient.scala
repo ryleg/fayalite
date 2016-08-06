@@ -1,3 +1,4 @@
+/*
 package org.fayalite.util
 
 import org.fayalite.util.RemoteAkkaUtils._
@@ -34,4 +35,4 @@ class RemoteClient(port: Int=rport) {
     at match { case Failure(e) => e.printStackTrace(); case _ => }
     at.toOption
   }
-}
+}*/

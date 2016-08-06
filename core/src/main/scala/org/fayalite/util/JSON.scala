@@ -1,6 +1,5 @@
 package org.fayalite.util
 
-import org.fayalite.repl.REPL.SuperInstruction
 import org.json4s.jackson.JsonMethods._
 import org.json4s.{DefaultFormats, Extraction, _}
 

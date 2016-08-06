@@ -11,7 +11,7 @@ import org.apache.spark.rdd.RDD
   */
 object DebugAWSLoad {
 
-  val sc: SparkContext = _
+  val sc: SparkContext = null
 
 
   def main(args: Array[String]): Unit = {

@@ -5,7 +5,6 @@ import org.fayalite.util.JSON
 
 import scala.concurrent.{Future, Await}
 
-import org.fayalite.repl.REPL._
 
 import scala.util.Try
 

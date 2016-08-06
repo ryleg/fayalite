@@ -150,10 +150,7 @@ with TileCoordinator {
     println("Input bootstrap")
     //mkMinTile("AD")
 
-    window.onkeyup = (ke: KeyboardEvent) => {
-
-    }
-
+/*
     document.onkeydown = (ke: KeyboardEvent) => {
       val numShifts = if (ke.ctrlKey) {
         if (ke.altKey) 3 else 2
@@ -178,7 +175,7 @@ with TileCoordinator {
         case _ =>
       }
     }
-
+/**/
     document.onkeypress = (ke: KeyboardEvent) => {
       val chr = ke.keyString
       codeSample += chr
@@ -201,6 +198,7 @@ with TileCoordinator {
       _ =>
         mLast.onOff()
     }
+/**/
 
     var lastSelectedWord : LatCoord = LatCoord(0,0)
 
@@ -235,6 +233,7 @@ with TileCoordinator {
           wordLast.fillAll(lightBlue, 0.25D)
       }
     }
+*/
 
     window.onmousemove = (me: MouseEvent) => {
       //println("ON Mouse move")

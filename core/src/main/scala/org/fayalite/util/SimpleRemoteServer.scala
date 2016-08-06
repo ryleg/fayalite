@@ -1,3 +1,4 @@
+/*
 package org.fayalite.util
 
 import akka.actor.{Actor, Props}
@@ -17,3 +18,4 @@ class SimpleRemoteServer(actorDeploy: => Actor, port: Int = rport) {
   val deployedActor = actorSystem.actorOf(Props(actorDeploy), name=serverActorName)
 
 }
+*/
