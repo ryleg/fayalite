@@ -8,6 +8,7 @@ object PageRender {
     html(
       scalatags.Text.all.head(
         scalatags.Text.tags2.title("fayalite"),
+        link(rel := "icon", href := "img/fay16x16.png"),
         meta(charset := "UTF-8")
       )
       ,

@@ -1,10 +1,12 @@
 package org.fayalite.sjs.input
 
+import javafx.scene.input.MouseButton
+
 import org.fayalite.sjs.Schema.{CanvasContextInfo, LatCoord}
 import org.fayalite.sjs.canvas.CanvasBootstrap._
 import org.fayalite.sjs.comm.XHR
 import org.scalajs.dom._
-import org.scalajs.dom.ext.KeyCode
+import org.scalajs.dom.ext.{Image, KeyCode}
 import rx.ops.{DomScheduler, Timer}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -12,8 +14,20 @@ import scala.concurrent.duration._
 import scala.collection.mutable
 import scala.util.Try
 
-
-trait TileCoordinator {
+/**
+  * A lot of this is low-performance and garbage. But it's convenient to setup
+  * this way because the ideal structure for char manipulation / large char graphs
+  * is one where you have direct access to byte pixel data (for server side synchronization)
+  * and for reducing rendering time. Each canvas should ideally be able to 'drop' pixel data
+  * down from those that it overlays, so that we can consider all user operations as transformations
+  * on a single uber-canvas. (For rendering performance, we want around a few hundred different
+  * canvas elements, maybe even a few thousands, each of which handles portions / areas of screen.
+  * This gives us translations / rotations in pixeldata space at a lower computational cost.
+  *
+  * Ideally, canvas char render representations should be pre-cached, mixed between DOM nodes
+  * and capable of swapping between canvas areas by direct pixel representations.
+  */
+trait TileCoordinator extends InputHelp {
 
   val absoluteLatResolve = mutable.HashMap[LatCoord, CanvasContextInfo]()
 
@@ -44,7 +58,7 @@ trait TileCoordinator {
     createCanvasZeroSquare(minSize, methodGold, .1D)
 
   val wordHover =
-    createCanvasZeroSquare(minSize, commentGreen, .5D)
+    createCanvasZeroSquare(minSize, commentGreen, .2D)
 
   val wordLast =
     createCanvasZeroSquare(minSize, lightBlue, .01D)
@@ -90,11 +104,63 @@ trait TileCoordinator {
   }
 
   val wordResolve = mutable.HashMap[LatCoord, Array[CanvasContextInfo]]()
+  val wordIdResolve = mutable.HashMap[Int, Word]()
+  val wordIdResolveLocation = mutable.HashMap[LatCoord, Word]()
   val wordResolveArea = mutable.HashMap[LatCoord, (LatCoord, Int)]()
   val wordResolveStr = mutable.HashMap[LatCoord, String]()
+  val wordResolveType = mutable.HashMap[LatCoord, String]()
+  var wordHoverTooltipActive = false
+  var wordHoverTooltipProccing = false
 
+  def mkTransientTooltip(location: LatCoord, toolTip: String) = {
+    val word = mkWord("[" + toolTip + "]", location.up)
+    val tooltipBG = createCanvasZeroSquare(minSize, darkGrey, 1D, zIndex = 4)
+    tooltipBG.move(word.origin)
+    tooltipBG.canvas.width = word.word.length*minSize
+    tooltipBG.clear()
+    tooltipBG.fillAll(darkerBlackBlue, 1D)
 
-  def mkWord(word: String, origin: LatCoord) = {
+    wordHoverTooltipActive = true
+    setTimeout(() => {
+      println("attempting delete")
+      word.delete()
+      tooltipBG.delete()
+      wordHoverTooltipActive = false
+    }, 2500D)
+  }
+
+  var lastWordId = 0
+
+  case class Word(id: Int, word: String, origin: LatCoord, renders: Seq[CanvasContextInfo]) {
+
+    def delete(): Unit = {
+      wordResolve.remove(origin)
+      wordResolveType.remove(origin)
+      val len = word.length
+      (0 until len).foreach { i =>
+        wordResolveStr.remove(origin.right(i))
+        wordResolveArea.remove(origin.right(i))
+      }
+      renders.foreach{
+        r =>
+          document.body.removeChild(r.canvas)
+      }
+    }
+    val children = mutable.HashSet[Word]()
+  }
+
+  val defaultZIndex = 3
+
+  val RIGHT_MOUSE_CODE = 2
+  val LEFT_MOUSE_CODE = 0
+
+  //val testImage = Image.createBase64Svg("TestBase64SVG")
+  //testImage.style.zIndex = "20"
+  //appendBody(testImage)
+
+  def mkWord(word: String, origin: LatCoord, zIndex: Int = defaultZIndex) = {
+    val id = lastWordId
+    lastWordId += 1
     val tempCnvRenders = word.map{_.toString}.map{mkCharLikeSquareNode}
     tempCnvRenders.head.move(origin)
     updateCoords(tempCnvRenders.head)
@@ -110,15 +176,29 @@ trait TileCoordinator {
           c.shiftRight()
         }
         updateCoords(c)
+        c.canvas.onmousedown = (me: MouseEvent) => {
+          if (me.button == RIGHT_MOUSE_CODE) {
+            c.isMoving = true
+            c.canvas.onmousemove = (mve: MouseEvent) => {
+              c.move(mve.tileCoordinates(minSize))
+            }
+            c.canvas.onmouseup = (mue: MouseEvent) => {
+              c.canvas.onmousemove = (mve: MouseEvent) => ()
+              c.isMoving = false
+            }
+          }
+        }
     }
     val len = word.length
-
 
     wordResolve(origin) = tempCnvRenders.toArray
     (0 until len).foreach { i =>
       wordResolveStr(origin.right(i)) = word
       wordResolveArea(origin.right(i)) = origin -> len
     }
+    val wordc = Word(id, word, origin, tempCnvRenders)
+    wordIdResolveLocation(origin) = wordc
+    wordc
   }
 
 }
@@ -127,8 +207,7 @@ trait TileCoordinator {
   * Setup listeners for inputs from client
   * in terms of mouse / key actions
   */
-object InputBootstrap extends InputHelp
-with TileCoordinator {
+object InputBootstrap extends TileCoordinator {
 
   case class FileResponse(files: Array[String])
 
@@ -145,12 +224,13 @@ with TileCoordinator {
 
   var codeSample = ""
 
+
   def init() : Unit = {
-    //disableRightClick() // TODO : Enable when scrolling is implemented
+    disableRightClick() // TODO : Enable when scrolling is implemented
     println("Input bootstrap")
     //mkMinTile("AD")
 
-/*
+
     document.onkeydown = (ke: KeyboardEvent) => {
       val numShifts = if (ke.ctrlKey) {
         if (ke.altKey) 3 else 2
@@ -175,7 +255,7 @@ with TileCoordinator {
         case _ =>
       }
     }
-/**/
+
     document.onkeypress = (ke: KeyboardEvent) => {
       val chr = ke.keyString
       codeSample += chr
@@ -198,11 +278,11 @@ with TileCoordinator {
       _ =>
         mLast.onOff()
     }
-/**/
+
 
     var lastSelectedWord : LatCoord = LatCoord(0,0)
 
-    window.onmousedown = (me: MouseEvent) => {
+    window.onmousedown = (me: MouseEvent) => if (me.button == LEFT_MOUSE_CODE) {
       val minXY = me.tileCoordinates(minSize)
       val bulXY = me.tileCoordinates(bulkSize)
       mLast.move(minXY)
@@ -224,16 +304,16 @@ with TileCoordinator {
             fileResponse =>
               fileResponse.files.zipWithIndex.foreach{
                 case (f, fidx) =>
-                  val lc = lastSelectedWord.down(fidx+1).right
-                  mkWord(f, lc)
+                  val lc = selectAsOfPost.down(fidx+1).right
+                  val cw = mkWord(f, lc)
+                  selectAsOfPost
               }
           }, "files")
           wordLast.canvas.width = wordHover.canvas.width
           wordLast.clear()
-          wordLast.fillAll(lightBlue, 0.25D)
+          wordLast.fillAll(lightBlue, 0.12D)
       }
     }
-*/
 
     window.onmousemove = (me: MouseEvent) => {
       //println("ON Mouse move")
@@ -241,14 +321,27 @@ with TileCoordinator {
       val getOptH = wordResolveArea.get(coordH)
       getOptH.foreach{
         case (origin, len) =>
-        //  println("Moving")
+          //  println("Moving")
           wordHover.move(origin)
           wordHover.canvas.width = len*minSize
           wordHover.clear()
-          wordHover.fillAll(commentGreen, 0.2D)
+          wordHover.fillAll(commentGreen, 0.12D)
+
+          if (!wordHoverTooltipActive && !wordHoverTooltipProccing) {
+            setTimeout(() => {
+              if (wordHover.location == origin) {
+                wordResolveType.get(origin).foreach { typ =>
+                  mkTransientTooltip(origin, typ)
+                }
+              }
+              wordHoverTooltipProccing = false
+            }, 1200D)
+            wordHoverTooltipProccing = true
+          }
       }
       if (getOptH.isEmpty) {
         wordHover.clear()
+        wordHover.move(LatCoord(-1, -1))
       }
 
       mHover.move(coordH)

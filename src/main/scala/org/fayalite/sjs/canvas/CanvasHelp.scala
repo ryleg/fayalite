@@ -257,7 +257,7 @@ trait CanvasHelp extends SJSHelp {
       move(other.left, other.top)
     }
 
-    def setBorder(hexColor: String, numPixels: Int, alpha: Double = .17D) = {
+    def setBorder(hexColor: String, numPixels: Int, alpha: Double = .09D) = {
       fill(0D, 0D, getWidth, numPixels.toDouble, hexColor, alpha) // top
       fill(0D, getHeight, getWidth, -1*numPixels.toDouble, hexColor, alpha) // bottom
       fill(0D, 0D, numPixels.toDouble, getHeight, hexColor, alpha) // left
@@ -268,8 +268,8 @@ trait CanvasHelp extends SJSHelp {
                   text: String,
                   hexColor: String = methodGold,
                   alpha: Double = 1D,
-                  x: Double = 8D,
-                  y: Double = 20D
+                  x: Double = 5D,
+                  y: Double = 14D
                 ) = {
       color{
         ctxi.fillText(text, x, y)
@@ -295,8 +295,8 @@ trait CanvasHelp extends SJSHelp {
 
   def createCanvasWithPosition(left: Int = 0,
                                top: Int = 0,
-                               width: Int = 27,
-                               height: Int = 27,
+                               width: Int = CanvasBootstrap.minSize,
+                               height: Int = CanvasBootstrap.minSize,
                                zIndex: Int = 3
                   ): CanvasContextInfo = {
     val cv = createCanvas(zIndex)

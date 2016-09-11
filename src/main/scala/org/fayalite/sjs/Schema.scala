@@ -3,6 +3,7 @@ package org.fayalite.sjs
 
 import org.fayalite.sjs.canvas.CanvasBootstrap
 import org.scalajs.dom
+import org.scalajs.dom.Node
 import org.scalajs.dom.raw.CanvasRenderingContext2D
 import org.scalajs.dom.raw.HTMLCanvasElement
 import rx.core.{Rx, Var}
@@ -24,6 +25,9 @@ object Schema extends SJSHelp {
                             cookies: String,
                             requestId: String
                           )
+
+  val defaultFont = "12pt monospace"
+
   /**
     * This is used because the canvas
     * engine requires setting flags in advance of draw
@@ -36,18 +40,27 @@ object Schema extends SJSHelp {
     *                    as in png for draw call
     */
   case class CanvasStyling(
-                            font: String = "14pt monospace",
+                            font: String = defaultFont,
                             fillStyle: String =  lightBlue,
                             globalAlpha: Double = 1D
                           )
+
+  trait DeleteAble {
+    val node: Node
+    def delete(): Unit = {
+      node.parentNode.removeChild(node)
+    }
+  }
 
   case class CanvasContextInfo(
                               canvas: HTMLCanvasElement,
                               context: CanvasRenderingContext2D,
                               tileSize: Int = CanvasBootstrap.minSize,
                               text: Option[String] = None
-                              ) {
+                              ) extends DeleteAble {
+    val node = canvas
     var location = LatCoord(0, 0)
+    var isMoving = false
   }
 
   case class LatCoord(x: Int, y: Int)(implicit squareTileSize : Int =
@@ -60,7 +73,7 @@ object Schema extends SJSHelp {
     def right = this.copy(x=x+1*squareTileSize)
     def right(n: Int) = this.copy(x=x+n*squareTileSize)
     def left = this.copy(x=x-1)
-    def up = this.copy(y=y-1)
+    def up = this.copy(y=y-1*squareTileSize)
     def down = this.copy(y=y+1*squareTileSize)
     def down(n: Int) = this.copy(y=y+n*squareTileSize)
     def *(o: LatCoordD) = { // elementwise

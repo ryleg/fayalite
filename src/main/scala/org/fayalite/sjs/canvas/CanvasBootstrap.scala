@@ -20,8 +20,9 @@ trait CanvasTileUtils extends DOMHelp {
     * character sequences for re-use.
     */
 
-  val minSize = 27
-  val bulkSize = minSize*9
+  val minSize = 18
+  val bulkMultiplier = 9
+  val bulkSize = minSize*bulkMultiplier
 
   /**
     * Used for the background optimized render subgrids.
@@ -105,7 +106,7 @@ with CanvasTileUtils
       cvTx.canvas.style.top = (tileYIndex * bulkSize).toString
       cvTx.setBackground(ansiDarkGrey)
       cvTx.setBorder(lightBlue, 1)
-      cvTx.grid(9)
+      cvTx.grid(bulkMultiplier)
       cvTx
     }
 

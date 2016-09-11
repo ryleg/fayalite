@@ -1,3 +1,0 @@
-export NAMENODE_DIR=/mnt/ephemeral-hdfs/dfs/name
-export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64/
-export HOME=/root/

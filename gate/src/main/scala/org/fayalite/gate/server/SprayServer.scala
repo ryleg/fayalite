@@ -105,8 +105,8 @@ class SprayServer(
               getFromFile(f)
             }
           }
-        } ~
-          path("files") {
+        } ~ pathPrefix("img") {getFromResourceDirectory("img")} ~
+            path("files") {
             get {
               import fa._
               completeWithJSON(FSCodePull.getTopLevelFiles.map{_.getName}.json)
