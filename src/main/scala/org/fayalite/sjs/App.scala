@@ -21,7 +21,6 @@ object App extends JSApp {
 
   @JSExport
   def main(): Unit = {
-    println("SJS fayalite initialized")
     canvas.CanvasBootstrap.init()
     input.InputBootstrap.init()
     meta.MetaBootstrap.init()

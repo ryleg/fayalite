@@ -10,7 +10,7 @@ object MetaBootstrap {
 
     XHR.requestTopLevelFiles{
       f =>
-        println("Attempting mkWord", f.head)
+     //   println("Attempting mkWord", f.head)
         val coord: LatCoord = LatCoord(CanvasBootstrap.minSize * 5, CanvasBootstrap.minSize * 5)
         InputBootstrap.wordResolveType(coord) = "Folder"
         InputBootstrap.mkWord(f.head, coord)

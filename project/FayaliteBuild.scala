@@ -10,7 +10,7 @@ object FayaliteBuild extends sbt.Build {
   bintray.BintrayKeys.bintrayVcsUrl := Some("git@github.com:ryleg/fayalite.git")
 
   val scalaV = "2.11.6"
-  val fayaliteVersion = "0.0.5"
+  val fayaliteVersion = "0.0.6"
 
   val scalaDeps = Seq(
     "org.scala-lang"    %   "scala-compiler"      % scalaV withJavadoc() withSources(),

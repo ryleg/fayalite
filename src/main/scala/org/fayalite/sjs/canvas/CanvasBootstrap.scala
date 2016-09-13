@@ -66,7 +66,7 @@ with CanvasTileUtils
     // package later
 
     // Initialization checks
-    printDebugInfo()
+    //printDebugInfo()
 
     // Disable scroll bar
     document.body.style.overflow = "hidden"

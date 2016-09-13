@@ -122,7 +122,7 @@ trait TileCoordinator extends InputHelp {
 
     wordHoverTooltipActive = true
     setTimeout(() => {
-      println("attempting delete")
+   //   println("attempting delete")
       word.delete()
       tooltipBG.delete()
       wordHoverTooltipActive = false
@@ -158,6 +158,8 @@ trait TileCoordinator extends InputHelp {
   //testImage.style.zIndex = "20"
   //appendBody(testImage)
 
+  var activeMovingContext : Option[CanvasContextInfo] = None
+
   def mkWord(word: String, origin: LatCoord, zIndex: Int = defaultZIndex) = {
     val id = lastWordId
     lastWordId += 1
@@ -176,18 +178,6 @@ trait TileCoordinator extends InputHelp {
           c.shiftRight()
         }
         updateCoords(c)
-        c.canvas.onmousedown = (me: MouseEvent) => {
-          if (me.button == RIGHT_MOUSE_CODE) {
-            c.isMoving = true
-            c.canvas.onmousemove = (mve: MouseEvent) => {
-              c.move(mve.tileCoordinates(minSize))
-            }
-            c.canvas.onmouseup = (mue: MouseEvent) => {
-              c.canvas.onmousemove = (mve: MouseEvent) => ()
-              c.isMoving = false
-            }
-          }
-        }
     }
     val len = word.length
 
@@ -227,7 +217,7 @@ object InputBootstrap extends TileCoordinator {
 
   def init() : Unit = {
     disableRightClick() // TODO : Enable when scrolling is implemented
-    println("Input bootstrap")
+   // println("Input bootstrap")
     //mkMinTile("AD")
 
 
@@ -238,7 +228,7 @@ object InputBootstrap extends TileCoordinator {
 
       ke.keyCode match {
         case KeyCode.a if ke.ctrlKey =>
-          println("Cell capture attempt ")
+        //  println("Cell capture attempt ")
         case KeyCode.backspace =>
           handleBackspace(ke)
         case KeyCode.left =>
@@ -263,9 +253,7 @@ object InputBootstrap extends TileCoordinator {
       ke.keyCode match {
         case KeyCode.enter =>
           mLast.shiftDownLeftZero(minSize)
-          println("Code sample " + codeSample)
-
-
+        //  println("Code sample " + codeSample)
         case KeyCode.backspace =>
           handleBackspace(ke)
         case kc =>
@@ -294,7 +282,8 @@ object InputBootstrap extends TileCoordinator {
       maybeTuple.foreach {
         case (o, l) =>
           val w = wordResolveStr(minXY)
-          println("Clicked on w " + w)
+          val charContext = absoluteLatResolve(minXY)
+        //  println("Clicked on w " + w)
           wordLast.moveTo(wordHover)
           lastSelectedWord = wordLast.location
           val selectAsOfPost = lastSelectedWord

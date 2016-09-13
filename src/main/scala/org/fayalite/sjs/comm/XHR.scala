@@ -22,7 +22,7 @@ object XHR {
           import upickle._
           read[Array[String]](xhr.responseText)
         }
-        println("XHR response", text.toSeq)
+      //  println("XHR response", text.toSeq)
         callback(text)
       } // else println("XHR response failure")
     }
@@ -41,7 +41,7 @@ object XHR {
       if (xhr.readyState == 4 && xhr.status == 200) {
         val text = {
           import upickle._
-          println("Response text", xhr.responseText)
+       //   println("Response text", xhr.responseText)
           read[R](xhr.responseText)
         }
         callback(text)
