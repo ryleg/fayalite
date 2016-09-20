@@ -147,6 +147,11 @@ trait TileCoordinator extends InputHelp {
       }
     }
     val children = mutable.HashSet[Word]()
+    def move(toAbs: LatCoord => LatCoord) = {
+      val adjusted = toAbs(origin)
+
+      copy(origin=adjusted)
+    }
   }
 
   val defaultZIndex = 3
@@ -229,6 +234,7 @@ object InputBootstrap extends TileCoordinator {
       ke.keyCode match {
         case KeyCode.a if ke.ctrlKey =>
         //  println("Cell capture attempt ")
+          // TODO :  Change this, yucky here.
         case KeyCode.backspace =>
           handleBackspace(ke)
         case KeyCode.left =>
@@ -269,8 +275,8 @@ object InputBootstrap extends TileCoordinator {
 
 
     var lastSelectedWord : LatCoord = LatCoord(0,0)
-
-    window.onmousedown = (me: MouseEvent) => if (me.button == LEFT_MOUSE_CODE) {
+    // if (me.button == LEFT_MOUSE_CODE)
+    window.onmousedown = (me: MouseEvent) => {
       val minXY = me.tileCoordinates(minSize)
       val bulXY = me.tileCoordinates(bulkSize)
       mLast.move(minXY)
@@ -302,7 +308,9 @@ object InputBootstrap extends TileCoordinator {
           wordLast.clear()
           wordLast.fillAll(lightBlue, 0.12D)
       }
-    }
+    } // else if (me.button == RIGHT_MOUSE_CODE) {
+
+   // }
 
     window.onmousemove = (me: MouseEvent) => {
       //println("ON Mouse move")
